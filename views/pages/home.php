@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($tituloDaPagina) ?></title>
+    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/index.css">
+    <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/header.php';?>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
-        header { background: #111; color: #fff; padding: 20px; text-align: center; }
         .categorias { display: flex; justify-content: center; gap: 15px; padding: 20px; list-style: none; }
         .categorias a { text-decoration: none; color: #333; background: #ddd; padding: 8px 16px; border-radius: 20px; font-weight: bold; }
         .vitrine { display: flex; justify-content: center; gap: 20px; padding: 20px; flex-wrap: wrap; }
@@ -17,10 +18,26 @@
 </head>
 <body>
 
-    <header>
-        <h1>MAGDA CREW</h1>
-        <p>A revolução do seu estilo.</p>
-    </header>
+
+<main>
+  <section class="hero">
+    <div class="arrow left">‹</div>
+
+    <div class="hero-content">
+      <h1>FALL ’26 COLLECTION ©</h1>
+      <a href="#">Compre Agora</a>
+    </div>
+
+    <div class="arrow right">›</div>
+
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </section>
+</main>
+
+
 
     <ul class="categorias">
         <?php foreach ($categorias as $cat): ?>

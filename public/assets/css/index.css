@@ -1,0 +1,250 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #1d1e22;
+  color: #fff;
+  font-family: "Cinzel", serif;
+}
+
+header {
+  height: 105px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  align-items: center;
+  /* O space-between distribui os 3 blocos (nav, logo, actions) proporcionalmente */
+  justify-content: space-between; 
+  padding: 0 80px;
+  background: #1c1d21;
+}
+
+nav {
+  display: flex;
+  gap: 55px;
+  /* Garante que o menu ocupe um espaço base para ajudar na centralização da logo */
+  flex: 1; 
+}
+
+nav a {
+  color: #e8e8e8;
+  text-decoration: none;
+  font-size: 20px;
+  transition: .3s;
+}
+
+nav a:hover {
+  color: #aaa;
+}
+
+.logo {
+  /* Removido o position: absolute para a logo respeitar o fluxo do layout */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1; /* Faz com que o container da logo tente ocupar o centro */
+}
+
+.logo img {
+  width: 180px; /* Ajuste este valor para o tamanho que desejar */
+  height: auto;
+  letter-spacing: 3px;
+  transition: .3s;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex: 1;
+  justify-content: flex-end; /* Empurra a busca e ícones para a direita */
+}
+
+.search {
+  background: #373737;
+  border-radius: 30px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  width: 90px;
+  font-size: 17px;
+  font-family: "Cinzel", serif;
+}
+
+.search input::placeholder {
+  color: #fff;
+}
+
+.icon {
+  font-size: 32px;
+  color: #eee;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.icon:hover {
+  opacity: .6;
+}
+
+main {
+  padding: 35px 55px;
+}
+
+.hero {
+  position: relative;
+  height: 720px;
+  border-radius: 45px;
+  overflow: hidden;
+  background: url("img/fundo.jpg") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .68);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+}
+
+.hero-content h1 {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 25px;
+}
+
+.hero-content a {
+  display: inline-block;
+  padding: 18px 65px;
+  border-radius: 35px;
+  background: rgba(255, 255, 255, .35);
+  color: white;
+  text-decoration: none;
+  font-family: "Cinzel", serif;
+  font-size: 20px;
+  backdrop-filter: blur(6px);
+  transition: .3s;
+}
+
+.hero-content a:hover {
+  background: rgba(255, 255, 255, .5);
+  transform: scale(1.04);
+}
+
+.arrow {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 80px;
+  color: rgba(255,255,255,.75);
+  cursor: pointer;
+  user-select: none;
+}
+
+.arrow.left {
+  left: 60px;
+}
+
+.arrow.right {
+  right: 60px;
+}
+
+.dots {
+  position: absolute;
+  bottom: 22px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 13px;
+  height: 13px;
+  background: #ddd;
+  border-radius: 50%;
+  opacity: .8;
+}
+
+.dot:nth-child(2) {
+  opacity: .45;
+}
+
+@media (max-width: 1100px) {
+  header {
+    padding: 0 30px;
+  }
+  nav {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  header {
+    padding: 0 25px;
+  }
+
+  nav {
+    display: none;
+  }
+
+  .logo img {
+    width: 130px; /* Diminui a logo no mobile */
+  }
+
+  .actions {
+    gap: 15px;
+  }
+
+  .search {
+    display: none;
+  }
+
+  main {
+    padding: 20px;
+  }
+
+  .hero {
+    height: 560px;
+    border-radius: 30px;
+  }
+
+  .hero-content h1 {
+    font-size: 23px;
+  }
+
+  .hero-content a {
+    padding: 15px 45px;
+  }
+
+  .arrow {
+    font-size: 55px;
+  }
+
+  .arrow.left {
+    left: 25px;
+  }
+
+  .arrow.right {
+    right: 25px;
+  }
+}

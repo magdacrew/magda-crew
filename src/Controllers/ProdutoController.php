@@ -10,7 +10,7 @@ class ProdutoController {
     public function detalhes($id = null) {
         if (!$id) {
             // Se tentarem acessar sem ID, manda de volta pra home
-            header("Location: /MAGDA-CREW/public/");
+            header("Location: /MAGDA-CREW/public/index.php");
             exit;
         }
 
