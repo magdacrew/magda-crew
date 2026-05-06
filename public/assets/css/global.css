@@ -1,0 +1,59 @@
+/* Arquivo: public/assets/css/global.css */
+
+/* Reset e Estrutura Base */
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    background: #f9f9f9; 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 100vh; 
+}
+main { 
+    flex: 1; 
+}
+
+/* Header e Menu */
+header { 
+    background: #111; 
+    color: #fff; 
+    padding: 20px; 
+    text-align: center; 
+}
+.nav-categorias { 
+    display: flex; 
+    justify-content: center; 
+    gap: 15px; 
+    padding: 15px; 
+    background: #eee; 
+    list-style: none; 
+    margin: 0; 
+    border-bottom: 1px solid #ddd; 
+}
+.nav-categorias a { 
+    text-decoration: none; 
+    color: #333; 
+    font-weight: bold; 
+    padding: 5px 10px; 
+    transition: color 0.3s; 
+}
+.nav-categorias a:hover { 
+    color: #e74c3c; 
+}
+
+/* Footer */
+.site-footer {
+    background: #111; 
+    color: #fff; 
+    text-align: center; 
+    padding: 20px; 
+    margin-top: 40px;
+}
+.site-footer p {
+    margin: 5px 0;
+}
+.site-footer .creditos {
+    font-size: 12px; 
+    color: #aaa;
+}

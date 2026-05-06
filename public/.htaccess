@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Se o que o usuário digitou NÃO for um arquivo real (como uma imagem ou css)...
+RewriteCond %{REQUEST_FILENAME} !-f
+# E NÃO for uma pasta real...
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# ...redireciona tudo para o index.php, passando a URL como um parâmetro invisível
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
