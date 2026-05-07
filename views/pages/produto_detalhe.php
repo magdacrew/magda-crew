@@ -1,5 +1,6 @@
 <?php require_once __DIR__ . '/../components/header.php'; ?>
-
+<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/footer.css">
+<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/index.css">
 <div class="container-produto">
     <div class="produto-galeria">
         <div class="imagem-placeholder">
@@ -38,4 +39,5 @@
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../components/footer.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
+<script src="assets/js/script.js"></script>

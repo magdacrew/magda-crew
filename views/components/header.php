@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($tituloDaPagina) ? htmlspecialchars($tituloDaPagina) : 'Magda Crew' ?></title>
     
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/index.css">
+    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/header.css">
     
     <?= isset($cssExtra) ? $cssExtra : '' ?>
 </head>
@@ -27,13 +27,18 @@
   <div class="actions">
     <div class="search">
       <input type="text" placeholder="Buscar">
-      <span>🔍</span>
+      <img src="/MAGDA-CREW/public/assets/images/WhiteMagnifyingGlass.png" alt="Buscar" class="icon">
     </div>
-
-    <span class="icon">♙</span>
-    <span class="icon">☼</span>
-    <span class="icon">▱</span>
+    <a href="#">
+      <img src="/MAGDA-CREW/public/assets/images/WhiteUser.png" alt="Usuário"  class="icon">
+    </a>
+    
+    <a href="#">
+      <img src="/MAGDA-CREW/public/assets/images/Sun.png" alt="Alternar tema para claro"  class="icon">
+    </a>
+    <a href="#">
+      <img src="/MAGDA-CREW/public/assets/images/WhiteBag.png" alt="Sacola"  class="icon">
+    </a>
   </div>
 </header>
-
     <main></main>

@@ -2,42 +2,39 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($tituloDaPagina) ?></title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/index.css">
+    <link rel="stylesheet" href="/magda-crew/public/assets/css/index.css">
+    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/header.css">
+    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/footer.css">
     <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/header.php';?>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
-        .categorias { display: flex; justify-content: center; gap: 15px; padding: 20px; list-style: none; }
-        .categorias a { text-decoration: none; color: #333; background: #ddd; padding: 8px 16px; border-radius: 20px; font-weight: bold; }
-        .vitrine { display: flex; justify-content: center; gap: 20px; padding: 20px; flex-wrap: wrap; }
-        .card-produto { background: #fff; border: 1px solid #eee; padding: 20px; border-radius: 8px; width: 250px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .preco { color: #27ae60; font-size: 24px; font-weight: bold; margin: 10px 0; }
-        .btn-comprar { display: inline-block; background: #111; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px; width: 100%; box-sizing: border-box; }
-    </style>
 </head>
 <body>
 
 
 <main>
-  <section class="hero">
-    <div class="arrow left">‹</div>
+  <section class="hero" id="hero-container">
+  <div class="arrow left" id="prevBtn">
+    ‹</div>
 
-    <div class="hero-content">
-      <h1>FALL ’26 COLLECTION ©</h1>
-      <a href="#">Compre Agora</a>
-    </div>
+  <div class="hero-content active" data-bg="/magda-crew/public/assets/images/background.png">
+    <h1>FALL ’26 COLLECTION ©</h1>
+    <a href="#">Compre Agora</a>
+  </div>
 
-    <div class="arrow right">›</div>
+  <div class="hero-content" data-bg="/magda-crew/public/assets/images/background2.png">
+        <h1>ROMANTIC ’26 ©</h1>
+    <a href="#">Compre Agora</a>
+  </div>
 
-    <div class="dots">
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
-  </section>
+  <div class="arrow right" id="nextBtn">›</div>
+  
+  <div class="dots">
+    <div class="dot active"></div>
+    <div class="dot"></div> </div>
+</section>
 </main>
-
-
 
     <ul class="categorias">
         <?php foreach ($categorias as $cat): ?>
@@ -49,25 +46,25 @@
         <?php endforeach; ?>
     </ul>
 
-    <h2 style="text-align: center; margin-top: 40px;">Destaques da Semana</h2>
-    <div class="vitrine">
-        <?php foreach ($produtosDestaque as $produto): ?>
-            <div class="card-produto">
-                <div style="width: 100%; height: 200px; background: #eee; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: #aaa;">
-                    Sem Imagem
+<div class="vitrine">
+    <?php foreach ($produtosDestaque as $produto): ?>
+        <div class="card-produto">
+            <a href="/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
+                <div class="imagem-placeholder">
+                    <span>Sem Imagem</span>
                 </div>
                 
-                <h3 style="font-size: 18px; margin: 0;"><?= htmlspecialchars($produto['nome']) ?></h3>
-                <p style="font-size: 12px; color: #666;"><?= htmlspecialchars($produto['categoria_nome']) ?></p>
-                
+                <h3><?= htmlspecialchars($produto['nome']) ?></h3>
                 <div class="preco">R$ <?= number_format($produto['preco'], 2, ',', '.') ?></div>
-                
-                <a href="/MAGDA-CREW/public/produto/detalhes/<?= $produto['id'] ?>" class="btn-comprar">
-                    Ver Detalhes
-                </a>
-            </div>
-        <?php endforeach; ?>
-    </div>
+            </a>
+        </div>
+    <?php endforeach; ?>
+</div>
+ 
+    
+
+<?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
+<script src="assets/js/script.js"></script>
 
 </body>
 </html>

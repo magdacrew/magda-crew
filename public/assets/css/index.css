@@ -1,3 +1,4 @@
+/* CONFIGURAÇÕES GERAIS */
 * {
   margin: 0;
   padding: 0;
@@ -5,117 +6,33 @@
 }
 
 body {
-  background: #1d1e22;
-  color: #fff;
+  background: #1c1c20;
+  color: #e7e9eb;
   font-family: "Cinzel", serif;
-}
-
-header {
-  height: 105px;
-  border-bottom: 1px solid #333;
-  display: flex;
-  align-items: center;
-  /* O space-between distribui os 3 blocos (nav, logo, actions) proporcionalmente */
-  justify-content: space-between; 
-  padding: 0 80px;
-  background: #1c1d21;
-}
-
-nav {
-  display: flex;
-  gap: 55px;
-  /* Garante que o menu ocupe um espaço base para ajudar na centralização da logo */
-  flex: 1; 
-}
-
-nav a {
-  color: #e8e8e8;
-  text-decoration: none;
-  font-size: 20px;
-  transition: .3s;
-}
-
-nav a:hover {
-  color: #aaa;
-}
-
-.logo {
-  /* Removido o position: absolute para a logo respeitar o fluxo do layout */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1; /* Faz com que o container da logo tente ocupar o centro */
-}
-
-.logo img {
-  width: 180px; /* Ajuste este valor para o tamanho que desejar */
-  height: auto;
-  letter-spacing: 3px;
-  transition: .3s;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  flex: 1;
-  justify-content: flex-end; /* Empurra a busca e ícones para a direita */
-}
-
-.search {
-  background: #373737;
-  border-radius: 30px;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.search input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: white;
-  width: 90px;
-  font-size: 17px;
-  font-family: "Cinzel", serif;
-}
-
-.search input::placeholder {
-  color: #fff;
-}
-
-.icon {
-  font-size: 32px;
-  color: #eee;
-  cursor: pointer;
-  transition: .3s;
-}
-
-.icon:hover {
-  opacity: .6;
 }
 
 main {
-  padding: 35px 55px;
-}
+  padding: 15px 55px;
+} 
 
+/* SEÇÃO HERO */
 .hero {
   position: relative;
   height: 720px;
   border-radius: 45px;
   overflow: hidden;
-  background: url("img/fundo.jpg") center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.5s ease-in-out; /* Transição suave entre slides */
+  background-size: cover;
+  background-position: center;
 }
 
 .hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, .68);
   z-index: 1;
 }
 
@@ -124,6 +41,17 @@ main {
   z-index: 2;
   text-align: center;
   font-family: "Inter", sans-serif;
+  display: none; /* Escondido por padrão */
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Estado ativo do slide */
+.hero-content.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 1;
 }
 
 .hero-content h1 {
@@ -139,7 +67,7 @@ main {
   background: rgba(255, 255, 255, .35);
   color: white;
   text-decoration: none;
-  font-family: "Cinzel", serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 20px;
   backdrop-filter: blur(6px);
   transition: .3s;
@@ -150,6 +78,7 @@ main {
   transform: scale(1.04);
 }
 
+/* CONTROLES DO SLIDER (SETAS E PONTOS) */
 .arrow {
   position: absolute;
   z-index: 3;
@@ -159,15 +88,22 @@ main {
   color: rgba(255,255,255,.75);
   cursor: pointer;
   user-select: none;
+  transition: all 0.3s ease;
 }
 
-.arrow.left {
-  left: 60px;
+.arrow:hover {
+  color: rgba(255, 255, 255, 1); /* Branco total */
+  transform: translateY(-50%) scale(1.1); /* Aumenta um pouco sem perder o alinhamento vertical */
+  text-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Sombra para destacar em fundos claros */
 }
 
-.arrow.right {
-  right: 60px;
+/* Opcional: Feedback visual ao clicar */
+.arrow:active {
+  transform: translateY(-50%) scale(0.9);
 }
+
+.arrow.left { left: 60px; }
+.arrow.right { right: 60px; }
 
 .dots {
   position: absolute;
@@ -180,71 +116,141 @@ main {
 .dot {
   width: 13px;
   height: 13px;
-  background: #ddd;
+  background: #fff;
   border-radius: 50%;
-  opacity: .8;
+  opacity: 0.3; /* Todas começam foscas */
+  transition: 0.3s;
+  cursor: pointer;
 }
 
-.dot:nth-child(2) {
-  opacity: .45;
+.dot.active {
+  opacity: 1; /* A ativa brilha */
+  transform: scale(1.2);
 }
 
-@media (max-width: 1100px) {
-  header {
-    padding: 0 30px;
-  }
-  nav {
-    gap: 20px;
-  }
+/* CATEGORIAS E VITRINE */
+.categorias { 
+  display: flex;
+  gap: 15px; 
+  padding: 45px 55px;
+  list-style: none;
 }
 
+.categorias a { 
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  text-decoration: none;
+  color: #333;
+  background: #ddd;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.categorias a:hover {
+  background: #bbb;
+}
+
+.vitrine { 
+    display: flex;
+    justify-content: flex-start; /* Alinha os itens à esquerda */
+    gap: 20px; 
+    padding: 40px 80px; /* Alinhado com o padding do seu header */
+    flex-wrap: nowrap; /* Mantém em linha para o scroll se necessário */
+    overflow-x: auto; /* Permite scroll horizontal se houver muitos itens */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* CONTAINER DO CARD */
+.card-produto { 
+    background: transparent; /* Fundo transparente como na foto */
+    width: 280px; 
+    flex-shrink: 0; /* Impede que o card esmague em telas menores */
+    transition: opacity 0.3s ease;
+}
+
+.card-produto:hover {
+    opacity: 0.8; /* Efeito suave de hover comum nessas lojas */
+}
+
+/* LINK QUE ENVOLVE TODO O CONTEÚDO */
+.link-card-produto {
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+
+/* ÁREA DA IMAGEM */
+.imagem-placeholder, .card-produto img {
+    width: 100%; 
+    height: 380px; /* Proporção vertical de editorial */
+    background-color: #f0f0f0; /* Fundo cinza claro ou branco para o produto */
+    object-fit: cover;
+    border-radius: 12px; /* Cantos bem arredondados como na imagem */
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* TEXTOS DO PRODUTO */
+.card-produto h3 {
+    font-size: 13px; /* Fonte pequena e minimalista */
+    font-weight: 700;
+    text-transform: uppercase; /* Tudo em maiúsculo */
+    letter-spacing: 0.5px;
+    margin: 10px 0 5px 0;
+    color: #e7e9eb;
+    line-height: 1.4;
+    text-align: left; /* Alinhado à esquerda */
+}
+
+.card-produto .preco { 
+    color: #e7e9eb;
+    font-size: 13px; 
+    font-weight: 500;
+    text-align: left;
+}
+
+/* TAG "ESGOTADO" (Opcional, caso queira o detalhe da imagem) */
+.tag-esgotado {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* BARRA DE SCROLL CUSTOMIZADA (A que aparece embaixo na sua imagem) */
+.vitrine::-webkit-scrollbar {
+    height: 4px;
+}
+
+.vitrine::-webkit-scrollbar-track {
+    background: #333;
+    margin: 0 80px;
+}
+
+.vitrine::-webkit-scrollbar-thumb {
+    background: #fff;
+    border-radius: 10px;
+}
+/* Removi o botão .btn-comprar pois agora o card inteiro é o botão */
+
+/* RESPONSIVIDADE GERAL */
 @media (max-width: 900px) {
-  header {
-    padding: 0 25px;
-  }
-
-  nav {
-    display: none;
-  }
-
-  .logo img {
-    width: 130px; /* Diminui a logo no mobile */
-  }
-
-  .actions {
-    gap: 15px;
-  }
-
-  .search {
-    display: none;
-  }
-
-  main {
-    padding: 20px;
-  }
-
-  .hero {
-    height: 560px;
-    border-radius: 30px;
-  }
-
-  .hero-content h1 {
-    font-size: 23px;
-  }
-
-  .hero-content a {
-    padding: 15px 45px;
-  }
-
-  .arrow {
-    font-size: 55px;
-  }
-
-  .arrow.left {
-    left: 25px;
-  }
-
-  .arrow.right {
-    right: 25px;
-  }
+  main { padding: 20px; }
+  .hero { height: 560px; border-radius: 30px; }
+  .hero-content h1 { font-size: 23px; }
+  .hero-content a { padding: 15px 45px; }
+  .arrow { font-size: 55px; }
+  .arrow.left { left: 25px; }
+  .arrow.right { right: 25px; }
 }

@@ -2,7 +2,7 @@
 
 /* Reset e Estrutura Base */
 body { 
-    font-family: Arial, sans-serif; 
+    font-family:BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0; 
     padding: 0; 
     background: #f9f9f9; 

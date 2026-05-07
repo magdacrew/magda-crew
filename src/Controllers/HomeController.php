@@ -7,7 +7,7 @@ require_once __DIR__ . '/../Models/Produto.php';
 class HomeController {
     
     public function index() {
-        $tituloDaPagina = "Magda Crew - Início";
+        $tituloDaPagina = "Magda Crew";
         
         // Instancia os Models
         $categoriaModel = new Categoria();
