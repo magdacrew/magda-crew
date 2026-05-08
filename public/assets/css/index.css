@@ -64,6 +64,7 @@ main {
   display: inline-block;
   padding: 18px 65px;
   border-radius: 35px;
+  border: 1px solid #e7e9eb;
   background: rgba(255, 255, 255, .35);
   color: white;
   text-decoration: none;
@@ -129,6 +130,8 @@ main {
 }
 
 /* CATEGORIAS E VITRINE */
+
+/* Adaptado para funcionar com <a> ou <button> sem mudar o visual */
 .categorias { 
   display: flex;
   gap: 15px; 
@@ -136,26 +139,34 @@ main {
   list-style: none;
 }
 
-.categorias a { 
+.categorias button { 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   text-decoration: none;
-  color: #333;
-  background: #ddd;
-  padding: 8px 16px;
+  color: #fff; /* Texto branco por padrão */
+  background: #888; /* Fundo cinza conforme a imagem */
+  padding: 8px 20px;
   border-radius: 20px;
   font-weight: bold;
   transition: 0.3s;
+  border: none;
+  cursor: pointer;
 }
 
-.categorias a:hover {
+/* Quando o botão estiver selecionado */
+.categorias button.active {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+.categorias button:hover {
   background: #bbb;
 }
 
 .vitrine { 
     display: flex;
     justify-content: flex-start; /* Alinha os itens à esquerda */
-    gap: 20px; 
-    padding: 40px 80px; /* Alinhado com o padding do seu header */
+    gap: 50px; 
+    padding: 45px 55px; /* Alinhado com o padding do seu header */
     flex-wrap: nowrap; /* Mantém em linha para o scroll se necessário */
     overflow-x: auto; /* Permite scroll horizontal se houver muitos itens */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -182,8 +193,8 @@ main {
 
 /* ÁREA DA IMAGEM */
 .imagem-placeholder, .card-produto img {
-    width: 100%; 
-    height: 380px; /* Proporção vertical de editorial */
+    width: 300px; 
+    height: 300px; /* Proporção vertical de editorial */
     background-color: #f0f0f0; /* Fundo cinza claro ou branco para o produto */
     object-fit: cover;
     border-radius: 12px; /* Cantos bem arredondados como na imagem */

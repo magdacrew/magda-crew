@@ -13,7 +13,7 @@ class Categoria {
 
     // Método para buscar todas as categorias
     public function buscarTodas() {
-        $sql = "SELECT * FROM categorias ORDER BY nome ASC";
+        $sql = "SELECT * FROM categorias ORDER BY id ASC";
         $stmt = $this->conexao->prepare($sql);
         $stmt->execute();
         

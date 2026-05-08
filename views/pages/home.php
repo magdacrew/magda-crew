@@ -18,7 +18,7 @@
   <div class="arrow left" id="prevBtn">
     ‹</div>
 
-  <div class="hero-content active" data-bg="/magda-crew/public/assets/images/background.png">
+  <div class="hero-content active" data-bg="/magda-crew/public/assets/images/background3.png">
     <h1>FALL ’26 COLLECTION ©</h1>
     <a href="#">Compre Agora</a>
   </div>
@@ -36,29 +36,34 @@
 </section>
 </main>
 
-    <ul class="categorias">
-        <?php foreach ($categorias as $cat): ?>
-            <li>
-                <a href="/MAGDA-CREW/public/produtos/categoria/<?= $cat['id'] ?>">
-                    <?= htmlspecialchars($cat['nome']) ?>
-                </a>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-
-<div class="vitrine">
-    <?php foreach ($produtosDestaque as $produto): ?>
-        <div class="card-produto">
-            <a href="/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
-                <div class="imagem-placeholder">
-                    <span>Sem Imagem</span>
-                </div>
-                
-                <h3><?= htmlspecialchars($produto['nome']) ?></h3>
-                <div class="preco">R$ <?= number_format($produto['preco'], 2, ',', '.') ?></div>
-            </a>
-        </div>
+<ul class="categorias">
+    <?php foreach ($categorias as $cat): ?>
+        <li>
+            <button 
+                class="btn-filtro-categoria <?= ($cat['nome'] == 'Tudo') ? 'active' : '' ?>" 
+                data-id="<?= $cat['id'] ?>">
+                <?= htmlspecialchars($cat['nome']) ?>
+            </button>
+        </li>
     <?php endforeach; ?>
+</ul>
+
+<div class="vitrine" id="vitrine-container">
+    <?php if (!empty($produtosDestaque)): ?>
+        <?php foreach ($produtosDestaque as $produto): ?>
+            <div class="card-produto">
+                <a href="/magda-crew/public/produto/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
+                    <div class="imagem-placeholder">
+                        <span>Sem Imagem</span>
+                    </div>
+                    <h3><?= htmlspecialchars($produto['nome']) ?></h3>
+                    <div class="preco">R$ <?= number_format($produto['preco'], 2, ',', '.') ?></div>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p style="color: white; padding: 20px;">Nenhum produto encontrado nesta categoria.</p>
+    <?php endif; ?>
 </div>
  
     

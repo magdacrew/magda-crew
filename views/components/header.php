@@ -29,7 +29,7 @@
       <input type="text" placeholder="Buscar">
       <img src="/MAGDA-CREW/public/assets/images/WhiteMagnifyingGlass.png" alt="Buscar" class="icon">
     </div>
-    <a href="#">
+    <a href="/magda-crew/views/pages/login.php">
       <img src="/MAGDA-CREW/public/assets/images/WhiteUser.png" alt="Usuário"  class="icon">
     </a>
     
