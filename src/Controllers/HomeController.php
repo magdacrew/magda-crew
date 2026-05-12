@@ -9,15 +9,13 @@ class HomeController {
     public function index() {
         $tituloDaPagina = "Magda Crew";
         
-        // Instancia os Models
         $categoriaModel = new Categoria();
         $produtoModel = new Produto();
         
-        // Pede os dados ao banco
         $categorias = $categoriaModel->buscarTodas();
-        $produtosDestaque = $produtoModel->buscarDestaques();
+        // Carrega todos os produtos por padrão
+        $produtos = $produtoModel->buscarTodos(); 
         
-        // Chama a View
         require_once __DIR__ . '/../../views/pages/home.php';
     }
 }

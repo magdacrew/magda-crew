@@ -6,45 +6,48 @@ document.addEventListener("DOMContentLoaded", function() {
     const botoesFiltro = document.querySelectorAll('.btn-filtro-categoria');
     const containerVitrine = document.getElementById('vitrine-container');
 
-    botoesFiltro.forEach(botao => {
-        botao.addEventListener('click', function() {
-            // Controle visual dos botões (Fundo branco no ativo)
-            botoesFiltro.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+    if (containerVitrine) {
+        botoesFiltro.forEach(botao => {
+            botao.addEventListener('click', function() {
+                // Controle visual: remove 'active' de todos e coloca no clicado
+                botoesFiltro.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
 
-            const categoriaId = this.getAttribute('data-id');
-            if (!containerVitrine) return;
+                // Pega o ID (1 para Tudo, 6 para Camisas, etc)
+                const categoriaId = this.getAttribute('data-id');
 
-            containerVitrine.style.opacity = '0.5';
+                // Feedback visual de carregamento
+                containerVitrine.style.opacity = '0.5';
 
-            // URL para o filtro no PHP
-            const url = `/MAGDA-CREW/public/produtos/categoria/${categoriaId}`;
+                // URL para o filtro no PHP
+                const url = `/MAGDA-CREW/public/produtos/categoria/${categoriaId}`;
 
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error('Erro na requisição');
-                    return response.text();
-                })
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    
-                    // Busca a div .vitrine dentro do HTML que o servidor retornou
-                    const novaVitrine = doc.querySelector('.vitrine');
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Erro na requisição');
+                        return response.text();
+                    })
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        // Busca a div .vitrine dentro do HTML que o servidor retornou
+                        const novaVitrine = doc.querySelector('.vitrine');
 
-                    if (novaVitrine) {
-                        // Injeta o conteúdo filtrado na vitrine da página atual
-                        containerVitrine.innerHTML = novaVitrine.innerHTML;
-                    }
-                    containerVitrine.style.opacity = '1';
-                })
-                .catch(error => {
-                    console.error('Erro ao filtrar:', error);
-                    containerVitrine.style.opacity = '1';
-                });
+                        if (novaVitrine) {
+                            // Substitui o conteúdo da vitrine atual pelo novo
+                            containerVitrine.innerHTML = novaVitrine.innerHTML;
+                        }
+                        
+                        containerVitrine.style.opacity = '1';
+                    })
+                    .catch(error => {
+                        console.error('Erro ao filtrar:', error);
+                        containerVitrine.style.opacity = '1';
+                    });
+            });
         });
-    });
-
+    }
 
     // ==========================================
     // 2. BOTÃO VOLTAR AO TOPO
@@ -64,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-
 
     // ==========================================
     // 3. CARROSSEL HERO
@@ -91,7 +93,9 @@ document.addEventListener("DOMContentLoaded", function() {
             if (dots[currentSlide]) dots[currentSlide].classList.add('active');
 
             const newBg = slides[currentSlide].getAttribute('data-bg');
-            hero.style.backgroundImage = `url('${newBg}')`;
+            if (newBg) {
+                hero.style.backgroundImage = `url('${newBg}')`;
+            }
         }
 
         function startAutoPlay() {

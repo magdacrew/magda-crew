@@ -7,7 +7,7 @@ CREATE TABLE categorias (
 );
 
 INSERT INTO categorias(nome) VALUES 
-('Camisetas'), ('Casacos'), ('Calças'), ('Bermudas'), ('Acessórios');
+('Tudo'), ('Camisetas'), ('Casacos'), ('Calças'), ('Bermudas'), ('Acessórios');
 
 CREATE TABLE cores(
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -31,12 +31,15 @@ INSERT INTO tamanhos(nome) VALUES
 -- ==========================================
 CREATE TABLE usuarios (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nome_completo VARCHAR(150) NOT NULL,
+    nome_completo VARCHAR(150) NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
-    telefone VARCHAR(20),
-    cpf VARCHAR(14) UNIQUE,
-    nascimento DATE NOT NULL,
-    senha_hash VARCHAR(255) NOT NULL,
+    telefone VARCHAR(20) NULL,
+    cpf VARCHAR(14) UNIQUE NULL,
+    nascimento DATE NULL,
+    codigo_login VARCHAR(10) NULL,
+    codigo_expira DATETIME NULL,
+    email_verificado BOOLEAN NOT NULL DEFAULT FALSE,
+    ultimo_login DATETIME NULL,
     data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     ativo BOOLEAN NOT NULL DEFAULT TRUE
@@ -148,3 +151,5 @@ CREATE TABLE itens_venda (
     FOREIGN KEY (venda_id) REFERENCES vendas(id) ON DELETE CASCADE,
     FOREIGN KEY (variante_id) REFERENCES produto_variantes(id) ON DELETE SET NULL
 );
+
+

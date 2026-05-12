@@ -49,10 +49,10 @@
 </ul>
 
 <div class="vitrine" id="vitrine-container">
-    <?php if (!empty($produtosDestaque)): ?>
-        <?php foreach ($produtosDestaque as $produto): ?>
+    <?php if (!empty($produtos)): ?>
+        <?php foreach ($produtos as $produto): ?>
             <div class="card-produto">
-                <a href="/magda-crew/public/produto/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
+                <a href="/MAGDA-CREW/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
                     <div class="imagem-placeholder">
                         <span>Sem Imagem</span>
                     </div>
@@ -69,7 +69,7 @@
     
 
 <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
-<script src="assets/js/script.js"></script>
+<script src="/MAGDA-CREW/public/assets/js/script.js"></script>
 
 </body>
 </html>
