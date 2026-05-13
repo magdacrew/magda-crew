@@ -10,11 +10,11 @@ class Produto {
         $this->conexao = Database::getConnection();
     }
 
-    // Busca TODOS os produtos ativos (Usado para o botão "Tudo")
     public function buscarTodos() {
-        $sql = "SELECT p.*, c.nome as categoria_nome 
+        $sql = "SELECT p.*, c.nome as categoria_nome, p_img.caminho_imagem 
                 FROM produtos p 
                 LEFT JOIN categorias c ON p.categoria_id = c.id 
+                LEFT JOIN produto_imagens p_img ON p.id = p_img.produto_id AND p_img.is_principal = 1
                 WHERE p.ativo = 1 
                 ORDER BY p.id DESC";
         $stmt = $this->conexao->prepare($sql);
@@ -22,23 +22,23 @@ class Produto {
         return $stmt->fetchAll();
     }
 
-    // Busca produtos de UMA categoria específica (Dinâmico para Camisas, Calças, etc.)
     public function buscarPorCategoria($categoria_id) {
-    $sql = "SELECT p.*, c.nome as categoria_nome 
-            FROM produtos p 
-            LEFT JOIN categorias c ON p.categoria_id = c.id 
-            WHERE p.categoria_id = :cat_id AND p.ativo = 1 
-            ORDER BY p.id DESC";
-    
-    $stmt = $this->conexao->prepare($sql);
-    $stmt->execute([':cat_id' => $categoria_id]);
-    return $stmt->fetchAll();
-}
-
-    public function buscarPorId($id) {
-        $sql = "SELECT p.*, c.nome as categoria_nome 
+        $sql = "SELECT p.*, c.nome as categoria_nome, p_img.caminho_imagem 
                 FROM produtos p 
                 LEFT JOIN categorias c ON p.categoria_id = c.id 
+                LEFT JOIN produto_imagens p_img ON p.id = p_img.produto_id AND p_img.is_principal = 1
+                WHERE p.categoria_id = :cat_id AND p.ativo = 1 
+                ORDER BY p.id DESC";
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([':cat_id' => $categoria_id]);
+        return $stmt->fetchAll();
+    }
+
+    public function buscarPorId($id) {
+        $sql = "SELECT p.*, c.nome as categoria_nome, p_img.caminho_imagem 
+                FROM produtos p 
+                LEFT JOIN categorias c ON p.categoria_id = c.id 
+                LEFT JOIN produto_imagens p_img ON p.id = p_img.produto_id AND p_img.is_principal = 1
                 WHERE p.id = :id AND p.ativo = 1";
         $stmt = $this->conexao->prepare($sql);
         $stmt->execute([':id' => $id]);

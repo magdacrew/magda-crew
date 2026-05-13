@@ -3,8 +3,18 @@
 <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/index.css">
 <div class="container-produto">
     <div class="produto-galeria">
-        <div class="imagem-placeholder">
-            Sem Imagem
+        <div class="imagem-placeholder-detalhe">
+            <div class="imagem-produto">
+                        <?php if (!empty($produto['caminho_imagem'])): ?>
+                            <img src="/magda-crew/public/assets/images/produtos/<?= $produto['caminho_imagem'] ?>" 
+                                alt="<?= htmlspecialchars($produto['nome']) ?>" 
+                                style="width: 100%; height: auto; border-radius: 8px;">
+                        <?php else: ?>
+                            <div class="imagem-placeholder">
+                                <span>Sem Imagem</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
         </div>
     </div>
 

@@ -8,46 +8,76 @@ $pdo = Database::getConnection();
 $erro = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
     $email = trim($_POST["email"] ?? "");
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
         $erro = "Digite um e-mail válido.";
+
     } else {
 
         $codigo = random_int(100000, 999999);
-        $expira = date("Y-m-d H:i:s", strtotime("+10 minutes"));
 
-        $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
+        $expira = date(
+            "Y-m-d H:i:s",
+            strtotime("+10 minutes")
+        );
+
+        $stmt = $pdo->prepare("
+            SELECT id 
+            FROM usuarios 
+            WHERE email = ?
+            LIMIT 1
+        ");
+
         $stmt->execute([$email]);
 
-        $usuario = $stmt->fetch();
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($usuario) {
 
             $stmt = $pdo->prepare("
-                UPDATE usuarios 
-                SET codigo_login = ?, codigo_expira = ?
+                UPDATE usuarios
+                SET codigo_login = ?,
+                    codigo_expira = ?
                 WHERE email = ?
             ");
 
-            $stmt->execute([$codigo, $expira, $email]);
+            $stmt->execute([
+                $codigo,
+                $expira,
+                $email
+            ]);
 
         } else {
 
             $stmt = $pdo->prepare("
-                INSERT INTO usuarios 
-                (email, codigo_login, codigo_expira)
-                VALUES (?, ?, ?)
+                INSERT INTO usuarios (
+                    email,
+                    codigo_login,
+                    codigo_expira,
+                    ativo,
+                    email_verificado,
+                    data_cadastro
+                )
+                VALUES (?, ?, ?, 1, 0, NOW())
             ");
 
-            $stmt->execute([$email, $codigo, $expira]);
+            $stmt->execute([
+                $email,
+                $codigo,
+                $expira
+            ]);
         }
 
         $_SESSION["email_login"] = $email;
 
         $_SESSION["codigo_para_email"] = $codigo;
 
-header("Location: /magda-crew/views/pages/enviar-emailjs.php");
+        $_SESSION["enviar_email"] = true;
+
+header("Location: /magda-crew/views/pages/verificar-codigo.php");
 exit;
     }
 }
@@ -57,45 +87,70 @@ exit;
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/magda-crew/public/assets/css/login.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet"
+href="/magda-crew/public/assets/css/login.css">
+
 <title>Login - Magda Crew</title>
 </head>
 <body>
 
 <div class="login-container">
 
-  <div class="logo">
-    <a href="/magda-crew/public/index.php">
-      <img src="/magda-crew/public/assets/images/MagdaWhiteLogo.png" class="logo-img">
-    </a>
-  </div>
-
-  <h2>Fazer login</h2>
-  <p>Digite seu e-mail para receber um código de acesso</p>
-
-  <form method="POST">
-    <div class="input-box">
-      <input 
-        type="email" 
-        name="email" 
-        placeholder="E-mail"
-        value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-        required
-      >
+    <div class="logo">
+        <a href="/magda-crew/public/index.php">
+            <img
+                src="/magda-crew/public/assets/images/MagdaWhiteLogo.png"
+                class="logo-img"
+            >
+        </a>
     </div>
 
-    <?php if (!empty($erro)): ?>
-      <div class="error"><?= htmlspecialchars($erro) ?></div>
-    <?php endif; ?>
+    <h2>Fazer login</h2>
 
-    <button class="continue-btn" type="submit">
-      Continuar
-    </button>
-  </form>
+    <p>
+        Digite seu e-mail para receber
+        um código de acesso
+    </p>
 
-  <div class="links">
-    <a href="#">Política de privacidade</a>
-  </div>
+    <form method="POST">
+
+        <div class="input-box">
+
+            <input
+                type="email"
+                name="email"
+                placeholder="E-mail"
+                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                autocomplete="email"
+                required
+            >
+
+        </div>
+
+        <?php if (!empty($erro)): ?>
+
+            <div class="error">
+                <?= htmlspecialchars($erro) ?>
+            </div>
+
+        <?php endif; ?>
+
+        <button
+            class="continue-btn"
+            type="submit"
+        >
+            Continuar
+        </button>
+
+    </form>
+
+    <div class="links">
+        <a href="#">
+            Política de privacidade
+        </a>
+    </div>
 
 </div>
 

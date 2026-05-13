@@ -2,7 +2,7 @@
     
     <div class="footer-left">
         <div class="brand-section">
-            <img src="assets/images/MagdaWhiteLogo.png" alt="Magda Logo" class="footer-logo">
+            <img src="/magda-crew/public/assets/images/MagdaWhiteLogo.png" alt="Magda Logo" class="footer-logo">
             
             <form class="newsletter-form">
                 <input type="email" placeholder="E-mail" required>

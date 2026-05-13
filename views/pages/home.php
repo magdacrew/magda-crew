@@ -13,7 +13,7 @@
 <body>
 
 
-<main>
+<main style="padding: 15px 55px;">
   <section class="hero" id="hero-container">
   <div class="arrow left" id="prevBtn">
     ‹</div>
@@ -53,8 +53,16 @@
         <?php foreach ($produtos as $produto): ?>
             <div class="card-produto">
                 <a href="/MAGDA-CREW/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
-                    <div class="imagem-placeholder">
-                        <span>Sem Imagem</span>
+                    <div class="imagem-produto">
+                        <?php if (!empty($produto['caminho_imagem'])): ?>
+                            <img src="/magda-crew/public/assets/images/produtos/<?= $produto['caminho_imagem'] ?>" 
+                                alt="<?= htmlspecialchars($produto['nome']) ?>" 
+                                style="width: 100%; height: auto; border-radius: 8px;">
+                        <?php else: ?>
+                            <div class="imagem-placeholder">
+                                <span>Sem Imagem</span>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <h3><?= htmlspecialchars($produto['nome']) ?></h3>
                     <div class="preco">R$ <?= number_format($produto['preco'], 2, ',', '.') ?></div>
@@ -65,8 +73,6 @@
         <p style="color: white; padding: 20px;">Nenhum produto encontrado nesta categoria.</p>
     <?php endif; ?>
 </div>
- 
-    
 
 <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
 <script src="/MAGDA-CREW/public/assets/js/script.js"></script>
