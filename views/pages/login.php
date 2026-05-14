@@ -98,6 +98,10 @@ href="/magda-crew/public/assets/css/login.css">
 
 <div class="login-container">
 
+    <a href="/magda-crew/public/index.php" target="_blank">
+        <img src="/magda-crew/public/assets/images/X.png" alt="Canto" class="botao-x">
+    </a>
+
     <div class="logo">
         <a href="/magda-crew/public/index.php">
             <img

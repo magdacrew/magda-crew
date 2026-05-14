@@ -22,7 +22,7 @@
 
         <div class="user-info">
             <span>Bem-vindo(a), Admin</span>
-            <a href="logout.php">Sair</a>
+            <a href="/magda-crew/views/pages/logout.php">Sair</a>
         </div>
     </header>
     

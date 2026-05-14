@@ -5,6 +5,7 @@ $pdo = Database::getConnection();
 
 $id = (int) ($_GET['id'] ?? 0);
 
+// PRODUTO
 $stmt = $pdo->prepare("
     SELECT * FROM produtos WHERE id = ?
 ");
@@ -17,19 +18,23 @@ if (!$produto) {
     die("Produto não encontrado.");
 }
 
+// CATEGORIAS
 $categorias = $pdo->query("
     SELECT * FROM categorias ORDER BY nome ASC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
+// IMAGENS
 $imagens = $pdo->prepare("
     SELECT * FROM produto_imagens
     WHERE produto_id = ?
+    ORDER BY ordem ASC
 ");
 
 $imagens->execute([$id]);
 
 $listaImagens = $imagens->fetchAll(PDO::FETCH_ASSOC);
 
+// SALVAR
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $nome = $_POST['nome'];
@@ -40,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $destaque = isset($_POST['destaque']) ? 1 : 0;
     $ativo = isset($_POST['ativo']) ? 1 : 0;
 
+    // UPDATE PRODUTO
     $update = $pdo->prepare("
         UPDATE produtos
         SET
@@ -62,15 +68,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id
     ]);
 
+    // ALTERAR IMAGEM PRINCIPAL
+    if(isset($_POST['imagem_existente_principal'])) {
+
+        $imagemPrincipal = $_POST['imagem_existente_principal'];
+
+        $pdo->prepare("
+            UPDATE produto_imagens
+            SET is_principal = 0
+            WHERE produto_id = ?
+        ")->execute([$id]);
+
+        $pdo->prepare("
+            UPDATE produto_imagens
+            SET is_principal = 1
+            WHERE id = ?
+        ")->execute([$imagemPrincipal]);
+    }
+
+    // NOVAS IMAGENS
     if (!empty($_FILES['imagens']['name'][0])) {
 
         foreach ($_FILES['imagens']['tmp_name'] as $key => $tmp_name) {
 
-            $nomeArquivo = time() . '_' . $_FILES['imagens']['name'][$key];
+            $nomeArquivo = time() . '_' . basename($_FILES['imagens']['name'][$key]);
 
-            $caminho = 'public/assets/images/produtos/' . $nomeArquivo;
+            // CAMINHO FÍSICO
+            $pastaFisica = __DIR__ . '/public/assets/images/produtos/';
 
-            move_uploaded_file($tmp_name, $caminho);
+            // CRIA PASTA SE NÃO EXISTIR
+            if (!is_dir($pastaFisica)) {
+                mkdir($pastaFisica, 0777, true);
+            }
+
+            // CAMINHO DO ARQUIVO
+            $arquivoFisico = $pastaFisica . $nomeArquivo;
+
+            // CAMINHO SALVO NO BANCO
+            $caminhoBanco = $nomeArquivo;
+
+            // UPLOAD
+            move_uploaded_file($tmp_name, $arquivoFisico);
 
             $isPrincipal = ($_POST['imagem_principal'] == $key) ? 1 : 0;
 
@@ -87,29 +125,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $insertImagem->execute([
                 $id,
-                $caminho,
+                $caminhoBanco,
                 $isPrincipal,
                 $key
             ]);
         }
     }
 
-    if(isset($_POST['imagem_existente_principal'])) {
-
-    $imagemPrincipal = $_POST['imagem_existente_principal'];
-
-    $pdo->prepare("
-        UPDATE produto_imagens
-        SET is_principal = 0
-        WHERE produto_id = ?
-    ")->execute([$id]);
-
-    $pdo->prepare("
-        UPDATE produto_imagens
-        SET is_principal = 1
-        WHERE id = ?
-    ")->execute([$imagemPrincipal]);
-}
     header("Location: produtos.php");
     exit;
 }
@@ -117,12 +139,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Editar Produto</title>
 
-<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
+<link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+
+<link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+
 </head>
+
 <body>
 
 <main class="main-content">
@@ -133,11 +164,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <form method="POST" enctype="multipart/form-data" class="form-admin">
 
-    <input type="text" name="nome" value="<?= $produto['nome'] ?>" required>
+    <input 
+        type="text"
+        name="nome"
+        value="<?= htmlspecialchars($produto['nome']) ?>"
+        required
+    >
 
-    <textarea name="descricao" rows="5"><?= $produto['descricao'] ?></textarea>
+    <textarea 
+        name="descricao"
+        rows="5"
+    ><?= htmlspecialchars($produto['descricao']) ?></textarea>
 
-    <input type="number" step="0.01" name="preco" value="<?= $produto['preco'] ?>" required>
+    <input 
+        type="number"
+        step="0.01"
+        name="preco"
+        value="<?= $produto['preco'] ?>"
+        required
+    >
 
     <select name="categoria_id">
 
@@ -147,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 value="<?= $categoria['id'] ?>"
                 <?= $produto['categoria_id'] == $categoria['id'] ? 'selected' : '' ?>
             >
-                <?= $categoria['nome'] ?>
+                <?= htmlspecialchars($categoria['nome']) ?>
             </option>
 
         <?php endforeach; ?>
@@ -160,7 +205,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             name="destaque"
             <?= $produto['destaque'] ? 'checked' : '' ?>
         >
-
         Produto em destaque
     </label>
 
@@ -170,40 +214,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             name="ativo"
             <?= $produto['ativo'] ? 'checked' : '' ?>
         >
-
         Produto ativo
     </label>
 
     <hr>
 
-   <h3>Imagens atuais</h3>
+    <h3>Imagens atuais</h3>
 
 <div class="preview-imagens">
 
-    <?php foreach($listaImagens as $index => $img): ?>
+<?php foreach($listaImagens as $img): ?>
 
-        <div class="preview-item">
+    <?php
 
-            <img 
-                src="/magda_crew/<?= $img['caminho_imagem'] ?>"
+    // CAMINHO COMPLETO DA IMAGEM
+    $caminhoImagem = '/magda-crew/public/assets/images/produtos/' . trim($img['caminho_imagem']);
+
+    ?>
+
+    <div class="preview-item">
+
+        <!-- MOSTRA O CAMINHO -->
+        
+    
+        <!-- IMAGEM -->
+        <img 
+         src="<?= $caminhoImagem ?>"
+    alt=""
+    style="
+        width:100%;
+        height:160px;
+        object-fit:cover;
+        border-radius:10px;
+    "
+        >
+
+        <label class="principal-label">
+
+            <input 
+                type="radio"
+                name="imagem_existente_principal"
+                value="<?= $img['id'] ?>"
+                <?= $img['is_principal'] ? 'checked' : '' ?>
             >
 
-            <label class="principal-label">
+            Principal
 
-                <input 
-                    type="radio"
-                    name="imagem_existente_principal"
-                    value="<?= $img['id'] ?>"
-                    <?= $img['is_principal'] ? 'checked' : '' ?>
-                >
+        </label>
 
-                Principal
+    </div>
 
-            </label>
-
-        </div>
-
-    <?php endforeach; ?>
+<?php endforeach; ?>
 
 </div>
 
@@ -211,30 +272,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="upload-area">
 
-    <label for="imagens" class="upload-box">
-        Clique para selecionar imagens
-    </label>
+        <label for="imagens" class="upload-box">
+            Clique para selecionar imagens
+        </label>
 
-    <input 
-        type="file"
-        id="imagens"
-        name="imagens[]"
-        multiple
-        accept="image/*"
-        hidden
-    >
+        <input 
+            type="file"
+            id="imagens"
+            name="imagens[]"
+            multiple
+            accept="image/*"
+            hidden
+        >
 
-</div>
+    </div>
 
-<div id="previewImagens" class="preview-imagens"></div>
-
-    <select name="imagem_principal">
-
-        <option value="0">Primeira imagem</option>
-        <option value="1">Segunda imagem</option>
-        <option value="2">Terceira imagem</option>
-
-    </select>
+    <div id="previewImagens" class="preview-imagens"></div>
 
     <button type="submit" class="btn-add">
         Salvar Alterações
@@ -245,6 +298,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </section>
 
 </main>
+
+<script>
+
+const inputImagens = document.getElementById('imagens');
+
+const preview = document.getElementById('previewImagens');
+
+inputImagens.addEventListener('change', function() {
+
+    preview.innerHTML = '';
+
+    const arquivos = this.files;
+
+    for(let i = 0; i < arquivos.length; i++) {
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            const div = document.createElement('div');
+
+            div.classList.add('preview-item');
+
+            div.innerHTML = `
+                <img 
+                    src="${e.target.result}"
+                    style="width:100%; height:160px; object-fit:cover;"
+                >
+
+                <label class="principal-label">
+
+                    <input 
+                        type="radio"
+                        name="imagem_principal"
+                        value="${i}"
+                        ${i === 0 ? 'checked' : ''}
+                    >
+
+                    Principal
+
+                </label>
+            `;
+
+            preview.appendChild(div);
+        }
+
+        reader.readAsDataURL(arquivos[i]);
+    }
+
+});
+
+</script>
 
 </body>
 </html>

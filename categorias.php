@@ -11,6 +11,7 @@ $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
     <title>Categorias</title>
     <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
 </head>

@@ -21,8 +21,8 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
     <title>Vendas - Magda Crew</title>
-
     <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
 </head>
 <body>
