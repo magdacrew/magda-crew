@@ -248,14 +248,19 @@ body {
     text-transform: uppercase;
 }
 
-/* BARRA DE SCROLL CUSTOMIZADA (A que aparece embaixo na sua imagem) */
+.vitrine {
+    overflow-x: auto;
+    padding-bottom: 30px; /* empurra a scrollbar pra baixo */
+}
+
+/* BARRA DE SCROLL CUSTOMIZADA */
 .vitrine::-webkit-scrollbar {
-    height: 4px;
+    height: 9px;
 }
 
 .vitrine::-webkit-scrollbar-track {
     background: #333;
-    margin: 0 80px;
+    margin: 0 5px;
 }
 
 .vitrine::-webkit-scrollbar-thumb {
@@ -273,4 +278,67 @@ body {
   .arrow { font-size: 55px; }
   .arrow.left { left: 25px; }
   .arrow.right { right: 25px; }
+}
+.banner-section{
+    width:100%; 
+    height:85vh;
+    border-radius:30px;
+    overflow:hidden;
+    position:relative;
+
+    background:
+    linear-gradient(rgba(0,0,0,.15), rgba(0,0,0,.25)),
+    url('sua-imagem.jpg') center center/cover no-repeat;
+}
+
+.banner-overlay{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+
+    text-align:center;
+    color:white;
+}
+
+.banner-subtitle{
+    font-size:14px;
+    letter-spacing:2px;
+    font-weight:500;
+    text-transform:uppercase;
+}
+
+.banner-title{
+    font-size:52px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+
+.banner-button{
+    padding:12px 26px;
+    border-radius:999px;
+    
+    background:rgba(255,255,255,.2);
+    backdrop-filter:blur(10px);
+
+    color:white;
+    text-decoration:none;
+    font-size:15px;
+    font-weight:500;
+
+    border:1px solid rgba(255,255,255,.25);
+
+    transition:.3s;
+}
+
+.banner-button:hover{
+    background:white;
+    color:black;
+    transform:scale(1.05);
 }

@@ -49,7 +49,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <?php if (isset($_SESSION["usuario_id"])): ?>
 
-      <a href="/magda-crew/views/pages/perfil.php">
+      <a href="/magda-crew/views/pages/Profile.php">
         <img 
           src="/MAGDA-CREW/public/assets/images/WhiteUser.png" 
           alt="Perfil"  

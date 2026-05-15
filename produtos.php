@@ -60,7 +60,7 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </p>
             </div>
 
-            <a href="adicionar-produto.php" class="btn-add">
+            <a href="adicionar-produto.php" class="btn-adicionar">
                 + Novo Produto
             </a>
         </div>

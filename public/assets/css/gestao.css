@@ -164,15 +164,23 @@ table.tabela tr:hover {
 }
 
 .btn-add {
-    background: #111;
+    background: #17be01;
     color: white;
-    padding: 12px 18px;
+    padding: 8px 12px;
     border-radius: 8px;
     text-decoration: none;
     font-weight: bold;
     transition: 0.3s;
 }
-
+.btn-adicionar{
+    background: #000000;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
 .btn-add:hover {
     opacity: 0.8;
 }
@@ -278,4 +286,54 @@ table.tabela tr:hover {
     gap: 8px;
     margin-top: 10px;
     font-size: 14px;
+}
+
+/* Estilos para o preview das imagens */
+.preview-imagens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.preview-item {
+    position: relative; /* Importante para o X ficar no canto */
+    width: 130px; 
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+}
+
+.preview-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover; /* Evita que a imagem fique esticada/achatada */
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.btn-remover {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-remover:hover {
+    background-color: #cc0000;
 }

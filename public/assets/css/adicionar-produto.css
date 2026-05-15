@@ -1,0 +1,241 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #1f1f1f, #050505 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    padding: 20px; /* Garante espaço em telas menores */
+}
+
+.container-admin {
+    width: 100%;
+    max-width: 500px; /* Um pouco mais largo para o formulário de produto */
+    background: #0f0f0f;
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 0 40px rgba(0,0,0,.8);
+    border: 1px solid #242424;
+    position: relative;
+}
+
+.botao-x {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 20px;
+    height: auto;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.botao-x:hover {
+    opacity: .5;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+p.subtitle {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+/* Padronização de todos os campos de entrada */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 0 15px;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+}
+
+/* Ajustes específicos de altura */
+.form-group input, .form-group select {
+    height: 52px;
+}
+
+.form-group textarea {
+    padding: 15px;
+    resize: none;
+}
+
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: #fff;
+}
+
+/* Checkboxes estilo Magda */
+.check-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.check-area input {
+    width: 18px;
+    height: 18px;
+    accent-color: #fff;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #333;
+    margin: 20px 0;
+}
+
+h3 {
+    font-size: 16px;
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
+/* Área de Upload */
+.upload-box {
+    width: 100%;
+    height: 52px;
+    border: 1px dashed #444;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.upload-box:hover {
+    border-color: #fff;
+    color: #fff;
+}
+
+/* Botão de Cadastro (Estilo 'Continuar' do Login) */
+.btn-add {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 10px;
+    background: #fff;
+    color: #000;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.btn-add:hover {
+    background: #cfcfcf;
+}
+
+/* Estilos para o preview das imagens (Padrão Dark) */
+.preview-imagens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.preview-item {
+    position: relative; /* Mantém o X posicionado em relação ao card */
+    width: 120px; 
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #151515; /* Fundo igual aos inputs */
+    transition: transform 0.2s;
+}
+
+.preview-item:hover {
+    border-color: #555;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* O Botão de remover agora usa a sua imagem X.png */
+.btn-remover {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 22px;
+    height: 22px;
+    background: #000 url('/magda-crew/public/assets/images/X.png') no-repeat center;
+    background-size: 10px; /* Tamanho do ícone dentro do círculo */
+    border: 1px solid #242424;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: 0.2s;
+}
+
+.btn-remover:hover {
+    background-color: #333;
+    transform: scale(1.1);
+}
+
+/* Esconde o texto que costuma aparecer no botão de remover original */
+.btn-remover span {
+    display: none;
+}
+
+/* Estilo para o seletor de Imagem Principal dentro do preview */
+.principal-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #aaa;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.principal-label input[type="radio"] {
+    accent-color: #fff; /* Deixa o rádio branco no estilo Magda */
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.principal-label:hover {
+    color: #fff;
+}
+
+/* Ajuste fino no preview-item para caber o texto */
+.preview-item {
+    height: auto;
+    padding-bottom: 12px;
+}

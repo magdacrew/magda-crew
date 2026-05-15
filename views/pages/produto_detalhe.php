@@ -6,7 +6,7 @@
         <div class="imagem-placeholder-detalhe">
             <div class="imagem-produto">
                         <?php if (!empty($produto['caminho_imagem'])): ?>
-                            <img src="/magda-crew/public/assets/images/produtos/<?= $produto['caminho_imagem'] ?>" 
+                            <img src="/magda-crew/<?= $produto['caminho_imagem'] ?>" 
                                 alt="<?= htmlspecialchars($produto['nome']) ?>" 
                                 style="width: 100%; height: auto; border-radius: 8px;">
                         <?php else: ?>

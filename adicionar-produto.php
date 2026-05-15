@@ -85,132 +85,148 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
 <title>Novo Produto</title>
 
-<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
+<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/adicionar-produto.css">
 </head>
 <body>
 
-<main class="main-content">
+<main class="container-admin">
+    <a href="javascript:history.back()">
+        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+    </a>
 
-<section class="content">
+    <h1>Novo Produto</h1>
+    <p class="subtitle">Adicione as informações do novo item abaixo.</p>
 
-<h1>Novo Produto</h1>
+    <form method="POST" enctype="multipart/form-data">
+        
+        <div class="form-group">
+            <input type="text" name="nome" placeholder="Nome do produto" required>
+        </div>
 
-<form method="POST" enctype="multipart/form-data" class="form-admin">
+        <div class="form-group">
+            <textarea name="descricao" rows="5" placeholder="Descrição"></textarea>
+        </div>
 
-    <input type="text" name="nome" placeholder="Nome do produto" required>
+        <div class="form-group">
+            <input type="number" step="0.01" name="preco" placeholder="Preço" required>
+        </div>
 
-    <textarea name="descricao" rows="5" placeholder="Descrição"></textarea>
+        <div class="form-group">
+            <select name="categoria_id" required>
+                <option value="">Selecione uma categoria</option>
+                <?php foreach($categorias as $categoria): ?>
+                    <option value="<?= $categoria['id'] ?>">
+                        <?= $categoria['nome'] ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-    <input type="number" step="0.01" name="preco" placeholder="Preço" required>
+        <label class="check-area">
+            <input type="checkbox" name="destaque">
+            Produto em destaque
+        </label>
 
-    <select name="categoria_id" required>
+        <label class="check-area">
+            <input type="checkbox" name="ativo" checked>
+            Produto ativo
+        </label>
 
-        <option value="">Selecione uma categoria</option>
+        <hr>
 
-        <?php foreach($categorias as $categoria): ?>
+        <h3>Imagens do Produto</h3>
 
-            <option value="<?= $categoria['id'] ?>">
-                <?= $categoria['nome'] ?>
-            </option>
+        <div class="upload-area">
+            <label for="imagens" class="upload-box">
+                Clique para selecionar imagens
+            </label>
+            <input 
+                type="file"
+                id="imagens"
+                name="imagens[]"
+                multiple
+                accept="image/*"
+                hidden
+            >
+        </div>
 
-        <?php endforeach; ?>
+        <div id="previewImagens" class="preview-imagens" style="color: #666; font-size: 12px; margin-top: 10px;"></div>
 
-    </select>
+        <button type="submit" class="btn-add">
+            Cadastrar Produto
+        </button>
 
-    <label>
-        <input type="checkbox" name="destaque">
-        Produto em destaque
-    </label>
-
-    <label>
-        <input type="checkbox" name="ativo" checked>
-        Produto ativo
-    </label>
-
-    <hr>
-
-    <h3>Imagens do Produto</h3>
-
-<div class="upload-area">
-
-    <label for="imagens" class="upload-box">
-        Clique para selecionar imagens
-    </label>
-
-    <input 
-        type="file"
-        id="imagens"
-        name="imagens[]"
-        multiple
-        accept="image/*"
-        hidden
-    >
-
-</div>
-
-<div id="previewImagens" class="preview-imagens"></div>
-
-    <p>Escolha qual será a imagem principal:</p>
-
-    <select name="imagem_principal">
-
-        <option value="0">Primeira imagem</option>
-        <option value="1">Segunda imagem</option>
-        <option value="2">Terceira imagem</option>
-        <option value="3">Quarta imagem</option>
-
-    </select>
-
-    <button type="submit" class="btn-add">
-        Cadastrar Produto
-    </button>
-
-</form>
-
-</section>
-
+    </form>
 </main>
 <script>
 
 const inputImagens = document.getElementById('imagens');
 const preview = document.getElementById('previewImagens');
 
-inputImagens.addEventListener('change', function() {
+// Variável para armazenar todos os arquivos selecionados
+let arquivosAcumulados = [];
 
-    preview.innerHTML = '';
+// Função que atualiza o input original para o PHP receber os arquivos certos
+function atualizarInputFiles() {
+    const dataTransfer = new DataTransfer();
+    arquivosAcumulados.forEach(file => {
+        dataTransfer.items.add(file);
+    });
+    inputImagens.files = dataTransfer.files;
+}
 
-    const arquivos = this.files;
+// Função para desenhar as imagens na tela
+function renderizarPreview() {
+    preview.innerHTML = ''; // Limpa a tela para redesenhar
 
-    for(let i = 0; i < arquivos.length; i++) {
-
+    arquivosAcumulados.forEach((arquivo, index) => {
         const reader = new FileReader();
 
         reader.onload = function(e) {
-
             const div = document.createElement('div');
             div.classList.add('preview-item');
 
+            // Agora usando o botão vazio (o CSS coloca o X.png) e a estrutura correta
             div.innerHTML = `
+                <button type="button" class="btn-remover" onclick="removerImagem(${index})"></button>
+                
                 <img src="${e.target.result}">
 
                 <label class="principal-label">
                     <input 
                         type="radio"
                         name="imagem_principal"
-                        value="${i}"
-                        ${i === 0 ? 'checked' : ''}
+                        value="${index}"
+                        ${index === 0 ? 'checked' : ''}
                     >
-                    Principal
+                    <span>Principal</span>
                 </label>
             `;
 
             preview.appendChild(div);
         }
 
-        reader.readAsDataURL(arquivos[i]);
-    }
+        reader.readAsDataURL(arquivo);
+    });
+}
 
+// Evento quando o usuário escolhe novas imagens
+inputImagens.addEventListener('change', function() {
+    const novosArquivos = Array.from(this.files);
+    
+    // Junta as imagens antigas com as novas
+    arquivosAcumulados = arquivosAcumulados.concat(novosArquivos);
+    
+    atualizarInputFiles(); // Atualiza o campo <input> escondido
+    renderizarPreview();   // Mostra na tela
 });
+
+// Função para remover uma imagem específica
+window.removerImagem = function(index) {
+    arquivosAcumulados.splice(index, 1); // Remove 1 item do array na posição selecionada
+    atualizarInputFiles();               // Atualiza o <input> para o PHP não receber a imagem apagada
+    renderizarPreview();                 // Redesenha a tela
+};
 
 </script>
 </body>

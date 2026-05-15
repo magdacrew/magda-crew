@@ -152,4 +152,16 @@ CREATE TABLE itens_venda (
     FOREIGN KEY (variante_id) REFERENCES produto_variantes(id) ON DELETE SET NULL
 );
 
+UPDATE produto_imagens
+SET caminho_imagem = REPLACE(
+    caminho_imagem,
+    '/magda-crew/public/assets/images/produtos/',
+    'assets/images/produtos/'
+);
 
+UPDATE produto_imagens
+SET caminho_imagem = REPLACE(
+    caminho_imagem,
+    '/magda-crew/',
+    ''
+);

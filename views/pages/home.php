@@ -55,7 +55,7 @@
                 <a href="/MAGDA-CREW/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
                     <div class="imagem-produto">
                         <?php if (!empty($produto['caminho_imagem'])): ?>
-                            <img src="/magda-crew/public/assets/images/produtos/<?= $produto['caminho_imagem'] ?>" 
+                            <img src="/magda-crew/<?= $produto['caminho_imagem'] ?>" 
                                 alt="<?= htmlspecialchars($produto['nome']) ?>" 
                                 style="width: 100%; height: auto; border-radius: 8px;">
                         <?php else: ?>
@@ -72,6 +72,14 @@
     <?php else: ?>
         <p style="color: white; padding: 20px;">Nenhum produto encontrado nesta categoria.</p>
     <?php endif; ?>
+</div>
+
+<div class="banner-section">
+    <div class="banner-overlay">
+        <span class="banner-subtitle">FALL26 COLLECTION</span>
+        <h1 class="banner-title">T-SHIRTS</h1>
+        <a href="#" class="banner-button">Explore Agora</a>
+    </div>
 </div>
 
 <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>

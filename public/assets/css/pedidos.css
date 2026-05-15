@@ -1,0 +1,66 @@
+/* --- ESTILO DA TABELA DE PEDIDOS --- */
+.table-container {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #eaeaea;
+    overflow: hidden; /* Garante que as bordas da tabela fiquem arredondadas */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.tabela-pedidos {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabela-pedidos th,
+.tabela-pedidos td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #eaeaea;
+    font-size: 14px;
+}
+
+.tabela-pedidos th {
+    background-color: #fafafa;
+    color: #666;
+    font-weight: 500;
+}
+
+.tabela-pedidos tr:last-child td {
+    border-bottom: none;
+}
+
+.tabela-pedidos tr:hover {
+    background-color: #fcfcfc;
+}
+
+/* Badge de Status (Ex: Pendente, Aprovado) */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Ajuste essas classes conforme os status do seu banco de dados */
+.status-pendente { background-color: #fff3cd; color: #856404; }
+.status-aprovado { background-color: #d4edda; color: #155724; }
+.status-cancelado { background-color: #f8d7da; color: #721c24; }
+
+/* Botão de Visualizar */
+.btn-detalhes {
+    text-decoration: none;
+    color: #111;
+    font-weight: 500;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+.btn-detalhes:hover {
+    background-color: #111;
+    color: #fff;
+    border-color: #111;
+}

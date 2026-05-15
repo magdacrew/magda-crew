@@ -113,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="pt-BR">
 
 <head>
-
+<link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
 <meta charset="UTF-8">
 
 <meta name="viewport"
@@ -130,8 +130,8 @@ href="/magda-crew/public/assets/css/login.css">
 
 <div class="login-container">
 
-    <a href="/magda-crew/public/index.php" target="_blank">
-        <img src="/magda-crew/public/assets/images/X.png" alt="Canto" class="botao-x">
+    <a href="javascript:history.back()">
+        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
     </a>
 
     <div class="logo">
