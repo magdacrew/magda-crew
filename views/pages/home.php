@@ -74,9 +74,12 @@
     <?php endif; ?>
 </div>
 
+<main style="padding: 15px 55px;">
+    <section class="banner" id="banner-section">
+    </div>
 <div class="banner-section">
-    <div class="banner-overlay">
-        <span class="banner-subtitle">FALL26 COLLECTION</span>
+    <div class="banner-overlay" >
+        <span class="banner-subtitle">FALL6 COLLECTION</span>
         <h1 class="banner-title">T-SHIRTS</h1>
         <a href="#" class="banner-button">Explore Agora</a>
     </div>

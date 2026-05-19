@@ -139,216 +139,200 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Editar Produto</title>
-
-<link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
-
-<link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Produto</title>
+    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    
+    <link rel="stylesheet" href="/magda-crew/public/assets/css/adicionar-produto.css">
 </head>
-
 <body>
 
-<main class="main-content">
+<main class="container-admin">
+    <a href="javascript:history.back()">
+        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+    </a>
 
-<section class="content">
+    <h1>Editar Produto</h1>
+    <p class="subtitle">Edite as informações do item abaixo.</p>
 
-<h1>Editar Produto</h1>
+    <form method="POST" enctype="multipart/form-data">
 
-<form method="POST" enctype="multipart/form-data" class="form-admin">
-
-    <input 
-        type="text"
-        name="nome"
-        value="<?= htmlspecialchars($produto['nome']) ?>"
-        required
-    >
-
-    <textarea 
-        name="descricao"
-        rows="5"
-    ><?= htmlspecialchars($produto['descricao']) ?></textarea>
-
-    <input 
-        type="number"
-        step="0.01"
-        name="preco"
-        value="<?= $produto['preco'] ?>"
-        required
-    >
-
-    <select name="categoria_id">
-
-        <?php foreach($categorias as $categoria): ?>
-
-            <option 
-                value="<?= $categoria['id'] ?>"
-                <?= $produto['categoria_id'] == $categoria['id'] ? 'selected' : '' ?>
-            >
-                <?= htmlspecialchars($categoria['nome']) ?>
-            </option>
-
-        <?php endforeach; ?>
-
-    </select>
-
-    <label>
-        <input 
-            type="checkbox"
-            name="destaque"
-            <?= $produto['destaque'] ? 'checked' : '' ?>
-        >
-        Produto em destaque
-    </label>
-
-    <label>
-        <input 
-            type="checkbox"
-            name="ativo"
-            <?= $produto['ativo'] ? 'checked' : '' ?>
-        >
-        Produto ativo
-    </label>
-
-    <hr>
-
-    <h3>Imagens atuais</h3>
-
-<div class="preview-imagens">
-
-<?php foreach($listaImagens as $img): ?>
-
-    <?php
-
-    // CAMINHO COMPLETO DA IMAGEM
-    $caminhoImagem = '/magda-crew/public/assets/images/produtos/' . trim($img['caminho_imagem']);
-
-    ?>
-
-    <div class="preview-item">
-
-        <!-- MOSTRA O CAMINHO -->
-        
-    
-        <!-- IMAGEM -->
-        <img 
-         src="<?= $caminhoImagem ?>"
-    alt=""
-    style="
-        width:100%;
-        height:160px;
-        object-fit:cover;
-        border-radius:10px;
-    "
-        >
-
-        <label class="principal-label">
-
+        <div class="form-group">
             <input 
-                type="radio"
-                name="imagem_existente_principal"
-                value="<?= $img['id'] ?>"
-                <?= $img['is_principal'] ? 'checked' : '' ?>
+                type="text"
+                name="nome"
+                value="<?= htmlspecialchars($produto['nome']) ?>"
+                placeholder="Nome do produto"
+                required
             >
+        </div>
 
-            Principal
+        <div class="form-group">
+            <textarea 
+                name="descricao"
+                rows="5"
+                placeholder="Descrição"
+            ><?= htmlspecialchars($produto['descricao']) ?></textarea>
+        </div>
 
+        <div class="form-group">
+            <input 
+                type="number"
+                step="0.01"
+                name="preco"
+                value="<?= $produto['preco'] ?>"
+                placeholder="Preço"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <select name="categoria_id" required>
+                <?php foreach($categorias as $categoria): ?>
+                    <option 
+                        value="<?= $categoria['id'] ?>"
+                        <?= $produto['categoria_id'] == $categoria['id'] ? 'selected' : '' ?>
+                    >
+                        <?= htmlspecialchars($categoria['nome']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <label class="check-area">
+            <input 
+                type="checkbox"
+                name="destaque"
+                <?= $produto['destaque'] ? 'checked' : '' ?>
+            >
+            Produto em destaque
         </label>
 
-    </div>
-
-<?php endforeach; ?>
-
-</div>
-
-    <h3>Adicionar novas imagens</h3>
-
-    <div class="upload-area">
-
-        <label for="imagens" class="upload-box">
-            Clique para selecionar imagens
+        <label class="check-area">
+            <input 
+                type="checkbox"
+                name="ativo"
+                <?= $produto['ativo'] ? 'checked' : '' ?>
+            >
+            Produto ativo
         </label>
 
-        <input 
-            type="file"
-            id="imagens"
-            name="imagens[]"
-            multiple
-            accept="image/*"
-            hidden
-        >
+        <hr>
 
-    </div>
+        <h3>Imagens atuais</h3>
+        <div class="preview-imagens">
+            <?php foreach($listaImagens as $img): ?>
+                <?php $caminhoImagem = '/magda-crew/' . trim($img['caminho_imagem']); ?>
+                <div class="preview-item">
+                    <img src="<?= $caminhoImagem ?>" alt="">
+                    <label class="principal-label">
+                        <input 
+                            type="radio"
+                            name="imagem_existente_principal"
+                            value="<?= $img['id'] ?>"
+                            <?= $img['is_principal'] ? 'checked' : '' ?>
+                        >
+                        <span>Principal</span>
+                    </label>
+                </div>
+            <?php endforeach; ?>
+        </div>
 
-    <div id="previewImagens" class="preview-imagens"></div>
+        <hr>
 
-    <button type="submit" class="btn-add">
-        Salvar Alterações
-    </button>
+        <h3>Adicionar novas imagens</h3>
+        <div class="upload-area">
+            <label for="imagens" class="upload-box">
+                Clique para selecionar imagens
+            </label>
+            <input 
+                type="file"
+                id="imagens"
+                name="imagens[]"
+                multiple
+                accept="image/*"
+                hidden
+            >
+        </div>
 
-</form>
+        <div id="previewImagens" class="preview-imagens" style="color: #666; font-size: 12px; margin-top: 10px;"></div>
 
-</section>
+        <button type="submit" class="btn-add">
+            Salvar Alterações
+        </button>
 
+    </form>
 </main>
 
 <script>
-
 const inputImagens = document.getElementById('imagens');
-
 const preview = document.getElementById('previewImagens');
 
-inputImagens.addEventListener('change', function() {
+// Variável para armazenar todos os novos arquivos selecionados
+let arquivosAcumulados = [];
 
-    preview.innerHTML = '';
+// Função que atualiza o input original para o PHP receber os arquivos certos
+function atualizarInputFiles() {
+    const dataTransfer = new DataTransfer();
+    arquivosAcumulados.forEach(file => {
+        dataTransfer.items.add(file);
+    });
+    inputImagens.files = dataTransfer.files;
+}
 
-    const arquivos = this.files;
+// Função para desenhar as novas imagens na tela
+function renderizarPreview() {
+    preview.innerHTML = ''; // Limpa a tela para redesenhar
 
-    for(let i = 0; i < arquivos.length; i++) {
-
+    arquivosAcumulados.forEach((arquivo, index) => {
         const reader = new FileReader();
 
         reader.onload = function(e) {
-
             const div = document.createElement('div');
-
             div.classList.add('preview-item');
 
             div.innerHTML = `
-                <img 
-                    src="${e.target.result}"
-                    style="width:100%; height:160px; object-fit:cover;"
-                >
+                <button type="button" class="btn-remover" onclick="removerImagem(${index})"></button>
+                
+                <img src="${e.target.result}">
 
                 <label class="principal-label">
-
                     <input 
                         type="radio"
                         name="imagem_principal"
-                        value="${i}"
-                        ${i === 0 ? 'checked' : ''}
+                        value="${index}"
+                        ${index === 0 ? 'checked' : ''}
                     >
-
-                    Principal
-
+                    <span>Principal</span>
                 </label>
             `;
 
             preview.appendChild(div);
         }
 
-        reader.readAsDataURL(arquivos[i]);
-    }
+        reader.readAsDataURL(arquivo);
+    });
+}
 
+// Evento quando o usuário escolhe novas imagens
+inputImagens.addEventListener('change', function() {
+    const novosArquivos = Array.from(this.files);
+    
+    // Junta as imagens antigas com as novas
+    arquivosAcumulados = arquivosAcumulados.concat(novosArquivos);
+    
+    atualizarInputFiles(); // Atualiza o campo <input> escondido
+    renderizarPreview();   // Mostra na tela
 });
 
+// Função para remover uma nova imagem específica antes do upload
+window.removerImagem = function(index) {
+    arquivosAcumulados.splice(index, 1); // Remove 1 item do array na posição selecionada
+    atualizarInputFiles();               // Atualiza o <input> para o PHP não receber a imagem apagada
+    renderizarPreview();                 // Redesenha a tela
+};
 </script>
 
 </body>
