@@ -11,7 +11,6 @@ body {
   font-family: "Cinzel", serif;
 }
 
-
 /* SEÇÃO HERO */
 .hero {
   position: relative;
@@ -25,6 +24,7 @@ body {
   background-size: cover;
   background-position: center;
 }
+
 .hero::before {
   content: "";
   position: absolute;
@@ -125,9 +125,7 @@ body {
   transform: scale(1.2);
 }
 
-/* CATEGORIAS E VITRINE */
-
-/* Adaptado para funcionar com <a> ou <button> sem mudar o visual */
+/* CATEGORIAS */
 .categorias { 
   display: flex;
   gap: 15px; 
@@ -158,20 +156,29 @@ body {
   background: #bbb;
 }
 
+/* VITRINE */
 .vitrine { 
     display: flex;
     justify-content: flex-start; /* Alinha os itens à esquerda */
-    gap: 50px; 
-    padding: 10px 55px; /* Alinhado com o padding do seu header */
+    gap: 35px; /* Controla o espaço real entre os cards */
+    padding: 10px 55px; /* Alinhado com o padding do header */
     flex-wrap: nowrap; /* Mantém em linha para o scroll se necessário */
-    overflow-x: auto; /* Permite scroll horizontal se houver muitos itens */
+    overflow-x: auto; /* Permite scroll horizontal */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    /* Regras para esconder a scrollbar nativa */
+    -ms-overflow-style: none;  /* IE e Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.vitrine::-webkit-scrollbar {
+    display: none; /* Chrome, Safari e Opera */
 }
 
 /* CONTAINER DO CARD */
 .card-produto { 
     background: transparent; /* Fundo transparente como na foto */
-    width: 280px; 
+    width: 320px; 
     flex-shrink: 0; /* Impede que o card esmague em telas menores */
     transition: opacity 0.3s ease;
 }
@@ -188,25 +195,16 @@ body {
 }
 
 /* ÁREA DA IMAGEM */
-.imagem-placeholder, .card-produto img {
-    width: 300px; 
-    height: 300px; /* Proporção vertical de editorial */
-    background-color: #f0f0f0; /* Fundo cinza claro ou branco para o produto */
+/* Ajuste crítico: width para 100% para não vazar do card */
+.imagem-placeholder, 
+.imagem-placeholder-detalhe, 
+.card-produto img {
+    width: 100%; 
+    aspect-ratio: 1 / 1; /* Força um quadrado perfeito */
+    height: auto; /* Substitui os 300px fixos */
+    background-color: #f0f0f0; 
     object-fit: cover;
-    border-radius: 12px; /* Cantos bem arredondados como na imagem */
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.imagem-placeholder-detalhe, .card-produto img {
-    width: 500px; 
-    height: 500px; /* Proporção vertical de editorial */
-    background-color: #ffffff; /* Fundo cinza claro ou branco para o produto */
-    object-fit: cover;
-    border-radius: 12px; /* Cantos bem arredondados como na imagem */
+    border-radius: 12px; 
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -233,41 +231,147 @@ body {
     text-align: left;
 }
 
-/* TAG "ESGOTADO" (Opcional, caso queira o detalhe da imagem) */
+/* Garante que a tag fique presa dentro do limite da imagem */
+.imagem-produto {
+    position: relative;
+    display: block;
+}
+
+/* O visual idêntico ao do seu anexo */
 .tag-esgotado {
+    position: absolute; /* Tira a tag do fluxo normal e permite flutuar sobre a foto */
+    top: 15px; /* Distância do topo */
+    left: 15px; /* Distância da esquerda */
+    background-color: rgba(120, 120, 120, 0.95); /* Cor cinza do botão */
+    color: #ffffff; /* Texto branco */
+    padding: 6px 16px; /* Espaçamento interno para dar o formato */
+    border-radius: 20px; /* Bordas arredondadas (pílula) */
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-weight: 500;
+    z-index: 10; /* Garante que fique acima da imagem */
+    pointer-events: none; /* Faz o clique do mouse ignorar a tag e ir direto para o link da foto */
+    letter-spacing: 0.5px;
+}
+
+/* CAMADA DE ESCURECIMENTO PARA PRODUTOS ESGOTADOS */
+.overlay-esgotado {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(4px);
-    color: #fff;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: bold;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Cor preta com 40% de opacidade (ajuste o 0.4 se quiser mais claro ou escuro) */
+    background-color: rgba(0, 0, 0, 0.4); 
+    
+    /* Garante que fique acima da imagem, mas ABAIXO da tag "Esgotado" */
+    z-index: 5; 
+    
+    /* Deve ter o mesmo border-radius que você definiu para as imagens (era 12px) */
+    border-radius: 12px; 
+    
+    /* Evita que essa camada bloqueie cliques ao link do card */
+    pointer-events: none; 
+}
+
+/* BARRA DE SCROLL CUSTOMIZADA (O Input) */
+.embla__scrollbar {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    max-width: 800px; /* Conforme seu print */
+    height: 11px;
+    background-color: rgba(255, 255, 255, 0.1); /* Fundo sutil */
+    margin: 28px auto; /* Espaçamento e centralização */
+    display: block;
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Estilo do "Thumb" (A parte branca que se move) - WebKit (Chrome/Safari) */
+.embla__scrollbar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 150px; /* Define a largura da barrinha branca */
+    height: 11px;
+    background-color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Estilo do "Thumb" - Firefox */
+.embla__scrollbar::-moz-range-thumb {
+    width: 150px;
+    height: 11px;
+    background-color: #fff;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+/* SEÇÃO BANNER */
+.banner-section {
+  position: relative;
+  height: 720px;
+  border-radius: 45px;
+  overflow: hidden;
+  display: flex;
+  font-family: "Inter", sans-serif;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background:
+  linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),
+  url('/magda-crew/public/assets/images/background4.jpg') center center/cover no-repeat;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+    color: white;
+}
+
+.banner-subtitle {
+    font-size: 14px;
+    letter-spacing: 2px;
+    font-weight: 500;
     text-transform: uppercase;
 }
 
-.vitrine {
-    overflow-x: auto;
-    padding-bottom: 30px; /* empurra a scrollbar pra baixo */
+.banner-title {
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
-/* BARRA DE SCROLL CUSTOMIZADA */
-.vitrine::-webkit-scrollbar {
-    height: 9px;
+.banner a {
+  display: inline-block;
+  padding: 18px 65px;
+  border-radius: 35px;
+  border: 1px solid #e7e9eb;
+  background: rgba(255, 255, 255, .35);
+  color: white;
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  backdrop-filter: blur(6px);
+  transition: .3s;
 }
 
-.vitrine::-webkit-scrollbar-track {
-    background: #333;
-    margin: 0 5px;
+.banner a:hover {
+  background: rgba(255, 255, 255, .5);
+  transform: scale(1.04);
 }
-
-.vitrine::-webkit-scrollbar-thumb {
-    background: #fff;
-    border-radius: 10px;
-}
-/* Removi o botão .btn-comprar pois agora o card inteiro é o botão */
 
 /* RESPONSIVIDADE GERAL */
 @media (max-width: 900px) {
@@ -279,68 +383,53 @@ body {
   .arrow.left { left: 25px; }
   .arrow.right { right: 25px; }
 }
-.banner-section{
-   position: relative;
-  height: 720px;
-  border-radius: 45px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
-  background:
-  linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0.253)),
-  url('/magda-crew/public/assets/images/background3.png') center center/cover no-repeat;
-}
 
-.banner-overlay{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
+/* ==========================================
+   BOTÃO VOLTAR AO TOPO
+========================================== */
+.btn-topo {
+    position: fixed;
+    bottom: 40px; /* Distância do fundo */
+    right: 40px; /* Distância da direita */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Faz ficar redondo */
+    background-color: rgba(255, 255, 255, 0.15); /* Fundo cinza transparente */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Bordinha branca bem leve */
+    color: #ffffff; /* Cor da seta */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999; /* Fica sempre na frente das outras coisas */
     
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:14px;
-
-    text-align:center;
-    color:white;
-}
-
-.banner-subtitle{
-    font-size:14px;
-    letter-spacing:2px;
-    font-weight:500;
-    text-transform:uppercase;
-}
-
-.banner-title{
-    font-size:52px;
-    font-weight:700;
-    letter-spacing:2px;
-    text-transform:uppercase;
-}
-
-.banner-button{
-    padding:12px 26px;
-    border-radius:999px;
+    /* Configurações para ele começar escondido */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0); /* Posição inicial */
     
-    background:rgba(255,255,255,.2);
-    backdrop-filter:blur(10px);
-
-    color:white;
-    text-decoration:none;
-    font-size:15px;
-    font-weight:500;
-
-    border:1px solid rgba(255,255,255,.25);
-
-    transition:.3s;
+    /* Transições suaves para cor, opacidade, visibilidade e movimento */
+    transition: opacity 0.4s ease, visibility 0.4s ease, background-color 0.3s ease, transform 0.3s ease;
+    
+    /* Opcional: dá um efeitinho de vidro fosco no fundo do botão (muito usado no design streetwear/high-end) */
+    backdrop-filter: blur(5px);
 }
 
-.banner-button:hover{
-    background:white;
-    color:black;
-    transform:scale(1.05);
+/* Tamanho do ícone da seta */
+.btn-topo svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* CLASSE QUE O JS VAI ADICIONAR PARA MOSTRAR O BOTÃO */
+.btn-topo.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* EFEITOS DE HOVER (Quando passa o mouse) */
+.btn-topo.show:hover {
+    background-color: rgba(255, 255, 255, 0.35); /* Fica um pouco mais branco */
+    transform: translateY(-6px); /* Move 6 pixels para cima */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Uma sombrinha pra dar destaque */
 }

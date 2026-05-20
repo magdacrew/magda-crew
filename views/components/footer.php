@@ -37,7 +37,6 @@
         </div>
     </div>
 
-    <button id="backToTop" class="scroll-top-btn" title="Voltar ao topo">&#8593;</button>
 </footer>
 
 <script src="script.js"></script>

@@ -1,8 +1,9 @@
 
 <aside class="sidebar" id="sidebar">
     <div class="logo-container">
-        <img src="public/assets/images/MagdaWhiteLogo.png" alt="Logo" class="logo-img">
-    
+        <a href="/magda-crew/public/index.php">
+            <img src="public/assets/images/MagdaWhiteLogo.png" alt="Logo" class="logo-img">
+        </a>
     </div>
 
     
@@ -13,6 +14,7 @@
             <li><a href="categorias.php">Categorias</a></li>
             <li><a href="vendas.php">Vendas</a></li>
             <li><a href="clientes.php">Clientes</a></li>
+            <li><a href="estoque.php">estoque</a></li>
         </ul>
     </nav>
 </aside>

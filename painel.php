@@ -35,7 +35,7 @@ $totalAtivo = $stmproduto->fetch()['total'];
 </head>
 <body>
 
-<?php include 'sidebar.php'; ?>
+
 
     <section class="content">
         <h1>Visão Geral</h1>
