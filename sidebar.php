@@ -14,7 +14,7 @@
             <li><a href="categorias.php">Categorias</a></li>
             <li><a href="vendas.php">Vendas</a></li>
             <li><a href="clientes.php">Clientes</a></li>
-            <li><a href="estoque.php">estoque</a></li>
+            <li><a href="estoque.php">Estoque</a></li>
         </ul>
     </nav>
 </aside>

@@ -93,10 +93,11 @@
     </div>
 <div class="banner-section">
     <div class="banner-overlay" >
-        <h1>FALL’26 | T-SHIRTS </h1>
+        <h1>VAMPETA’26 | T-SHIRTS </h1>
         <a href="#">Explore Agora</a>
     </div>
 </div>
+</main>
 
 <button id="btnTop" class="btn-topo" aria-label="Voltar ao topo">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -105,7 +106,9 @@
     </svg>
 </button>
 
-<?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
+<div style="padding: 15px 55px;">
+    <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {

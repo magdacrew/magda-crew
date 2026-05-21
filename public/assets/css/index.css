@@ -324,7 +324,7 @@ body {
   background-size: cover;
   background:
   linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),
-  url('/magda-crew/public/assets/images/background4.jpg') center center/cover no-repeat;
+  url('/magda-crew/public/assets/images/background5.png') center center/cover no-repeat;
 }
 
 .banner-overlay {
