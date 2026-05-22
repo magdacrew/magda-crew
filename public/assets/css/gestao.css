@@ -186,7 +186,6 @@ table.tabela tr:hover {
 }
 
 .acoes {
-    display: flex;
     gap: 10px;
 }
 
@@ -336,4 +335,33 @@ table.tabela tr:hover {
 
 .btn-remover:hover {
     background-color: #cc0000;
+}
+
+/* --- ESTILOS DA MINIATURA NA TABELA DE PRODUTOS --- */
+
+.thumb-produto {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Caso o produto ainda não tenha imagem cadastrada */
+.thumb-produto.placeholder {
+    background-color: #eee;
+    color: #999;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px dashed #ccc;
+    box-shadow: none;
+}
+
+/* Centraliza verticalmente todos os itens da tabela para alinharem com a foto */
+table.tabela td {
+    vertical-align: middle;
 }
