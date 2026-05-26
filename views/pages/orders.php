@@ -58,8 +58,9 @@ $stmtItens = $pdo->prepare("
                 <a href="/magda-crew/views/pages/Profile.php">Profile</a>
             </div>
 
-            <div class="profile-icon">
-                👤
+            <a href="javascript:history.back()">
+        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="profile-icon">
+</a>
             </div>
         </div>
     </div>

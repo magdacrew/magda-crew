@@ -72,13 +72,18 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </td>
 
                 <td class="acoes">
-                    <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="btn-editar">Editar</a>
+                    <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="btn-editar-img" title="Editar Produto">
+                        <img src="/magda-crew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
+                    </a>
 
-                    <?php if(isset($produto['ativo']) && $produto['ativo'] == 1): ?>
-                        <a href="toggle-produto.php?id=<?= $produto['id'] ?>" class="btn-status">Desativar</a>
-                    <?php else: ?>
-                        <a href="toggle-produto.php?id=<?= $produto['id'] ?>" class="btn-add">Ativar</a>
-                    <?php endif; ?>
+                    <label class="switch">
+                        <input 
+                            type="checkbox" 
+                            <?= (isset($produto['ativo']) && $produto['ativo'] == 1) ? 'checked' : '' ?>
+                            onchange="window.location.href='toggle-produto.php?id=<?= $produto['id'] ?>'"
+                        >
+                        <span class="slider round"></span>
+                    </label>
                 </td>
             </tr>
             <?php endforeach; ?>

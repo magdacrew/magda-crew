@@ -38,6 +38,12 @@
 
 <ul class="categorias">
     <?php foreach ($categorias as $cat): ?>
+        <?php 
+            // Se a categoria tiver a coluna 'ativo' e for igual a 0 (inativa), pula para a próxima!
+            if (isset($cat['ativo']) && $cat['ativo'] == 0) {
+                continue; 
+            }
+        ?>
         <li>
             <button 
                 class="btn-filtro-categoria <?= ($cat['nome'] == 'Tudo') ? 'active' : '' ?>" 
@@ -51,6 +57,17 @@
 <div class="vitrine-wrapper">
     
     <div class="vitrine" id="vitrine-container">
+        <?php 
+            // ORDENAÇÃO: Coloca os produtos com estoque primeiro e os esgotados no final
+            if (!empty($produtos)) {
+                usort($produtos, function($a, $b) {
+                    $esgotadoA = (isset($a['total_estoque']) && $a['total_estoque'] <= 0) ? 1 : 0;
+                    $esgotadoB = (isset($b['total_estoque']) && $b['total_estoque'] <= 0) ? 1 : 0;
+                    return $esgotadoA <=> $esgotadoB;
+                });
+            }
+        ?>
+        
         <?php if (!empty($produtos)): ?>
             <?php foreach ($produtos as $produto): ?>
                 <div class="card-produto">
