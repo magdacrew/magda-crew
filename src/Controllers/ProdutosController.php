@@ -44,6 +44,6 @@ class ProdutosController { // Adicione o S aqui
         $tituloDaPagina = "Magda Crew - " . $produto['nome'];
         $cssExtra = '<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/produto.css">';
 
-        require_once __DIR__ . '/../../views/pages/produto_detalhe.php';
+        require_once __DIR__ . '/../../views/pages/produto-detalhe.php';
     }
 }

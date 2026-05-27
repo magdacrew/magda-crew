@@ -127,3 +127,56 @@ nav a:hover {
     display: none;
   }
 }
+        /* Fundo escuro que bloqueia a tela */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+            backdrop-filter: blur(2px);
+        }
+        .cart-overlay.ativo {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* A gaveta do carrinho (Escondida à direita) */
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -450px; /* ISSO AQUI ESCONDE ELA DA TELA */
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background-color: #1a1a1a;
+            color: #fff;
+            z-index: 1000;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+            transition: right 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+        }
+        .cart-drawer.aberto {
+            right: 0; /* ISSO FAZ ELA APARECER AO CLICAR */
+        }
+
+        /* Estilos internos da gaveta */
+        .cart-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; border-bottom: 1px solid #333;
+        }
+        .cart-header h2 { font-size: 1.2rem; margin: 0; display: flex; align-items: center; gap: 10px; font-weight: normal;}
+        .cart-count { background: #fff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.9rem; font-weight: bold;}
+        .fechar-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer;}
+        .cart-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .cart-footer { padding: 20px; border-top: 1px solid #333; background: #1a1a1a; }
+        .cart-total { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.1rem; font-weight: bold; }
+        .btn-finalizar { width: 100%; padding: 15px; background: #fff; color: #000; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+

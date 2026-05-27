@@ -7,7 +7,7 @@ try {
     die("Erro ao conectar: " . $e->getMessage());
 }
 
-// Atualizado para buscar a imagem principal do produto junto com os dados dele
+// Busca a imagem principal do produto junto com os dados dele
 $stmt = $pdo->query("
     SELECT p.*, 
            (SELECT caminho_imagem FROM produto_imagens WHERE produto_id = p.id AND is_principal = 1 LIMIT 1) as caminho_imagem
@@ -22,7 +22,7 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link class="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
     <title>Produtos - Magda Crew</title>
     <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
 </head>
@@ -46,47 +46,53 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
         <table class="tabela">
-            <tr>
-                <th>ID</th>
-                <th></th> <th>Produto</th>
-                <th>Preço</th>
-                <th>Ações</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">ID</th>
+                    <th>Produto</th>
+                    <th style="width: 150px;">Preço</th>
+                    <th style="width: 150px; text-align: center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach($produtos as $produto): ?>
+                <tr>
+                    <td><?= $produto['id'] ?></td>
 
-            <?php foreach($produtos as $produto): ?>
-            <tr>
-                <td><?= $produto['id'] ?></td>
+                    <td>
+                        <div class="produto-info-cell">
+                            <?php if (!empty($produto['caminho_imagem'])): ?>
+                                <img src="/magda-crew/<?= htmlspecialchars($produto['caminho_imagem']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>" class="thumb-produto">
+                            <?php else: ?>
+                                <div class="thumb-produto placeholder">Sem Foto</div>
+                            <?php endif; ?>
+                            <span class="produto-nome-texto"><?= htmlspecialchars($produto['nome']) ?></span>
+                        </div>
+                    </td>
 
-                <td>
-                    <?php if (!empty($produto['caminho_imagem'])): ?>
-                        <img src="/magda-crew/<?= htmlspecialchars($produto['caminho_imagem']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>" class="thumb-produto">
-                    <?php else: ?>
-                        <div class="thumb-produto placeholder">Sem Foto</div>
-                    <?php endif; ?>
-                </td>
+                    <td>
+                        R$ <?= number_format($produto['preco'], 2, ',', '.') ?>
+                    </td>
 
-                <td><?= htmlspecialchars($produto['nome']) ?></td>
+                    <td style="text-align: center;">
+                        <div class="acoes">
+                            <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="btn-editar-img" title="Editar Produto">
+                                <img src="/magda-crew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
+                            </a>
 
-                <td>
-                    R$ <?= number_format($produto['preco'], 2, ',', '.') ?>
-                </td>
-
-                <td class="acoes">
-                    <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="btn-editar-img" title="Editar Produto">
-                        <img src="/magda-crew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
-                    </a>
-
-                    <label class="switch">
-                        <input 
-                            type="checkbox" 
-                            <?= (isset($produto['ativo']) && $produto['ativo'] == 1) ? 'checked' : '' ?>
-                            onchange="window.location.href='toggle-produto.php?id=<?= $produto['id'] ?>'"
-                        >
-                        <span class="slider round"></span>
-                    </label>
-                </td>
-            </tr>
-            <?php endforeach; ?>
+                            <label class="switch" title="Ativar/Desativar">
+                                <input 
+                                    type="checkbox" 
+                                    <?= (isset($produto['ativo']) && $produto['ativo'] == 1) ? 'checked' : '' ?>
+                                    onchange="window.location.href='toggle-produto.php?id=<?= $produto['id'] ?>'"
+                                >
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
         </table>
 
     </section>

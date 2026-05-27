@@ -53,19 +53,18 @@ body {
 
 /* Estilização da Logo na Sidebar */
 .logo-container {
-    padding: 30px 20px; /* Espaçamento em volta da logo */
+    padding: 30px 20px;
     text-align: center;
-    border-bottom: 1px solid #333; /* Mantém a linha divisória se desejares */
+    border-bottom: 1px solid #333;
 }
 
 .logo-img {
-    max-width: 80%; /* Ajusta o tamanho da logo para não tocar nas bordas */
-    height: auto;   /* Mantém a proporção da imagem */
+    max-width: 80%;
+    height: auto;
     display: block;
     margin: 0 auto;
 }
 
-/* Ajuste opcional: se a logo for redonda ou quadrada e quiseres dar destaque */
 .logo-img:hover {
     transform: scale(1.05);
     transition: 0.3s;
@@ -120,28 +119,33 @@ body {
     color: #111;
 }
 
+/* ESTRUTURA REFINADA DA TABELA */
 table.tabela {
     width: 100%;
     border-collapse: collapse;
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 table.tabela th,
 table.tabela td {
-    padding: 15px;
+    padding: 14px 18px;
     border-bottom: 1px solid #eee;
     text-align: left;
+    vertical-align: middle;
 }
 
 table.tabela th {
     background: #111;
     color: white;
+    font-weight: 600;
+    font-size: 14px;
 }
 
 table.tabela tr:hover {
-    background: #f5f5f5;
+    background: #fcfcfc;
 }
 
 #menuToggle {
@@ -165,53 +169,58 @@ table.tabela tr:hover {
     margin-bottom: 20px;
 }
 
-.btn-add {
-    background: #17be01;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.btn-adicionar {
+.btn-add, .btn-adicionar, .btn-novo {
     background: #000000;
     color: white;
-    padding: 8px 12px;
+    padding: 9px 16px;
     border-radius: 8px;
     text-decoration: none;
     font-weight: bold;
-    transition: 0.3s;
+    font-size: 14px;
+    transition: opacity 0.2s;
 }
 
-.btn-add:hover {
+.btn-add:hover, .btn-adicionar:hover, .btn-novo:hover {
     opacity: 0.8;
 }
 
-.btn-editar {
-    background: #0d6efd;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    text-decoration: none;
+/* CONTAINER DA MINIATURA + TEXTO DO PRODUTO */
+.produto-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.produto-nome-texto {
+    font-weight: 500;
+    color: #111;
     font-size: 14px;
 }
 
-.btn-status {
-    background: #dc3545;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 14px;
+/* MINIATURAS */
+.thumb-produto {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
 }
 
-.btn-editar:hover,
-.btn-status:hover {
-    opacity: 0.8;
+.thumb-produto.placeholder {
+    background-color: #eee;
+    color: #999;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px dashed #ccc;
+    box-shadow: none;
 }
 
+/* FORMULÁRIOS DE ADMINISTRAÇÃO */
 .form-admin {
     display: flex;
     flex-direction: column;
@@ -226,175 +235,38 @@ table.tabela tr:hover {
     font-size: 15px;
 }
 
-.galeria-produto {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.item-galeria {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.item-galeria img {
-    border-radius: 10px;
-    border: 1px solid #ddd;
-}
-
-.upload-box {
-    width: 100%;
-    padding: 40px;
-    border: 2px dashed #999;
-    border-radius: 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.3s;
-    background: #fafafa;
-    font-size: 16px;
-}
-
-.upload-box:hover {
-    background: #f0f0f0;
-}
-
-.preview-imagens {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
-
-.preview-item {
-    position: relative; /* Importante para o X ficar no canto */
-    width: 130px; 
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #fff;
-}
-
-.preview-item img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover; /* Evita que a imagem fique esticada/achatada */
-    margin-bottom: 10px;
-    border-radius: 4px;
-}
-
-.principal-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-.btn-remover {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    font-weight: bold;
-    display: flex;
+/* REGRAS DE LAYOUT PARA AS AÇÕES (LÁPIS E TOGGLE SWITCH) */
+.acoes {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.btn-remover:hover {
-    background-color: #cc0000;
-}
-
-/* --- ESTILOS DA MINIATURA NA TABELA DE PRODUTOS --- */
-.thumb-produto {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 8px;
-    display: block;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Caso o produto ainda não tenha imagem cadastrada */
-.thumb-produto.placeholder {
-    background-color: #eee;
-    color: #999;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    border: 1px dashed #ccc;
-    box-shadow: none;
-}
-
-/* Centraliza verticalmente todos os itens da tabela para alinharem com a foto */
-table.tabela td {
+    gap: 16px;
     vertical-align: middle;
 }
 
-.btn-novo {
-    background: #000000;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.btn-novo:hover {
-    opacity: 0.8;
-}
-
-/* ==========================================================================
-   REGRAS DE LAYOUT PARA AS NOVAS AÇÕES (LÁPIS E TOGGLE SWITCH)
-   ========================================================================== */
-
-/* Alinha o lápis e o switch lado a lado horizontalmente dentro da td */
-.acoes {
-    align-items: center;
-    gap: 12px;
-}
-
-/* Reseta o link para se comportar estritamente como um botão contêiner */
 .btn-editar-img {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, opacity 0.2s ease;
     text-decoration: none;
     background: none;
     padding: 0;
 }
 
 .btn-editar-img:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    opacity: 0.7;
 }
 
-/* CONTROLE RESTRITO DE TAMANHO DA IMAGEM DO LÁPIS */
 .icon-editar {
-    width: 20px;
-    height: 20px;
-    max-width: 20px;
-    max-height: 20px;
+    width: 18px;
+    height: 18px;
     object-fit: contain;
     display: block;
 }
 
-/* --- O TOGGLE SWITCH COMPLETO --- */
+/* O TOGGLE SWITCH */
 .switch {
     position: relative;
     display: inline-block;
@@ -403,7 +275,6 @@ table.tabela td {
     cursor: pointer;
 }
 
-/* Esconde o checkbox HTML nativo */
 .switch input {
     opacity: 0;
     width: 0;
@@ -416,36 +287,240 @@ table.tabela td {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #e4e4e7;
+    border: 1px solid #d4d4d8;
     transition: .3s;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 16px;
-    width: 16px;
+    height: 14px;
+    width: 14px;
     left: 3px;
     bottom: 3px;
     background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     transition: .3s;
 }
 
-/* Aplica a cor verde ativa baseada na cor padrão do seu .btn-add */
 input:checked + .slider {
-    background-color: #17be01;
+    background-color: #000000;
+    border-color: #000000;
 }
 
 input:checked + .slider:before {
     transform: translateX(18px);
 }
 
-/* Arredonda o contêiner do Switch */
 .slider.round {
     border-radius: 22px;
 }
 
-/* Transforma a bolinha interna em um círculo perfeito */
 .slider.round:before {
     border-radius: 50%;
 }
+
+.btn-acao {
+    background-color: #333;
+    color: #fff;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: background 0.3s;
+}
+
+.btn-acao:hover {
+    background-color: #555;
+}
+
+/* ==========================================================================
+   NOVOS ESTILOS REFINADOS: TELA DE DETALHES DO CLIENTE / PEDIDO
+   ========================================================================== */
+
+.topo-acoes {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-voltar {
+    color: #111;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.btn-voltar:hover {
+    background: #f9f9f9;
+    border-color: #ccc;
+}
+
+/* Card Superior do Perfil (Avatar e Nome) */
+.perfil-header-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+}
+
+.avatar-circle {
+    width: 70px;
+    height: 70px;
+    background-color: #111;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.perfil-titulo h1 {
+    font-size: 24px;
+    color: #111;
+    margin-bottom: 4px;
+}
+
+.perfil-titulo p {
+    color: #666;
+    font-size: 15px;
+}
+
+/* Painéis de Informações */
+.painel-perfil, .painel-detalhes {
+    background-color: #fff;
+    border: 1px solid #eee;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.painel-perfil h2, .painel-header h2 {
+    font-size: 16px;
+    color: #111;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #f4f7f6;
+    padding-bottom: 12px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.info-box {
+    background: #fafafa;
+    padding: 16px 20px;
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+}
+
+.info-box span {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.info-box strong {
+    font-size: 1rem;
+    color: #222;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+.endereco-texto {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 400;
+}
+
+/* Badges de Status (Cores Modernas) */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.status-confirmado { background-color: #10b981; } /* Verde moderno */
+.status-pendente { background-color: #f59e0b; color: #fff; } /* Amarelo moderno */
+.status-cancelado { background-color: #ef4444; } /* Vermelho moderno */
+.status-padrao { background-color: #6b7280; } /* Cinza */
+
+.section-title {
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #111;
+}
+
+/* Formulário de Status (Para a tela de Venda Detalhes) */
+.painel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-status {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-status select {
+    padding: 8px;
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-salvar {
+    background-color: #10b981;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.btn-salvar:hover { background-color: #059669; }

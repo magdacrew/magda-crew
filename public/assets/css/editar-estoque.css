@@ -1,0 +1,183 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #1f1f1f, #050505 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    padding: 20px;
+}
+
+.container-admin {
+    width: 100%;
+    max-width: 480px;
+    background: #0f0f0f;
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 0 40px rgba(0,0,0,.8);
+    border: 1px solid #242424;
+    position: relative;
+}
+
+.botao-x {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 20px;
+    height: auto;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.2s;
+}
+
+.botao-x:hover {
+    opacity: .5;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+p.subtitle {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.form-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* --- CARD DE EXIBIÇÃO DA VARIANTE ATUAL --- */
+.card-detalhes-variante {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #141414;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #222;
+}
+
+.mini-foto-produto {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.detalhes-info h3 {
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.badges-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.badge-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1e1e1e;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #ccc;
+    border: 1px solid #2c2c2c;
+}
+
+.tamanho-badge {
+    font-weight: bold;
+    color: #fff;
+}
+
+.color-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* --- FORMULÁRIO --- */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: #aaa;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    height: 52px;
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 0 15px;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #ffffff;
+}
+
+/* --- BOTÃO DE SALVAR --- */
+.btn-salvar {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 10px;
+    background: #fff;
+    color: #000;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.btn-salvar:hover {
+    background: #cfcfcf;
+}
+
+/* --- NOTIFICAÇÕES --- */
+.alerta-erro, .alerta-sucesso {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.alerta-erro {
+    background-color: rgba(248, 215, 218, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(245, 198, 203, 0.2);
+}
+
+.alerta-sucesso {
+    background-color: rgba(212, 237, 218, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(195, 230, 203, 0.2);
+}

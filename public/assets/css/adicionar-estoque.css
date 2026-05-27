@@ -1,0 +1,286 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #1f1f1f, #050505 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    padding: 20px;
+}
+
+.container-admin {
+    width: 100%;
+    max-width: 500px;
+    background: #0f0f0f;
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 0 40px rgba(0,0,0,.8);
+    border: 1px solid #242424;
+    position: relative;
+}
+
+.botao-x {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 20px;
+    height: auto;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.2s;
+}
+
+.botao-x:hover {
+    opacity: .5;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+p.subtitle {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #333;
+    margin: 20px 0;
+}
+
+h3 {
+    font-size: 16px;
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
+.form-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: #aaa;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+/* --- DROPDOWNS CUSTOMIZADOS COMPATÍVEIS COM IMAGENS --- */
+.custom-select-trigger {
+    width: 100%;
+    height: 52px;
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 0 15px;
+    color: #fff;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+
+.custom-select-trigger::after {
+    content: '';
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-top-color: #aaa;
+}
+
+.custom-options-container {
+    position: absolute;
+    top: 56px;
+    left: 0;
+    width: 100%;
+    background: #111111;
+    border: 1px solid #282828;
+    border-radius: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    display: none;
+}
+
+.custom-options-container.show {
+    display: block;
+}
+
+.custom-option {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.custom-option:hover {
+    background: #1c1c1c;
+    color: #fff;
+}
+
+.custom-option img {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #222;
+}
+
+.color-circle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #333;
+}
+
+/* --- INPUTS NATIVOS DA GRADE DINÂMICA --- */
+.linha-dinamica {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+    background: #121212;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.linha-dinamica .form-group {
+    flex: 1;
+}
+
+.linha-dinamica .form-group select,
+.linha-dinamica .form-group input {
+    width: 100%;
+    height: 44px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0 12px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.linha-dinamica .form-group select:focus,
+.linha-dinamica .form-group input:focus {
+    border-color: #fff;
+}
+
+.btn-remover-linha {
+    width: 36px;
+    height: 36px;
+    background: #ff4444 url('/magda-crew/public/assets/images/X.png') no-repeat center;
+    background-size: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-remover-linha:hover {
+    background-color: #cc0000;
+    transform: scale(1.05);
+}
+
+/* --- BOTÕES DE CADASTRO --- */
+.btn-secundario {
+    width: 100%;
+    height: 46px;
+    border: 1px dashed #444;
+    border-radius: 10px;
+    background: transparent;
+    color: #aaa;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.btn-secundario:hover {
+    border-color: #fff;
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.btn-add {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 10px;
+    background: #fff;
+    color: #000;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.btn-add:hover {
+    background: #cfcfcf;
+}
+
+/* --- NOTIFICAÇÕES --- */
+.alerta-erro, .alerta-sucesso {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.alerta-erro {
+    background-color: rgba(248, 215, 218, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(245, 198, 203, 0.2);
+}
+
+.alerta-sucesso {
+    background-color: rgba(212, 237, 218, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(195, 230, 203, 0.2);
+}
+
+.custom-options-container::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-options-container::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

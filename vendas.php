@@ -7,6 +7,7 @@ try {
     die("Erro ao conectar: " . $e->getMessage());
 }
 
+// Melhoria na Query: Se você tiver uma tabela de usuários, seria ideal fazer um JOIN aqui para pegar o nome do cliente.
 $stmt = $pdo->query("
     SELECT *
     FROM vendas
@@ -24,47 +25,62 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
     <title>Vendas - Magda Crew</title>
     <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
+    
 </head>
 <body>
 
 <?php include 'sidebar.php'; ?>
 
-
     <section class="content">
 
-        <h1>Vendas</h1>
-
-        <p style="margin-bottom: 20px; color: #666;">
-            Lista de vendas realizadas na loja.
-        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h1>Vendas</h1>
+                <p style="color: #666; margin-top: 5px;">Gerencie e acompanhe todos os pedidos da loja.</p>
+            </div>
+        </div>
 
         <table class="tabela">
+            <thead>
+                <tr>
+                    <th class="text-center">ID</th>
+                    <th class="text-right">Valor Total</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach($vendas as $venda): ?>
+                    <?php 
+                        // Lógica para definir a cor da tag de status
+                        $statusClass = 'status-padrao';
+                        $statusText = strtolower($venda['status'] ?? '');
+                        if ($statusText === 'confirmado' || $statusText === 'pago') $statusClass = 'status-confirmado';
+                        elseif ($statusText === 'pendente' || $statusText === 'processando') $statusClass = 'status-pendente';
+                        elseif ($statusText === 'cancelado') $statusClass = 'status-cancelado';
+                    ?>
+                <tr>
+                    <td class="text-center"><strong>#<?= $venda['id'] ?></strong></td>
+                    
+                    <td class="text-right">
+                        R$ <?= number_format($venda['valor_total'], 2, ',', '.') ?>
+                    </td>
 
-            <tr>
-                <th>ID</th>
-                <th>Valor Total</th>
-                <th>Status</th>
-            </tr>
+                    <td class="text-center">
+                        <span class="status-badge <?= $statusClass ?>">
+                            <?= htmlspecialchars($venda['status'] ?? 'N/A') ?>
+                        </span>
+                    </td>
 
-            <?php foreach($vendas as $venda): ?>
-
-            <tr>
-                <td><?= $venda['id'] ?></td>
-
-                <td>
-                    R$ <?= number_format($venda['valor_total'], 2, ',', '.') ?>
-                </td>
-
-                <td><?= $venda['status'] ?></td>
-            </tr>
-
-            <?php endforeach; ?>
-
+                    <td class="text-center">
+                        <a href="venda_detalhes.php?id=<?= $venda['id'] ?>" class="btn-acao">Ver Detalhes</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
         </table>
 
     </section>
-
-</main>
 
 <script src="public/assets/js/main.js"></script>
 

@@ -16,14 +16,6 @@ $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Categorias</title>
     <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
     <style>
-        .topo-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .badge-ativo { color: #17be01; font-weight: bold; }
-        .badge-inativo { color: #dc3545; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -41,34 +33,33 @@ $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <tr>
                 <th>ID</th>
                 <th>Categoria</th>
-                <th>Status</th>
                 <th>Ações</th>
             </tr>
 
             <?php foreach($categorias as $categoria): ?>
                 <?php 
-                    // Verifica se a categoria está ativa (se a coluna não existir, assume 1)
+                    // Verifica se a categoria está ativa para o botão switch
                     $is_ativo = isset($categoria['ativo']) ? $categoria['ativo'] : 1; 
                 ?>
             <tr>
                 <td><?= $categoria['id'] ?></td>
                 <td><?= htmlspecialchars($categoria['nome']) ?></td>
-                <td>
-                    <?php if($is_ativo == 1): ?>
-                        <span class="badge-ativo">Ativo</span>
-                    <?php else: ?>
-                        <span class="badge-inativo">Inativo</span>
-                    <?php endif; ?>
+                
+                <td class="acoes">
+                    <a href="editar-categoria.php?id=<?= $categoria['id'] ?>" class="btn-editar-img" title="Editar Categoria">
+                        <img src="/magda-crew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
+                    </a>
+
+                    <label class="switch" title="Ativar/Desativar">
+                        <input 
+                            type="checkbox" 
+                            <?= ($is_ativo == 1) ? 'checked' : '' ?>
+                            onchange="window.location.href='status-categoria.php?id=<?= $categoria['id'] ?>'"
+                        >
+                        <span class="slider round"></span>
+                    </label>
                 </td>
-                <td class="acoes" style="display: flex; gap: 10px;">
-                    <a href="editar-categoria.php?id=<?= $categoria['id'] ?>" class="btn-editar">Editar</a>
-                    
-                    <?php if($is_ativo == 1): ?>
-                        <a href="status-categoria.php?id=<?= $categoria['id'] ?>" class="btn-status">Desativar</a>
-                    <?php else: ?>
-                        <a href="status-categoria.php?id=<?= $categoria['id'] ?>" class="btn-status" style="background: #17be01;">Ativar</a>
-                    <?php endif; ?>
-                </td>
+                
             </tr>
             <?php endforeach; ?>
         </table>
