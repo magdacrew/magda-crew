@@ -5,7 +5,6 @@ $pdo = Database::getConnection();
 
 // 2. BUSCAR AS IMAGENS DA GALERIA
 $galeria_imagens = [];
-
 if (isset($produto['id'])) {
     $stmt_imagens = $pdo->prepare("
         SELECT caminho_imagem 
@@ -20,12 +19,63 @@ if (isset($produto['id'])) {
         $galeria_imagens[] = $img['caminho_imagem'];
     }
 }
-
 if (empty($galeria_imagens) && !empty($produto['caminho_imagem'])) {
     $galeria_imagens[] = $produto['caminho_imagem'];
 }
 
-// 3. CARREGA O HEADER
+// 3. BUSCA TODOS OS TAMANHOS DO SISTEMA E CALCULA O ESTOQUE DINAMICAMENTE
+if (isset($produto['id'])) {
+    $stmt_vars = $pdo->prepare("
+        SELECT 
+            t.id AS tamanho_id,
+            t.nome AS tamanho_nome,
+            COALESCE(pv.quantidade_estoque, 0) AS quantidade_estoque,
+            COALESCE(pv.id, 0) AS variante_id
+        FROM tamanhos t
+        LEFT JOIN produto_variantes pv ON t.id = pv.tamanho_id AND pv.produto_id = ?
+        ORDER BY t.id ASC
+    ");
+    $stmt_vars->execute([$produto['id']]);
+    $variantes = $stmt_vars->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $variantes = [];
+}
+
+// 4. DESCOBRIR O ID DA VARIANTE COM ESTOQUE PARA PRÉ-SELECIONAR
+$variante_pre_selecionada = null;
+foreach ($variantes as $variante) {
+    if ($variante['quantidade_estoque'] > 0) {
+        $variante_pre_selecionada = $variante['variante_id'];
+        break; 
+    }
+}
+
+// 5. BUSCAR PRODUTOS RELACIONADOS (MESMA CATEGORIA, EXCLUINDO O ATUAL)
+$produtos_relacionados = [];
+if (isset($produto['categoria_id']) && isset($produto['id'])) {
+    // Busca os produtos, soma o estoque E traz a imagem principal
+    $stmt_relacionados = $pdo->prepare("
+        SELECT p.*, 
+               (SELECT SUM(quantidade_estoque) FROM produto_variantes WHERE produto_id = p.id) AS total_estoque,
+               (SELECT caminho_imagem FROM produto_imagens WHERE produto_id = p.id AND is_principal = 1 LIMIT 1) AS caminho_imagem
+        FROM produtos p
+        WHERE p.categoria_id = ? AND p.id != ?
+        LIMIT 10
+    ");
+    $stmt_relacionados->execute([$produto['categoria_id'], $produto['id']]);
+    $produtos_relacionados = $stmt_relacionados->fetchAll(PDO::FETCH_ASSOC);
+    
+    // ORDENAÇÃO: Coloca os produtos com estoque primeiro e os esgotados no final
+    if (!empty($produtos_relacionados)) {
+        usort($produtos_relacionados, function($a, $b) {
+            $esgotadoA = (isset($a['total_estoque']) && $a['total_estoque'] <= 0) ? 1 : 0;
+            $esgotadoB = (isset($b['total_estoque']) && $b['total_estoque'] <= 0) ? 1 : 0;
+            return $esgotadoA <=> $esgotadoB;
+        });
+    }
+}
+
+// 6. CARREGA O HEADER
 require_once __DIR__ . '/../components/header.php'; 
 ?>
 
@@ -43,7 +93,7 @@ require_once __DIR__ . '/../components/header.php';
                             $src_imagem = 'public/assets/images/produtos/' . $src_imagem;
                         }
                     ?>
-                    <img id="imagem-principal" src="/MAGDA-CREW/<?= $src_imagem ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
+                    <img id="imagem-principal" src="/MAGDA-CREW/<?= $src_imagem ?>" alt="<?= htmlspecialchars($produto['nome'] ?? '') ?>">
                     
                     <?php if (count($galeria_imagens) > 1): ?>
                         <button class="seta-galeria esq" onclick="mudarImagem(-1)">&#10094;</button>
@@ -71,28 +121,15 @@ require_once __DIR__ . '/../components/header.php';
         <div class="preco">R$ <?= number_format($produto['preco'] ?? 0, 2, ',', '.') ?></div>
         <p class="descricao"><?= nl2br(htmlspecialchars($produto['descricao'] ?? '')) ?></p>
 
-        <?php
-        // Lógica para descobrir qual o primeiro tamanho disponível (menor tamanho em estoque)
-        $tamanho_pre_selecionado = null;
-        foreach ($variantes as $variante) {
-            if ($variante['quantidade_estoque'] > 0) {
-                $tamanho_pre_selecionado = $variante['id'];
-                break; // Para no primeiro tamanho que encontrar com estoque
-            }
-        }
-        ?>
-
-        <form class="form-compra" method="POST" action="adicionar-carrinho.php">
-            <input type="hidden" name="variante_id" id="variante-selecionada" value="<?php echo $tamanho_pre_selecionado; ?>">
+        <form class="form-compra" method="POST" action="/MAGDA-CREW/src/Controllers/adicionar.php">
+            <input type="hidden" name="variante_id" id="variante-selecionada" value="<?php echo $variante_pre_selecionada; ?>">
 
             <label>Escolha o Tamanho:</label>
-            
             <div class="tamanhos-grid">
                 <?php foreach ($variantes as $variante): 
                     $tem_estoque = $variante['quantidade_estoque'] > 0;
-                    $is_selecionado = ($variante['id'] == $tamanho_pre_selecionado);
+                    $is_selecionado = ($tem_estoque && $variante['variante_id'] == $variante_pre_selecionada);
                     
-                    // Define as classes CSS dinamicamente com base no estoque
                     $classe_status = '';
                     if (!$tem_estoque) {
                         $classe_status = 'sem-estoque';
@@ -102,24 +139,60 @@ require_once __DIR__ . '/../components/header.php';
                 ?>
                     <button type="button" 
                             class="tamanho-opcao <?php echo $classe_status; ?>" 
-                            data-id="<?php echo $variante['id']; ?>"
+                            data-id="<?php echo $variante['variante_id']; ?>"
                             <?php echo !$tem_estoque ? 'disabled' : ''; ?>>
                         <?php echo htmlspecialchars($variante['tamanho_nome']); ?>
                     </button>
                 <?php endforeach; ?>
             </div>
 
-            <button type="submit" class="btn-comprar">Adicionar à Sacola</button>
+            <button type="submit" class="btn-comprar">ADICIONAR À SACOLA</button>
         </form>
     </div>
 </div>
 
+<?php if (!empty($produtos_relacionados)): ?>
+<div class="vitrine-wrapper">
+    
+    <div class="vitrine" id="vitrine-container">
+        <?php foreach ($produtos_relacionados as $rel_produto): ?>
+            <div class="card-produto">
+                <a href="/MAGDA-CREW/public/produtos/detalhes/<?= $rel_produto['id'] ?>" class="link-card-produto">
+                    <div class="imagem-produto-vitrine">
+                        <?php if (isset($rel_produto['total_estoque']) && $rel_produto['total_estoque'] <= 0): ?>
+                            <div class="overlay-esgotado"></div>
+                            <span class="tag-esgotado">Esgotado</span>
+                        <?php endif; ?>
+
+                        <?php if (!empty($rel_produto['caminho_imagem'])): ?>
+                            <img src="/magda-crew/<?= $rel_produto['caminho_imagem'] ?>" 
+                                 alt="<?= htmlspecialchars($rel_produto['nome']) ?>">
+                        <?php else: ?>
+                            <div class="imagem-placeholder">
+                                <span>Sem Imagem</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <h3><?= htmlspecialchars($rel_produto['nome']) ?></h3>
+                    <div class="preco">R$ <?= number_format($rel_produto['preco'], 2, ',', '.') ?></div>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <input class="embla__scrollbar" id="custom-scrollbar" type="range" min="0" max="100" value="0">
+</div>
+<?php endif; ?>
+
 <div style="padding: 15px 55px;">
-    <?php include $_SERVER['DOCUMENT_ROOT']. '/MAGDA-CREW/views/components/footer.php';?>
+    <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
 </div>
 
 <script>
-    // LÓGICA DA GALERIA
+    // ----------------------------------------------------
+    // LÓGICA DA GALERIA DO PRODUTO
+    // ----------------------------------------------------
     let imagemAtual = 0;
     const miniaturas = document.querySelectorAll('.miniatura');
     const imagemPrincipal = document.getElementById('imagem-principal');
@@ -142,7 +215,9 @@ require_once __DIR__ . '/../components/header.php';
         miniaturas[imagemAtual].classList.add('ativa');
     }
 
-    // LÓGICA AJAX (CARRINHO)
+    // ----------------------------------------------------
+    // LÓGICA AJAX (CARRINHO) E SELEÇÃO DE TAMANHOS
+    // ----------------------------------------------------
     const formCompra = document.querySelector('.form-compra');
     
     if (formCompra) {
@@ -156,9 +231,18 @@ require_once __DIR__ . '/../components/header.php';
             
             fetch(this.action, {
                 method: 'POST',
-                body: new FormData(this)
+                body: new FormData(this),
+                credentials: 'same-origin' // <-- ADICIONADO PARA ENVIAR O COOKIE DE SESSÃO
             })
-            .then(res => res.json())
+            // Leitura segura da resposta para capturar erros do PHP
+            .then(async res => {
+                const text = await res.text();
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    throw new Error("Erro do PHP retornado: " + text);
+                }
+            })
             .then(data => {
                 if (data.success) {
                     fetch(window.location.href + '?v=' + Math.random())
@@ -198,6 +282,7 @@ require_once __DIR__ . '/../components/header.php';
             })
             .catch(err => {
                 console.error(err);
+                alert("Ocorreu um erro ao adicionar. Veja o console (F12) para detalhes.");
                 btnSubmit.disabled = false;
                 btnSubmit.innerText = textoOriginal;
             });
@@ -206,17 +291,34 @@ require_once __DIR__ . '/../components/header.php';
 
     document.querySelectorAll('.tamanho-opcao').forEach(botao => {
         botao.addEventListener('click', function() {
-            // Ignora o clique se o botão não tiver estoque
-            if (this.classList.contains('sem-estoque')) return;
-
-            // Remove a seleção visual de todos os outros botões
+            if (this.classList.contains('sem-estoque') || this.disabled) return;
             document.querySelectorAll('.tamanho-opcao').forEach(b => b.classList.remove('selecionado'));
-
-            // Adiciona a cor branca ao botão clicado
             this.classList.add('selecionado');
-
-            // Atualiza o valor do input oculto com o ID da variante correspondente
             document.getElementById('variante-selecionada').value = this.getAttribute('data-id');
         });
     });
+
+    // ----------------------------------------------------
+    // LÓGICA DA VITRINE SCROLLBAR (PRODUTOS RELACIONADOS)
+    // ----------------------------------------------------
+    const vitrine = document.getElementById('vitrine-container');
+    const scrollbar = document.getElementById('custom-scrollbar');
+
+    if (vitrine && scrollbar) {
+        // Atualiza a barrinha quando o cliente desliza com o dedo/mouse
+        vitrine.addEventListener('scroll', () => {
+            const maxScrollLeft = vitrine.scrollWidth - vitrine.clientWidth;
+            if (maxScrollLeft > 0) {
+                const scrollPercentage = (vitrine.scrollLeft / maxScrollLeft) * 100;
+                scrollbar.value = scrollPercentage;
+            }
+        });
+
+        // Atualiza os produtos quando o cliente arrasta a barrinha
+        scrollbar.addEventListener('input', () => {
+            const maxScrollLeft = vitrine.scrollWidth - vitrine.clientWidth;
+            const scrollPos = (scrollbar.value / 100) * maxScrollLeft;
+            vitrine.scrollLeft = scrollPos;
+        });
+    }
 </script>

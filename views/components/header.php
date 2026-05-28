@@ -1,40 +1,33 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/../../src/Config/Database.php';
 
-// =======================================================
-// LÓGICA DO CARRINHO PARA A GAVETA (Busca no Banco)
-// =======================================================
 $session_id = session_id();
+$usuario_id = $_SESSION['usuario_id'] ?? null;
 $itensCarrinho = [];
 $totalCarrinho = 0;
 $quantidadeTotal = 0;
 
 try {
-    // Verifica se a classe do Banco de Dados está disponível antes de rodar
-    if (class_exists('Database')) {
-        $pdo_cart = Database::getConnection();
-        
-        $stmtCarrinho = $pdo_cart->prepare("
-            SELECT c.quantidade, v.tamanho_nome, p.nome, p.preco, p.caminho_imagem
+    $pdo_cart = Database::getConnection();
+    // Query corrigida com JOIN na tabela tamanhos
+    $sql = "SELECT c.quantidade, t.nome AS tamanho_nome, p.nome, p.preco, p_img.caminho_imagem
             FROM carrinho c
             JOIN produto_variantes v ON c.variante_id = v.id
+            JOIN tamanhos t ON v.tamanho_id = t.id
             JOIN produtos p ON v.produto_id = p.id
-            WHERE c.session_id = ?
-        ");
-        $stmtCarrinho->execute([$session_id]);
-        $itensCarrinho = $stmtCarrinho->fetchAll(PDO::FETCH_ASSOC);
+            LEFT JOIN produto_imagens p_img ON p.id = p_img.produto_id AND p_img.is_principal = 1
+            WHERE c.usuario_id = :usuario_id OR c.session_id = :session_id";
+            
+    $stmtCarrinho = $pdo_cart->prepare($sql);
+    $stmtCarrinho->execute([':usuario_id' => $usuario_id ?? 0, ':session_id' => $session_id]);
+    $itensCarrinho = $stmtCarrinho->fetchAll(PDO::FETCH_ASSOC);
 
-        // Calcula os totais (Preço x Quantidade)
-        foreach($itensCarrinho as $item) {
-            $totalCarrinho += ($item['preco'] * $item['quantidade']);
-            $quantidadeTotal += $item['quantidade'];
-        }
+    foreach($itensCarrinho as $item) {
+        $totalCarrinho += ($item['preco'] * $item['quantidade']);
+        $quantidadeTotal += $item['quantidade'];
     }
-} catch (Exception $e) {
-    // Apenas ignora se houver erro nesta etapa visual
-}
+} catch (Exception $e) { error_log($e->getMessage()); }
 ?>
 
 <!DOCTYPE html>
@@ -68,10 +61,10 @@ try {
             right: 0;
         }
 
-        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #333; }
-        .cart-header h2 { font-size: 1.2rem; margin: 0; display: flex; align-items: center; gap: 10px; font-weight: normal;}
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #333; flex-wrap: wrap;}
+        .cart-header h2 { font-size: 1.2rem; margin: 0; display: flex; align-items: center; gap: 10px; font-weight: normal; width: 100%;}
         .cart-count { background: #fff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.9rem; font-weight: bold;}
-        .fechar-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer;}
+        .fechar-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; position: absolute; right: 20px; top: 15px;}
         .cart-content { flex: 1; padding: 20px; overflow-y: auto; }
         .cart-footer { padding: 20px; border-top: 1px solid #333; background: #1a1a1a; }
         .cart-total { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.1rem; font-weight: bold; }
@@ -87,6 +80,10 @@ try {
     <a href="/MAGDA-CREW/views/pages/shop.php">Shop</a>
     <a href="#">Archive</a>
     <a href="#">Flagship</a>
+    
+    <?php if (!empty($_SESSION["usuario_id"]) && !empty($_SESSION["is_admin"])): ?>
+        <a href="/magda-crew/painel.php">Painel</a>
+    <?php endif; ?>
   </nav>
 
   <div class="logo">
@@ -126,6 +123,9 @@ try {
 <div id="cartDrawer" class="cart-drawer">
     <div class="cart-header">
         <h2>Carrinho <span class="cart-count"><?= $quantidadeTotal ?></span></h2>
+        
+        <p style="font-size: 12px; color: #ff6b6b; margin-top: 10px; width: 100%;">Minha Sessão: <?= htmlspecialchars($session_id) ?></p> 
+        
         <button class="fechar-btn" onclick="fecharCarrinho()">&times;</button>
     </div>
     

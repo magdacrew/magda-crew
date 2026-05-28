@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/admin_guard.php';
+
 require_once __DIR__ . '/src/Config/Database.php';
 
 $cliente_id = $_GET['id'] ?? null;

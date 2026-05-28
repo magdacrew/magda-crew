@@ -1,6 +1,5 @@
 <?php
 // Arquivo: src/Models/Produto.php
-
 require_once __DIR__ . '/../Config/Database.php';
 
 class Produto {
@@ -20,7 +19,6 @@ class Produto {
                 WHERE p.ativo = 1 
                 GROUP BY p.id
                 ORDER BY p.id DESC";
-                
         $stmt = $this->conexao->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -36,33 +34,27 @@ class Produto {
                 WHERE p.categoria_id = :cat_id AND p.ativo = 1 
                 GROUP BY p.id
                 ORDER BY p.id DESC";
-                
         $stmt = $this->conexao->prepare($sql);
         $stmt->execute([':cat_id' => $categoria_id]);
         return $stmt->fetchAll();
     }
 
     public function buscarPorId($id) {
-        // O buscarPorId continua igual, pois não precisamos da tag na tela de detalhes, 
-        // lá o usuário vai ver o estoque de cada tamanho/cor individualmente.
         $sql = "SELECT p.*, c.nome as categoria_nome, p_img.caminho_imagem 
                 FROM produtos p 
                 LEFT JOIN categorias c ON p.categoria_id = c.id 
                 LEFT JOIN produto_imagens p_img ON p.id = p_img.produto_id AND p_img.is_principal = 1
                 WHERE p.id = :id AND p.ativo = 1";
-                
         $stmt = $this->conexao->prepare($sql);
         $stmt->execute([':id' => $id]);
         return $stmt->fetch();
     }
 
     public function buscarVariantes($produto_id) {
-        $sql = "SELECT pv.*, t.nome as tamanho_nome, c.nome as cor_nome 
+        $sql = "SELECT pv.*, t.nome as tamanho_nome 
                 FROM produto_variantes pv 
                 INNER JOIN tamanhos t ON pv.tamanho_id = t.id 
-                INNER JOIN cores c ON pv.cor_id = c.id 
                 WHERE pv.produto_id = :produto_id AND pv.quantidade_estoque > 0";
-                
         $stmt = $this->conexao->prepare($sql);
         $stmt->execute([':produto_id' => $produto_id]);
         return $stmt->fetchAll();

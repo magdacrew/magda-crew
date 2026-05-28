@@ -4,7 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // 1. CARREGA OS MODELS DO SEU PROJETO
-// (Ajuste os caminhos se necessário)
 require_once __DIR__ . '/../../src/Models/Categoria.php';
 require_once __DIR__ . '/../../src/Models/Produto.php';
 
@@ -12,7 +11,6 @@ try {
     $categoriaModel = new Categoria();
     $produtoModel = new Produto();
     
-    // Puxa as categorias e produtos usando as funções oficiais do seu sistema
     $categorias = $categoriaModel->buscarTodas();
     $produtos = $produtoModel->buscarTodos();
 
@@ -21,43 +19,92 @@ try {
 }
 
 // -------------------------------------------------------------
-// 2. LÓGICA DE ORDENAÇÃO (PHP)
+// 2. LÓGICA DE FILTRAGEM (SEM MEXER NO MODEL) E PREÇO DINÂMICO
 // -------------------------------------------------------------
-// Esta função processa a ordenação dos produtos na tela
+$tamanhosMarcados = isset($_GET['tamanho']) ? explode(',', $_GET['tamanho']) : [];
+$faixaPreco = isset($_GET['preco']) ? $_GET['preco'] : '';
+
+$precoMin = 0;
+$precoMax = 1000;
+if (!empty($faixaPreco) && strpos($faixaPreco, '-') !== false) {
+    list($precoMin, $precoMax) = explode('-', $faixaPreco);
+    $precoMin = (float)$precoMin;
+    $precoMax = (float)$precoMax;
+}
+
+if (!empty($produtos)) {
+    $produtos = array_filter($produtos, function($produto) use ($tamanhosMarcados, $precoMin, $precoMax, $faixaPreco, $produtoModel) {
+        $passouTamanho = true;
+        $passouPreco = true;
+
+        // Filtro de Tamanho
+        if (!empty($tamanhosMarcados)) {
+            $passouTamanho = false;
+            $filtrosUpper = array_map('strtoupper', $tamanhosMarcados);
+
+            // Busca as variantes deste produto específico no banco de dados
+            $variantes = $produtoModel->buscarVariantes($produto['id']);
+            
+            $tamanhosDoProduto = [];
+            if (!empty($variantes)) {
+                foreach ($variantes as $variante) {
+                    if (!empty($variante['tamanho_nome'])) {
+                        $tamanhosDoProduto[] = strtoupper(trim($variante['tamanho_nome']));
+                    }
+                }
+            }
+
+            if (!empty(array_intersect($filtrosUpper, $tamanhosDoProduto))) {
+                $passouTamanho = true;
+            }
+        }
+
+        // Filtro de Preço
+        if (!empty($faixaPreco) && isset($produto['preco'])) {
+            $precoProduto = (float) $produto['preco'];
+            if ($precoProduto < $precoMin || $precoProduto > $precoMax) {
+                $passouPreco = false;
+            }
+        }
+
+        return $passouTamanho && $passouPreco;
+    });
+}
+
+// -------------------------------------------------------------
+// 3. LÓGICA DE ORDENAÇÃO
+// -------------------------------------------------------------
 if (!empty($produtos)) {
     usort($produtos, function($a, $b) {
+        $estoqueA = $a['total_estoque'] ?? $a['estoque'] ?? $a['qtd'] ?? $a['quantidade'] ?? 1;
+        $estoqueB = $b['total_estoque'] ?? $b['estoque'] ?? $b['qtd'] ?? $b['quantidade'] ?? 1;
         
-        // ORDENAÇÃO PRIMÁRIA: Coloca os produtos com estoque primeiro e os esgotados no final
-        $esgotadoA = (isset($a['total_estoque']) && $a['total_estoque'] <= 0) ? 1 : 0;
-        $esgotadoB = (isset($b['total_estoque']) && $b['total_estoque'] <= 0) ? 1 : 0;
+        $esgotadoA = ((int)$estoqueA <= 0) ? 1 : 0;
+        $esgotadoB = ((int)$estoqueB <= 0) ? 1 : 0;
         
         if ($esgotadoA !== $esgotadoB) {
             return $esgotadoA <=> $esgotadoB;
         }
 
-        // ORDENAÇÃO SECUNDÁRIA: Processa o tipo de ordenação escolhido pelo usuário
         $order = $_GET['order'] ?? '';
         return match ($order) {
-            'price_asc' => $a['preco'] <=> $b['preco'], // Preço, ordem crescente
-            'price_desc' => $b['preco'] <=> $a['preco'], // Preço, ordem decrescente
-            'name_az' => strnatcasecmp($a['nome'], $b['nome']), // Ordem alfabética, A-Z
-            'name_za' => strnatcasecmp($b['nome'], $a['nome']), // Ordem alfabética, Z-A
-            default => 0, // Nenhuma ordenação secundária (padrão)
+            'price_asc' => $a['preco'] <=> $b['preco'],
+            'price_desc' => $b['preco'] <=> $a['preco'],
+            'name_az' => strnatcasecmp($a['nome'], $b['nome']),
+            'name_za' => strnatcasecmp($b['nome'], $a['nome']),
+            default => 0, 
         };
     });
 }
 
-// 3. CONFIGURAÇÕES DO CABEÇALHO
+// 4. CONFIGURAÇÕES DO CABEÇALHO
 $tituloDaPagina = 'Todos os Itens - Magda Crew';
 
-$cssExtra = '
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/footer.css">
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/style.css">
-';
-
-// Inclui o Header
-include_once $_SERVER['DOCUMENT_ROOT'] . '/MAGDA-CREW/views/components/header.php'; 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/header.php'; 
 ?>
+
+<link rel="stylesheet" href="/magda-crew/public/assets/css/footer.css">
+<link rel="stylesheet" href="/magda-crew/public/assets/css/style.css">
 
 <main>
 
@@ -96,18 +143,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/MAGDA-CREW/views/components/header.ph
                         <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12l-7 7-7-7"></path></svg>
                     </div>
                     <div class="dropdown-panel" id="panelTamanho">
-                        <label class="checkbox-label"><input type="checkbox"> P <span class="count">(55)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> M <span class="count">(55)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> G <span class="count">(55)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> GG <span class="count">(55)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> 3G <span class="count">(50)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> 4G <span class="count">(37)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> 40 <span class="count">(3)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> 42 <span class="count">(3)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> 44 <span class="count">(3)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> 46 <span class="count">(3)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> 48 <span class="count">(3)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> 50 <span class="count">(3)</span></label>
+                        <label class="checkbox-label"><input type="checkbox" class="check-tamanho" value="PP" <?= in_array('PP', array_map('strtoupper', $tamanhosMarcados)) ? 'checked' : '' ?>> PP</label>
+                        <label class="checkbox-label"><input type="checkbox" class="check-tamanho" value="P" <?= in_array('P', array_map('strtoupper', $tamanhosMarcados)) ? 'checked' : '' ?>> P</label>
+                        <label class="checkbox-label"><input type="checkbox" class="check-tamanho" value="M" <?= in_array('M', array_map('strtoupper', $tamanhosMarcados)) ? 'checked' : '' ?>> M</label>
+                        <label class="checkbox-label"><input type="checkbox" class="check-tamanho" value="G" <?= in_array('G', array_map('strtoupper', $tamanhosMarcados)) ? 'checked' : '' ?>> G</label>
+                        <label class="checkbox-label"><input type="checkbox" class="check-tamanho" value="GG" <?= in_array('GG', array_map('strtoupper', $tamanhosMarcados)) ? 'checked' : '' ?>> GG</label>
+                        <label class="checkbox-label"><input type="checkbox" class="check-tamanho" value="XGG" <?= in_array('XGG', array_map('strtoupper', $tamanhosMarcados)) ? 'checked' : '' ?>> XGG</label>
                     </div>
 
                     <div class="dropdown-section-header" id="headerPreco">
@@ -115,9 +156,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/MAGDA-CREW/views/components/header.ph
                         <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12l-7 7-7-7"></path></svg>
                     </div>
                     <div class="dropdown-panel" id="panelPreco">
-                        <label class="checkbox-label"><input type="checkbox"> R$ 50 - R$ 100 <span class="count">(10)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> R$ 100 - R$ 200 <span class="count">(25)</span></label>
-                        <label class="checkbox-label"><input type="checkbox"> Acima de R$ 200 <span class="count">(5)</span></label>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                            <input type="number" id="inputPrecoMin" placeholder="Mín" min="0" max="1000" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white;">
+                            <span style="color: white;">-</span>
+                            <input type="number" id="inputPrecoMax" placeholder="Máx" min="0" max="1000" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white;">
+                        </div>
+                        <small style="color: #aaa;">Máximo: R$ 1000,00</small>
                     </div>
 
                     <div class="dropdown-actions">
@@ -145,14 +189,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/MAGDA-CREW/views/components/header.ph
                     <div class="dropdown-section">Título</div>
                     <label class="radio-label"><input type="radio" name="ordem" value="name_az"> Ordem alfabética, A-Z</label>
                     <label class="radio-label"><input type="radio" name="ordem" value="name_za"> Ordem alfabética, Z-A</label>
-
-                    <div class="dropdown-section">Data</div>
-                    <label class="radio-label"><input type="radio" name="ordem" value="date_desc"> Data, mais recente primeiro</label>
-                    <label class="radio-label"><input type="radio" name="ordem" value="date_asc"> Data, mais antiga primeiro</label>
-                    
-                    <div class="dropdown-section">Outros</div>
-                    <label class="radio-label"><input type="radio" name="ordem" value="most_sold"> Mais vendidos</label>
-                    <label class="radio-label"><input type="radio" name="ordem" value="featured"> Em destaque</label>
                 </div>
             </div>
 
@@ -164,20 +200,22 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/MAGDA-CREW/views/components/header.ph
         <?php if (!empty($produtos)): ?>
             <?php foreach ($produtos as $produto): ?>
                 <div class="card-produto">
-                    <a href="/MAGDA-CREW/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
+                    <a href="/magda-crew/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
                         
                         <div class="imagem-produto">
-                            <?php if (isset($produto['total_estoque']) && $produto['total_estoque'] <= 0): ?>
+                            <?php 
+                            $estoqueProd = $produto['total_estoque'] ?? $produto['estoque'] ?? $produto['qtd'] ?? $produto['quantidade'] ?? 1;
+                            if ((int)$estoqueProd <= 0): 
+                            ?>
                                 <div class="overlay-esgotado"></div>
                                 <span class="tag-esgotado">Esgotado</span>
                             <?php endif; ?>
 
                             <?php 
-                            // Tenta encontrar a imagem mapeando os nomes mais comuns que o seu Model pode estar usando
                             $caminhoImagem = $produto['caminho_imagem'] ?? $produto['imagem'] ?? $produto['foto'] ?? $produto['imagem_url'] ?? '';
                             
                             if (!empty($caminhoImagem)): ?>
-                                <img src="/MAGDA-CREW/<?= $caminhoImagem ?>" 
+                                <img src="/magda-crew/<?= $caminhoImagem ?>" 
                                      alt="<?= htmlspecialchars($produto['nome']) ?>">
                             <?php else: ?>
                                 <div class="imagem-placeholder">
@@ -192,7 +230,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/MAGDA-CREW/views/components/header.ph
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p style="color: white; padding: 20px;">Nenhum produto encontrado.</p>
+            <p style="color: white; padding: 20px;">Nenhum produto encontrado com os filtros selecionados.</p>
         <?php endif; ?>
     </div>
 
@@ -206,16 +244,14 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/MAGDA-CREW/views/components/header.ph
 </main>
 
 <div style="padding: 15px 55px;">
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/MAGDA-CREW/views/components/footer.php'; ?>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/footer.php'; ?>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // -----------------------------------------
+    
     // Lógica do botão Voltar ao Topo
-    // -----------------------------------------
     const btnTop = document.getElementById('btnTop');
-
     if (btnTop) {
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
@@ -224,45 +260,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnTop.classList.remove('show');
             }
         });
-
         btnTop.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
 
-    // -----------------------------------------
     // Lógica dos Menus Dropdown (Filtros e Ordem)
-    // -----------------------------------------
     const btnFiltrar = document.getElementById('btnFiltrar');
     const menuFiltrar = document.getElementById('menuFiltrar');
-
     const btnOrdenar = document.getElementById('btnOrdenar');
     const menuOrdenar = document.getElementById('menuOrdenar');
     const closeOrdenar = document.getElementById('closeOrdenar');
 
-    // Abre/fecha filtro
     btnFiltrar?.addEventListener('click', (e) => {
         e.stopPropagation();
         menuFiltrar.classList.toggle('show');
-        menuOrdenar.classList.remove('show'); // fecha o outro
+        menuOrdenar.classList.remove('show'); 
     });
 
-    // Abre/fecha ordenar
     btnOrdenar?.addEventListener('click', (e) => {
         e.stopPropagation();
         menuOrdenar.classList.toggle('show');
-        menuFiltrar.classList.remove('show'); // fecha o outro
+        menuFiltrar.classList.remove('show'); 
     });
 
-    // Botão X de fechar o ordenar
     closeOrdenar?.addEventListener('click', () => {
         menuOrdenar.classList.remove('show');
     });
 
-    // Fecha ao clicar fora de qualquer menu
     document.addEventListener('click', (e) => {
         if (menuFiltrar && !menuFiltrar.contains(e.target) && !btnFiltrar.contains(e.target)) {
             menuFiltrar.classList.remove('show');
@@ -272,51 +297,125 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // -----------------------------------------
-    // Lógica para as Abas Expansíveis do Filtro (Tamanho, Preço, etc.)
-    // -----------------------------------------
+    // Lógica das Abas Expansíveis do Filtro
     const headers = document.querySelectorAll('.dropdown-section-header');
-
     headers.forEach(header => {
         header.addEventListener('click', () => {
             const panelId = header.id.replace('header', 'panel');
             const panel = document.getElementById(panelId);
             const arrow = header.querySelector('.dropdown-arrow');
 
-            // Toca a classe 'visible' no painel correspondente
             panel?.classList.toggle('visible');
-            
-            // Tira a classe 'rotated' na seta correspondente
             arrow?.classList.toggle('rotated');
         });
     });
 
-    // -----------------------------------------
-    // Lógica de Ordenação: Atualiza a URL ao selecionar um radio
-    // -----------------------------------------
+    // Lógica de Ordenação
     const radioOrdemList = document.querySelectorAll('input[name="ordem"]');
-    
-    // Adiciona o listener de clique em cada rádio
     radioOrdemList.forEach(radio => {
         radio.addEventListener('click', () => {
-            // Pega o valor do radio que foi clicado
             const ordemValue = radio.value;
-            
-            // Redireciona para a mesma página com o parâmetro 'order' na URL
-            // Ex: http://localhost/loja/pages/shop.php?order=price_asc
-            window.location.href = `?order=${ordemValue}`;
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('order', ordemValue);
+            window.location.search = urlParams.toString();
         });
     });
 
-    // Mantém o radio marcado com base na ordenação atual na URL
     const currentOrder = new URLSearchParams(window.location.search).get('order');
     if (currentOrder) {
-        document.querySelector(`input[name="ordem"][value="${currentOrder}"]`).checked = true;
+        const radioToSelect = document.querySelector(`input[name="ordem"][value="${currentOrder}"]`);
+        if (radioToSelect) radioToSelect.checked = true;
     }
+
+    // Lógica dos Botões de Filtro (Aplicar e Remover)
+    const btnAplicar = document.querySelector('.btn-aplicar');
+    const btnRemover = document.querySelector('.btn-remover');
+
+    // Preenche os inputs de preço caso a página já tenha sido filtrada
+    const precoUrl = new URLSearchParams(window.location.search).get('preco');
+    if (precoUrl) {
+        const [minUrl, maxUrl] = precoUrl.split('-');
+        const inputPrecoMin = document.getElementById('inputPrecoMin');
+        const inputPrecoMax = document.getElementById('inputPrecoMax');
+        if (inputPrecoMin) inputPrecoMin.value = minUrl;
+        if (inputPrecoMax) inputPrecoMax.value = maxUrl;
+    }
+
+    btnAplicar?.addEventListener('click', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Pega os tamanhos marcados
+        const tamanhosMarcados = Array.from(document.querySelectorAll('.check-tamanho:checked')).map(cb => cb.value);
+        if (tamanhosMarcados.length > 0) {
+            urlParams.set('tamanho', tamanhosMarcados.join(','));
+        } else {
+            urlParams.delete('tamanho');
+        }
+
+        // Pega os preços digitados
+        const inputPrecoMin = document.getElementById('inputPrecoMin');
+        const inputPrecoMax = document.getElementById('inputPrecoMax');
+        
+        let minVal = inputPrecoMin && inputPrecoMin.value !== '' ? parseFloat(inputPrecoMin.value) : 0;
+        let maxVal = inputPrecoMax && inputPrecoMax.value !== '' ? parseFloat(inputPrecoMax.value) : 1000;
+
+        // Limita ao máximo de R$ 1000 e mínimo de R$ 0
+        minVal = Math.max(0, minVal); 
+        maxVal = Math.min(1000, maxVal); 
+
+        // Se o usuário digitar o mínimo maior que o máximo, o código inverte automaticamente
+        if (minVal > maxVal) {
+            let temp = minVal;
+            minVal = maxVal;
+            maxVal = temp;
+        }
+
+        // Só aplica na URL se o usuário filtrou algo diferente do padrão (0 a 1000)
+        if (minVal > 0 || maxVal < 1000) {
+            urlParams.set('preco', `${minVal}-${maxVal}`);
+        } else {
+            urlParams.delete('preco');
+        }
+
+        window.location.search = urlParams.toString();
+    });
+
+    btnRemover?.addEventListener('click', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete('tamanho');
+        urlParams.delete('preco');
+        window.location.search = urlParams.toString();
+    });
 });
+
+// -------------------------------------------------------------
+    // RESETAR FILTROS AO TROCAR DE CATEGORIA (URL + TELA)
+    // -------------------------------------------------------------
+    const botoesCategoria = document.querySelectorAll('.btn-filtro-categoria');
+    botoesCategoria.forEach(botao => {
+        botao.addEventListener('click', () => {
+            // 1. Limpa visualmente as caixinhas de tamanho
+            const checkboxes = document.querySelectorAll('.check-tamanho');
+            checkboxes.forEach(cb => cb.checked = false);
+
+            // 2. Limpa visualmente os campos de preço
+            const inputPrecoMin = document.getElementById('inputPrecoMin');
+            const inputPrecoMax = document.getElementById('inputPrecoMax');
+            if (inputPrecoMin) inputPrecoMin.value = '';
+            if (inputPrecoMax) inputPrecoMax.value = '';
+
+            // 3. Limpa a URL para que o sistema não use os filtros antigos
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.delete('tamanho');
+            urlParams.delete('preco');
+            
+            const novaUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+            window.history.replaceState(null, '', novaUrl);
+        });
+    });
 </script>
 
-<script src="/MAGDA-CREW/public/assets/js/script.js"></script>
+<script src="/magda-crew/public/assets/js/script.js"></script>
 
 </body>
 </html>

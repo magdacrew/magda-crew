@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/admin_guard.php';
+
 require_once __DIR__ . '/src/Config/Database.php';
 
 // 1. Pega o ID da venda que veio na URL (ex: venda_detalhes.php?id=5)
