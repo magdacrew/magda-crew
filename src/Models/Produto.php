@@ -39,6 +39,52 @@ class Produto {
         return $stmt->fetchAll();
     }
 
+public function buscarPorNome($termo) {
+    // 1. Limpa o termo e divide em palavras
+    $termo = trim($termo);
+    $palavras = explode(' ', $termo);
+    $condicoes = [];
+    $parametros = [];
+
+    // 2. Construímos a lógica: Cada palavra digitada DEVE existir em algum campo
+    foreach ($palavras as $index => $palavra) {
+        $key = ":word" . $index;
+        // O uso de parênteses aqui é vital para o OR não quebrar o AND geral
+        $condicoes[] = "(p.nome LIKE $key OR c.nome LIKE $key OR p.descricao LIKE $key)";
+        $parametros[$key] = '%' . $palavra . '%';
+    }
+
+    $whereSql = implode(' AND ', $condicoes);
+
+    // 3. Query robusta
+    $sql = "SELECT 
+                p.id, p.nome, p.preco, p.descricao, p.categoria_id,
+                c.nome as categoria_nome, 
+                p_img.caminho_imagem,
+                COALESCE(SUM(v.quantidade_estoque), 0) AS total_estoque
+            FROM produtos p 
+            INNER JOIN categorias c ON p.categoria_id = c.id 
+            LEFT JOIN produto_imagens p_img ON p.id = p_img.produto_id AND p_img.is_principal = 1
+            LEFT JOIN produto_variantes v ON p.id = v.produto_id
+            WHERE ($whereSql) AND p.ativo = 1 
+            GROUP BY p.id
+            ORDER BY 
+                (CASE WHEN p.nome LIKE :priority THEN 1 ELSE 2 END) ASC, 
+                p.id DESC";
+    
+    // Parâmetro de prioridade para o nome do produto aparecer primeiro
+    $parametros[':priority'] = '%' . $palavras[0] . '%';
+
+    try {
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute($parametros);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Erro na busca: " . $e->getMessage());
+        return [];
+    }
+}
+
     public function buscarPorId($id) {
         $sql = "SELECT p.*, c.nome as categoria_nome, p_img.caminho_imagem 
                 FROM produtos p 
@@ -57,6 +103,6 @@ class Produto {
                 WHERE pv.produto_id = :produto_id AND pv.quantidade_estoque > 0";
         $stmt = $this->conexao->prepare($sql);
         $stmt->execute([':produto_id' => $produto_id]);
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

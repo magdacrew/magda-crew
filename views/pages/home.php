@@ -7,7 +7,6 @@
     <title><?= htmlspecialchars($tituloDaPagina) ?></title>
     <link rel="stylesheet" href="/magda-crew/public/assets/css/index.css">
     <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/header.css">
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/footer.css">
     <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/header.php';?>
 </head>
 <body>

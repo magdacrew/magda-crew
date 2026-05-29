@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/footer.css">
+
 <footer class="site-footer">
     
     <div class="footer-left">

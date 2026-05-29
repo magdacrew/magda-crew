@@ -162,165 +162,6 @@ table.tabela tr:hover {
     font-weight: bold;
 }
 
-.topo-produtos {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.btn-add, .btn-adicionar, .btn-novo {
-    background: #000000;
-    color: white;
-    padding: 9px 16px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 14px;
-    transition: opacity 0.2s;
-}
-
-.btn-add:hover, .btn-adicionar:hover, .btn-novo:hover {
-    opacity: 0.8;
-}
-
-/* CONTAINER DA MINIATURA + TEXTO DO PRODUTO */
-.produto-info-cell {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.produto-nome-texto {
-    font-weight: 500;
-    color: #111;
-    font-size: 14px;
-}
-
-/* MINIATURAS */
-.thumb-produto {
-    width: 44px;
-    height: 44px;
-    object-fit: cover;
-    border-radius: 8px;
-    display: block;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    border: 1px solid #eee;
-}
-
-.thumb-produto.placeholder {
-    background-color: #eee;
-    color: #999;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    border: 1px dashed #ccc;
-    box-shadow: none;
-}
-
-/* FORMULÁRIOS DE ADMINISTRAÇÃO */
-.form-admin {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-width: 500px;
-}
-
-.form-admin input {
-    padding: 14px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 15px;
-}
-
-/* REGRAS DE LAYOUT PARA AS AÇÕES (LÁPIS E TOGGLE SWITCH) */
-.acoes {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    vertical-align: middle;
-}
-
-.btn-editar-img {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    text-decoration: none;
-    background: none;
-    padding: 0;
-}
-
-.btn-editar-img:hover {
-    transform: scale(1.15);
-    opacity: 0.7;
-}
-
-.icon-editar {
-    width: 18px;
-    height: 18px;
-    object-fit: contain;
-    display: block;
-}
-
-/* O TOGGLE SWITCH */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 22px;
-    cursor: pointer;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #e4e4e7;
-    border: 1px solid #d4d4d8;
-    transition: .3s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 14px;
-    width: 14px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    transition: .3s;
-}
-
-input:checked + .slider {
-    background-color: #000000;
-    border-color: #000000;
-}
-
-input:checked + .slider:before {
-    transform: translateX(18px);
-}
-
-.slider.round {
-    border-radius: 22px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-
 .btn-acao {
     background-color: #333;
     color: #fff;
@@ -524,3 +365,11 @@ input:checked + .slider:before {
 }
 
 .btn-salvar:hover { background-color: #059669; }
+
+/* Estilo para a página ativa no menu lateral */
+.sidebar nav ul li a.active {
+    background-color: #333333; /* Ou a cor de destaque da Magda */
+    color: #ffffff;
+    font-weight: 600;
+    border-left: 4px solid #ffffff; /* Um detalhezinho na esquerda fica legal */
+}

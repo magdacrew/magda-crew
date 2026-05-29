@@ -50,26 +50,46 @@ foreach ($variantes as $variante) {
     }
 }
 
-// 5. BUSCAR PRODUTOS RELACIONADOS (MESMA CATEGORIA, EXCLUINDO O ATUAL)
+// 5. BUSCAR PRODUTOS RELACIONADOS (MESMA CATEGORIA OU TODOS SE NÃO HOUVER)
 $produtos_relacionados = [];
-if (isset($produto['categoria_id']) && isset($produto['id'])) {
-    // Busca os produtos, soma o estoque E traz a imagem principal
-    $stmt_relacionados = $pdo->prepare("
-        SELECT p.*, 
-               (SELECT SUM(quantidade_estoque) FROM produto_variantes WHERE produto_id = p.id) AS total_estoque,
-               (SELECT caminho_imagem FROM produto_imagens WHERE produto_id = p.id AND is_principal = 1 LIMIT 1) AS caminho_imagem
-        FROM produtos p
-        WHERE p.categoria_id = ? AND p.id != ?
-        LIMIT 10
-    ");
-    $stmt_relacionados->execute([$produto['categoria_id'], $produto['id']]);
-    $produtos_relacionados = $stmt_relacionados->fetchAll(PDO::FETCH_ASSOC);
+
+if (isset($produto['id'])) {
+    $categoria_id = $produto['categoria_id'] ?? null;
+    
+    // TENTATIVA 1: Busca produtos da mesma categoria
+    if ($categoria_id) {
+        $stmt_relacionados = $pdo->prepare("
+            SELECT p.*, 
+                   COALESCE((SELECT SUM(quantidade_estoque) FROM produto_variantes WHERE produto_id = p.id), 0) AS total_estoque,
+                   (SELECT caminho_imagem FROM produto_imagens WHERE produto_id = p.id AND is_principal = 1 LIMIT 1) AS caminho_imagem
+            FROM produtos p
+            WHERE p.categoria_id = ? AND p.id != ?
+            LIMIT 10
+        ");
+        $stmt_relacionados->execute([$categoria_id, $produto['id']]);
+        $produtos_relacionados = $stmt_relacionados->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // TENTATIVA 2 (PLANO B): Se não achou nenhum produto na mesma categoria, busca de TODAS as categorias
+    if (empty($produtos_relacionados)) {
+        $stmt_todos = $pdo->prepare("
+            SELECT p.*, 
+                   COALESCE((SELECT SUM(quantidade_estoque) FROM produto_variantes WHERE produto_id = p.id), 0) AS total_estoque,
+                   (SELECT caminho_imagem FROM produto_imagens WHERE produto_id = p.id AND is_principal = 1 LIMIT 1) AS caminho_imagem
+            FROM produtos p
+            WHERE p.id != ?
+            LIMIT 10
+        ");
+        // Executa passando apenas o ID do produto atual para excluí-lo da lista
+        $stmt_todos->execute([$produto['id']]);
+        $produtos_relacionados = $stmt_todos->fetchAll(PDO::FETCH_ASSOC);
+    }
     
     // ORDENAÇÃO: Coloca os produtos com estoque primeiro e os esgotados no final
     if (!empty($produtos_relacionados)) {
         usort($produtos_relacionados, function($a, $b) {
-            $esgotadoA = (isset($a['total_estoque']) && $a['total_estoque'] <= 0) ? 1 : 0;
-            $esgotadoB = (isset($b['total_estoque']) && $b['total_estoque'] <= 0) ? 1 : 0;
+            $esgotadoA = (int)$a['total_estoque'] <= 0 ? 1 : 0;
+            $esgotadoB = (int)$b['total_estoque'] <= 0 ? 1 : 0;
             return $esgotadoA <=> $esgotadoB;
         });
     }

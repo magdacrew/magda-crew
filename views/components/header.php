@@ -10,8 +10,8 @@ $quantidadeTotal = 0;
 
 try {
     $pdo_cart = Database::getConnection();
-    // Query corrigida com JOIN na tabela tamanhos
-    $sql = "SELECT c.quantidade, t.nome AS tamanho_nome, p.nome, p.preco, p_img.caminho_imagem
+    
+    $sql = "SELECT c.quantidade, c.variante_id, t.nome AS tamanho_nome, p.nome, p.preco, p_img.caminho_imagem
             FROM carrinho c
             JOIN produto_variantes v ON c.variante_id = v.id
             JOIN tamanhos t ON v.tamanho_id = t.id
@@ -27,7 +27,10 @@ try {
         $totalCarrinho += ($item['preco'] * $item['quantidade']);
         $quantidadeTotal += $item['quantidade'];
     }
-} catch (Exception $e) { error_log($e->getMessage()); }
+    
+} catch (Exception $e) { 
+    error_log($e->getMessage()); 
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,31 +39,13 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($tituloDaPagina) ? htmlspecialchars($tituloDaPagina) : 'Magda Crew' ?></title>
-
     <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/header.css">
     
     <style>
-        .cart-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.6); z-index: 999;
-            opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out;
-            backdrop-filter: blur(2px);
-        }
-        .cart-overlay.ativo {
-            opacity: 1; visibility: visible;
-        }
-
-        .cart-drawer {
-            position: fixed; top: 0; right: -450px; width: 100%; max-width: 450px;
-            height: 100vh; background-color: #1a1a1a; color: #fff; z-index: 1000;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
-            transition: right 0.3s ease-in-out; display: flex; flex-direction: column;
-            font-family: Arial, sans-serif;
-        }
-        .cart-drawer.aberto {
-            right: 0;
-        }
-
+        .cart-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out; backdrop-filter: blur(2px); }
+        .cart-overlay.ativo { opacity: 1; visibility: visible; }
+        .cart-drawer { position: fixed; top: 0; right: -450px; width: 100%; max-width: 450px; height: 100vh; background-color: #1a1a1a; color: #fff; z-index: 1000; box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5); transition: right 0.3s ease-in-out; display: flex; flex-direction: column; font-family: Arial, sans-serif; }
+        .cart-drawer.aberto { right: 0; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #333; flex-wrap: wrap;}
         .cart-header h2 { font-size: 1.2rem; margin: 0; display: flex; align-items: center; gap: 10px; font-weight: normal; width: 100%;}
         .cart-count { background: #fff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.9rem; font-weight: bold;}
@@ -69,9 +54,10 @@ try {
         .cart-footer { padding: 20px; border-top: 1px solid #333; background: #1a1a1a; }
         .cart-total { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.1rem; font-weight: bold; }
         .btn-finalizar { width: 100%; padding: 15px; background: #fff; color: #000; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .btn-remover { background: none; border: none; cursor: pointer; padding: 5px; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-remover:hover { opacity: 0.5; }
+        .btn-remover img { width: 18px; height: 18px; object-fit: contain; }
     </style>
-
-    <?= isset($cssExtra) ? $cssExtra : '' ?>
 </head>
 <body>
 
@@ -80,9 +66,8 @@ try {
     <a href="/MAGDA-CREW/views/pages/shop.php">Shop</a>
     <a href="#">Archive</a>
     <a href="#">Flagship</a>
-    
     <?php if (!empty($_SESSION["usuario_id"]) && !empty($_SESSION["is_admin"])): ?>
-        <a href="/magda-crew/painel.php">Painel</a>
+        <a href="/MAGDA-CREW/painel.php">Painel</a>
     <?php endif; ?>
   </nav>
 
@@ -93,92 +78,89 @@ try {
   </div>
 
   <div class="actions">
-    <div class="search">
-      <input type="text" placeholder="Buscar">
-      <img src="/MAGDA-CREW/public/assets/images/WhiteMagnifyingGlass.png" alt="Buscar" class="icon">
+    <div class="search" style="display: flex; align-items: center; position: relative;">
+      <input type="text" id="inputBusca" placeholder="Buscar" 
+             onkeyup="if(event.key === 'Enter') executarBusca()"
+             value="<?= isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '' ?>">
+      <img src="/MAGDA-CREW/public/assets/images/WhiteMagnifyingGlass.png" 
+           alt="Buscar" class="icon" onclick="executarBusca()" style="cursor: pointer;">
     </div>
 
     <?php if (isset($_SESSION["usuario_id"])): ?>
-      <a href="/magda-crew/views/pages/Profile.php">
+      <a href="/MAGDA-CREW/views/pages/Profile.php">
         <img src="/MAGDA-CREW/public/assets/images/WhiteUser.png" alt="Perfil" class="icon">
       </a>
     <?php else: ?>
-      <a href="/magda-crew/views/pages/login.php">
+      <a href="/MAGDA-CREW/views/pages/login.php">
         <img src="/MAGDA-CREW/public/assets/images/WhiteUser.png" alt="Login" class="icon">
       </a>
     <?php endif; ?>
 
-    <a href="#">
-      <img src="/MAGDA-CREW/public/assets/images/Sun.png" alt="Alternar tema" class="icon">
-    </a>
-
-    <a href="#" onclick="abrirCarrinho(event)">
-      <img src="/MAGDA-CREW/public/assets/images/WhiteBag.png" alt="Sacola" class="icon">
-    </a>
+    <a href="#"><img src="/MAGDA-CREW/public/assets/images/Sun.png" alt="Alternar tema" class="icon"></a>
+    <a href="#" onclick="abrirCarrinho(event)"><img src="/MAGDA-CREW/public/assets/images/WhiteBag.png" alt="Sacola" class="icon"></a>
   </div>
 </header>
 
 <div id="cartOverlay" class="cart-overlay" onclick="fecharCarrinho()"></div>
-
 <div id="cartDrawer" class="cart-drawer">
     <div class="cart-header">
         <h2>Carrinho <span class="cart-count"><?= $quantidadeTotal ?></span></h2>
-        
-        <p style="font-size: 12px; color: #ff6b6b; margin-top: 10px; width: 100%;">Minha Sessão: <?= htmlspecialchars($session_id) ?></p> 
-        
         <button class="fechar-btn" onclick="fecharCarrinho()">&times;</button>
     </div>
-    
     <div class="cart-content">
         <?php if (empty($itensCarrinho)): ?>
             <p style="text-align: center; color: #888; margin-top: 20px;">Seu carrinho está vazio.</p>
         <?php else: ?>
             <?php foreach($itensCarrinho as $item): ?>
-                <div style="display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px;">
-                    
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px; position: relative;">
                     <?php 
                         $imgSrc = $item['caminho_imagem'];
-                        if (strpos($imgSrc, 'public/') === false && strpos($imgSrc, 'http') === false) {
-                            $imgSrc = 'public/assets/images/produtos/' . $imgSrc;
+                        // Ajuste simples para o caminho da imagem
+                        if (strpos($imgSrc, 'http') === false) {
+                            $imgSrc = '/MAGDA-CREW/' . $imgSrc;
                         }
                     ?>
-                    <img src="/magda-crew/<?= htmlspecialchars($imgSrc) ?>" style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; background: #fff;">
-                    
+                    <img src="<?= htmlspecialchars($imgSrc) ?>" style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; background: #fff;">
                     <div style="flex: 1;">
-                        <h4 style="margin: 0; font-size: 0.95rem; text-transform: uppercase;"><?= htmlspecialchars($item['nome']) ?></h4>
-                        <p style="margin: 5px 0; color: #aaa; font-size: 0.85rem;">
-                            Tamanho: <?= htmlspecialchars($item['tamanho_nome']) ?> <br>
-                            Quantidade: <?= $item['quantidade'] ?>
-                        </p>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <h4 style="margin: 0; font-size: 0.95rem; text-transform: uppercase; padding-right: 25px;"><?= htmlspecialchars($item['nome']) ?></h4>
+                            <button class="btn-remover" onclick="removerItem(<?= $item['variante_id'] ?>)"><img src="/MAGDA-CREW/public/assets/images/WhiteTrash.png" alt="Remover"></button>
+                        </div>
+                        <p style="margin: 5px 0; color: #aaa; font-size: 0.85rem;">Tamanho: <?= htmlspecialchars($item['tamanho_nome']) ?> <br> Quantidade: <?= $item['quantidade'] ?></p>
                         <p style="margin: 0; font-weight: bold;">R$ <?= number_format($item['preco'] * $item['quantidade'], 2, ',', '.') ?></p>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
-
     <div class="cart-footer">
-        <div class="cart-total">
-            <span>Total estimado</span>
-            <span>R$ <?= number_format($totalCarrinho, 2, ',', '.') ?></span>
-        </div>
+        <div class="cart-total"><span>Total estimado</span><span>R$ <?= number_format($totalCarrinho, 2, ',', '.') ?></span></div>
         <button class="btn-finalizar">Finalizar a compra</button>
     </div>
 </div>
 
-<main>
-
 <script>
-    function abrirCarrinho(e) {
-        if(e) e.preventDefault();
-        document.getElementById('cartDrawer').classList.add('aberto');
-        document.getElementById('cartOverlay').classList.add('ativo');
-        document.body.style.overflow = 'hidden';
+    // FUNÇÃO DE BUSCA ATUALIZADA PARA REDIRECIONAR PARA SEARCH.PHP
+    function executarBusca() {
+        const input = document.getElementById('inputBusca');
+        const termo = input.value.trim();
+        
+        if (termo.length >= 2) { 
+            // Redireciona para a nova página de pesquisa dedicada
+            window.location.href = '/MAGDA-CREW/views/pages/search.php?q=' + encodeURIComponent(termo);
+        } else {
+            input.focus();
+            input.style.borderBottom = "1px solid red"; 
+            setTimeout(() => input.style.borderBottom = "", 1000);
+        }
     }
 
-    function fecharCarrinho() {
-        document.getElementById('cartDrawer').classList.remove('aberto');
-        document.getElementById('cartOverlay').classList.remove('ativo');
-        document.body.style.overflow = 'auto';
+    function abrirCarrinho(e) { if(e) e.preventDefault(); document.getElementById('cartDrawer').classList.add('aberto'); document.getElementById('cartOverlay').classList.add('ativo'); document.body.style.overflow = 'hidden'; }
+    function fecharCarrinho() { document.getElementById('cartDrawer').classList.remove('aberto'); document.getElementById('cartOverlay').classList.remove('ativo'); document.body.style.overflow = 'auto'; }
+    function removerItem(varianteId) {
+        const formData = new FormData();
+        formData.append('variante_id', varianteId);
+        fetch('/MAGDA-CREW/src/Controllers/remover-carrinho.php', { method: 'POST', body: formData })
+        .then(res => res.json()).then(data => { if(data.success) location.reload(); });
     }
 </script>

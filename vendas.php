@@ -26,16 +26,19 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
     <title>Vendas - Magda Crew</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
     
+    <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+    
+    <link rel="stylesheet" href="/magda-crew/public/assets/css/produtos.css">
 </head>
 <body>
 
 <?php include 'sidebar.php'; ?>
 
+<main class="main-content">
     <section class="content">
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div class="topo-produtos">
             <div>
                 <h1>Vendas</h1>
                 <p style="color: #666; margin-top: 5px;">Gerencie e acompanhe todos os pedidos da loja.</p>
@@ -45,10 +48,10 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <table class="tabela">
             <thead>
                 <tr>
-                    <th class="text-center">ID</th>
-                    <th class="text-right">Valor Total</th>
-                    <th class="text-center">Status</th>
-                    <th class="text-center">Ações</th>
+                    <th style="width: 80px;">ID</th>
+                    <th>Valor Total</th>
+                    <th>Status</th>
+                    <th style="width: 150px; text-align: center;">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -62,20 +65,22 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         elseif ($statusText === 'cancelado') $statusClass = 'status-cancelado';
                     ?>
                 <tr>
-                    <td class="text-center"><strong>#<?= $venda['id'] ?></strong></td>
+                    <td><?= $venda['id'] ?></td>
                     
-                    <td class="text-right">
+                    <td>
                         R$ <?= number_format($venda['valor_total'], 2, ',', '.') ?>
                     </td>
 
-                    <td class="text-center">
+                    <td>
                         <span class="status-badge <?= $statusClass ?>">
                             <?= htmlspecialchars($venda['status'] ?? 'N/A') ?>
                         </span>
                     </td>
 
-                    <td class="text-center">
-                        <a href="venda_detalhes.php?id=<?= $venda['id'] ?>" class="btn-acao">Ver Detalhes</a>
+                    <td style="text-align: center;">
+                        <div class="acoes">
+                            <a href="venda_detalhes.php?id=<?= $venda['id'] ?>" class="btn-acao">Ver Detalhes</a>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -83,6 +88,7 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </table>
 
     </section>
+</main>
 
 <script src="public/assets/js/main.js"></script>
 

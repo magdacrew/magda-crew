@@ -12,7 +12,16 @@ try {
     $produtoModel = new Produto();
     
     $categorias = $categoriaModel->buscarTodas();
-    $produtos = $produtoModel->buscarTodos();
+    
+    // Verifica se existe uma categoria selecionada na URL (ex: ?categoria=2)
+    $categoriaId = isset($_GET['categoria']) ? (int)$_GET['categoria'] : 0;
+    
+    // Se tiver categoria, busca os produtos dela. Se não, busca tudo.
+    if ($categoriaId > 0) {
+        $produtos = $produtoModel->buscarPorCategoria($categoriaId);
+    } else {
+        $produtos = $produtoModel->buscarTodos();
+    }
 
 } catch (Exception $e) {
     die("Erro ao carregar os dados da loja: " . $e->getMessage());
@@ -116,10 +125,14 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/header.ph
                     if (isset($cat['ativo']) && $cat['ativo'] == 0) {
                         continue; 
                     }
+                    
+                    // Lógica para descobrir qual botão deve ficar "aceso" (ativo)
+                    $isTudo = (strtolower($cat['nome']) === 'tudo');
+                    $isActive = ($categoriaId > 0 && $cat['id'] == $categoriaId) || ($categoriaId === 0 && $isTudo);
                 ?>
                 <li>
                     <button 
-                        class="btn-filtro-categoria <?= ($cat['nome'] == 'Tudo') ? 'active' : '' ?>" 
+                        class="btn-filtro-categoria <?= $isActive ? 'active' : '' ?>" 
                         data-id="<?= $cat['id'] ?>">
                         <?= htmlspecialchars($cat['nome']) ?>
                     </button>
@@ -165,8 +178,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/header.ph
                     </div>
 
                     <div class="dropdown-actions">
-                        <button class="btn-aplicar">Aplicar</button>
-                        <button class="btn-remover">Remover tudo</button>
+                        <button type="button" class="btn-aplicar">Aplicar</button>
+                        <button type="button" class="btn-remover" id="btnRemoverTudo">Remover tudo</button>
                     </div>
                 </div>
             </div>
@@ -249,8 +262,197 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/header.ph
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
+    // =============================================================
+    // 1. FUNÇÃO MESTRA PARA RESGATAR A CATEGORIA REAL
+    // =============================================================
+    function obterUrlBaseComCategoria() {
+        const url = new URL(window.location.origin + window.location.pathname);
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        let catId = urlParams.get('categoria');
+        if (!catId) {
+            const btnAtivo = document.querySelector('.btn-filtro-categoria.active');
+            if (btnAtivo) {
+                const isTudo = btnAtivo.innerText.trim().toLowerCase() === 'tudo';
+                const idAttr = btnAtivo.getAttribute('data-id');
+                if (!isTudo && idAttr) {
+                    catId = idAttr;
+                }
+            }
+        }
+
+        if (catId && catId !== '0') {
+            url.searchParams.set('categoria', catId);
+        }
+
+        const ordem = urlParams.get('order');
+        if (ordem) {
+            url.searchParams.set('order', ordem);
+        }
+
+        return url;
+    }
+
+    // =============================================================
+    // 2. NAVEGAÇÃO SEGURA DAS CATEGORIAS
+    // =============================================================
+    const botoesCategoria = document.querySelectorAll('.btn-filtro-categoria');
+    botoesCategoria.forEach(botao => {
+        botao.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            e.stopPropagation();
+
+            const catId = botao.getAttribute('data-id');
+            const isTudo = botao.innerText.trim().toLowerCase() === 'tudo';
+            
+            const url = new URL(window.location.origin + window.location.pathname);
+            
+            if (!isTudo && catId && catId !== '0') {
+                url.searchParams.set('categoria', catId);
+            }
+            
+            window.location.href = url.toString();
+        });
+    });
+
+    // =============================================================
+    // 3. LÓGICA DE APLICAR E REMOVER FILTROS (BLINDADOS)
+    // =============================================================
+    const btnAplicar = document.querySelector('.btn-aplicar');
+
+    // Preenche caixas se já houver filtro na URL
+    const urlAtual = new URL(window.location.href);
+    const precoUrl = urlAtual.searchParams.get('preco');
+    if (precoUrl) {
+        const [minUrl, maxUrl] = precoUrl.split('-');
+        const inputPrecoMin = document.getElementById('inputPrecoMin');
+        const inputPrecoMax = document.getElementById('inputPrecoMax');
+        if (inputPrecoMin) inputPrecoMin.value = minUrl;
+        if (inputPrecoMax) inputPrecoMax.value = maxUrl;
+    }
+
+    // BOTÃO APLICAR
+    btnAplicar?.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const url = obterUrlBaseComCategoria();
+
+        const tamanhosMarcados = Array.from(document.querySelectorAll('.check-tamanho:checked')).map(cb => cb.value);
+        if (tamanhosMarcados.length > 0) {
+            url.searchParams.set('tamanho', tamanhosMarcados.join(','));
+        }
+
+        const inputPrecoMin = document.getElementById('inputPrecoMin');
+        const inputPrecoMax = document.getElementById('inputPrecoMax');
+        
+        let minVal = inputPrecoMin && inputPrecoMin.value !== '' ? parseFloat(inputPrecoMin.value) : 0;
+        let maxVal = inputPrecoMax && inputPrecoMax.value !== '' ? parseFloat(inputPrecoMax.value) : 1000;
+
+        minVal = Math.max(0, minVal); 
+        maxVal = Math.min(1000, maxVal); 
+
+        if (minVal > maxVal) {
+            let temp = minVal;
+            minVal = maxVal;
+            maxVal = temp;
+        }
+
+        if (minVal > 0 || maxVal < 1000) {
+            url.searchParams.set('preco', `${minVal}-${maxVal}`);
+        }
+
+        window.location.href = url.toString();
+    });
+
+    // BOTÃO REMOVER (Único e isolado)
+    const btnRemoverReal = document.getElementById('btnRemoverTudo');
     
-    // Lógica do botão Voltar ao Topo
+    if (btnRemoverReal) {
+        btnRemoverReal.addEventListener('click', function(e) {
+            e.preventDefault(); 
+            // stopImmediatePropagation impede que QUALQUER outro script que tente 
+            // ouvir esse botão (como o script.js) execute.
+            e.stopImmediatePropagation(); 
+            
+            // 1. Limpa todas as caixas de tamanho na hora
+            const checkboxes = document.querySelectorAll('.check-tamanho');
+            checkboxes.forEach(function(cb) {
+                cb.checked = false;
+                cb.removeAttribute('checked');
+            });
+            
+            // 2. Reseta o filtro de preço na hora
+            const inputPrecoMin = document.getElementById('inputPrecoMin');
+            const inputPrecoMax = document.getElementById('inputPrecoMax');
+            if (inputPrecoMin) inputPrecoMin.value = '';
+            if (inputPrecoMax) inputPrecoMax.value = '';
+            
+            // 3. Monta uma URL 100% limpa, preservando SÓ a categoria e a ordem
+            const urlParamsAtuais = new URLSearchParams(window.location.search);
+            const categoriaAtual = urlParamsAtuais.get('categoria');
+            const ordemAtual = urlParamsAtuais.get('order');
+            
+            const urlLimpa = new URL(window.location.origin + window.location.pathname);
+            
+            if (categoriaAtual && categoriaAtual !== '0') {
+                urlLimpa.searchParams.set('categoria', categoriaAtual);
+            }
+            if (ordemAtual) {
+                urlLimpa.searchParams.set('order', ordemAtual);
+            }
+            
+            // 4. Redireciona à força para a URL limpa
+            window.location.href = urlLimpa.toString();
+        }, true); // O 'true' faz este evento disparar antes de qualquer outro (Capture Phase)
+    }
+
+    // =============================================================
+    // 4. LÓGICA DE ORDENAÇÃO PRESERVANDO CATEGORIA E REMOVENDO OPÇÃO
+    // =============================================================
+    const radioOrdemList = document.querySelectorAll('input[name="ordem"]');
+    radioOrdemList.forEach(radio => {
+        radio.addEventListener('click', (e) => {
+            const ordemValue = radio.value;
+            const paramsAtuais = new URLSearchParams(window.location.search);
+            const currentOrder = paramsAtuais.get('order');
+
+            const url = obterUrlBaseComCategoria();
+            
+            // Preserva os filtros de tamanho e preço se existirem
+            const tamanho = paramsAtuais.get('tamanho');
+            if (tamanho) url.searchParams.set('tamanho', tamanho);
+            
+            const preco = paramsAtuais.get('preco');
+            if (preco) url.searchParams.set('preco', preco);
+            
+            // Lógica mágica: se clicou na opção que JÁ ESTÁ na URL, a gente remove!
+            if (currentOrder === ordemValue) {
+                e.preventDefault(); // Impede que a bolinha continue marcada
+                radio.checked = false; // Força visualmente a desmarcar
+                url.searchParams.delete('order'); // Tira o parâmetro 'order' do link
+            } else {
+                // Se clicou em uma nova opção, aplica ela
+                url.searchParams.set('order', ordemValue);
+            }
+            
+            // Recarrega a página com a nova URL
+            window.location.href = url.toString();
+        });
+    });
+
+    // Mantém a bolinha marcada quando a página recarregar
+    const currentOrder = new URLSearchParams(window.location.search).get('order');
+    if (currentOrder) {
+        const radioToSelect = document.querySelector(`input[name="ordem"][value="${currentOrder}"]`);
+        if (radioToSelect) {
+            radioToSelect.checked = true;
+        }
+    }
+
+    // =============================================================
+    // 5. COMPORTAMENTOS VISUAIS (TOPO E DROPDOWNS)
+    // =============================================================
     const btnTop = document.getElementById('btnTop');
     if (btnTop) {
         window.addEventListener('scroll', () => {
@@ -265,7 +467,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lógica dos Menus Dropdown (Filtros e Ordem)
     const btnFiltrar = document.getElementById('btnFiltrar');
     const menuFiltrar = document.getElementById('menuFiltrar');
     const btnOrdenar = document.getElementById('btnOrdenar');
@@ -297,7 +498,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Lógica das Abas Expansíveis do Filtro
     const headers = document.querySelectorAll('.dropdown-section-header');
     headers.forEach(header => {
         header.addEventListener('click', () => {
@@ -310,109 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Lógica de Ordenação
-    const radioOrdemList = document.querySelectorAll('input[name="ordem"]');
-    radioOrdemList.forEach(radio => {
-        radio.addEventListener('click', () => {
-            const ordemValue = radio.value;
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('order', ordemValue);
-            window.location.search = urlParams.toString();
-        });
-    });
-
-    const currentOrder = new URLSearchParams(window.location.search).get('order');
-    if (currentOrder) {
-        const radioToSelect = document.querySelector(`input[name="ordem"][value="${currentOrder}"]`);
-        if (radioToSelect) radioToSelect.checked = true;
-    }
-
-    // Lógica dos Botões de Filtro (Aplicar e Remover)
-    const btnAplicar = document.querySelector('.btn-aplicar');
-    const btnRemover = document.querySelector('.btn-remover');
-
-    // Preenche os inputs de preço caso a página já tenha sido filtrada
-    const precoUrl = new URLSearchParams(window.location.search).get('preco');
-    if (precoUrl) {
-        const [minUrl, maxUrl] = precoUrl.split('-');
-        const inputPrecoMin = document.getElementById('inputPrecoMin');
-        const inputPrecoMax = document.getElementById('inputPrecoMax');
-        if (inputPrecoMin) inputPrecoMin.value = minUrl;
-        if (inputPrecoMax) inputPrecoMax.value = maxUrl;
-    }
-
-    btnAplicar?.addEventListener('click', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Pega os tamanhos marcados
-        const tamanhosMarcados = Array.from(document.querySelectorAll('.check-tamanho:checked')).map(cb => cb.value);
-        if (tamanhosMarcados.length > 0) {
-            urlParams.set('tamanho', tamanhosMarcados.join(','));
-        } else {
-            urlParams.delete('tamanho');
-        }
-
-        // Pega os preços digitados
-        const inputPrecoMin = document.getElementById('inputPrecoMin');
-        const inputPrecoMax = document.getElementById('inputPrecoMax');
-        
-        let minVal = inputPrecoMin && inputPrecoMin.value !== '' ? parseFloat(inputPrecoMin.value) : 0;
-        let maxVal = inputPrecoMax && inputPrecoMax.value !== '' ? parseFloat(inputPrecoMax.value) : 1000;
-
-        // Limita ao máximo de R$ 1000 e mínimo de R$ 0
-        minVal = Math.max(0, minVal); 
-        maxVal = Math.min(1000, maxVal); 
-
-        // Se o usuário digitar o mínimo maior que o máximo, o código inverte automaticamente
-        if (minVal > maxVal) {
-            let temp = minVal;
-            minVal = maxVal;
-            maxVal = temp;
-        }
-
-        // Só aplica na URL se o usuário filtrou algo diferente do padrão (0 a 1000)
-        if (minVal > 0 || maxVal < 1000) {
-            urlParams.set('preco', `${minVal}-${maxVal}`);
-        } else {
-            urlParams.delete('preco');
-        }
-
-        window.location.search = urlParams.toString();
-    });
-
-    btnRemover?.addEventListener('click', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.delete('tamanho');
-        urlParams.delete('preco');
-        window.location.search = urlParams.toString();
-    });
 });
-
-// -------------------------------------------------------------
-    // RESETAR FILTROS AO TROCAR DE CATEGORIA (URL + TELA)
-    // -------------------------------------------------------------
-    const botoesCategoria = document.querySelectorAll('.btn-filtro-categoria');
-    botoesCategoria.forEach(botao => {
-        botao.addEventListener('click', () => {
-            // 1. Limpa visualmente as caixinhas de tamanho
-            const checkboxes = document.querySelectorAll('.check-tamanho');
-            checkboxes.forEach(cb => cb.checked = false);
-
-            // 2. Limpa visualmente os campos de preço
-            const inputPrecoMin = document.getElementById('inputPrecoMin');
-            const inputPrecoMax = document.getElementById('inputPrecoMax');
-            if (inputPrecoMin) inputPrecoMin.value = '';
-            if (inputPrecoMax) inputPrecoMax.value = '';
-
-            // 3. Limpa a URL para que o sistema não use os filtros antigos
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.delete('tamanho');
-            urlParams.delete('preco');
-            
-            const novaUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-            window.history.replaceState(null, '', novaUrl);
-        });
-    });
 </script>
 
 <script src="/magda-crew/public/assets/js/script.js"></script>

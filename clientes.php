@@ -22,27 +22,10 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
     <title>Clientes - Magda Crew</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
-    <style>
-        .btn-acao {
-            background-color: #333;
-            color: #fff;
-            padding: 6px 12px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            transition: background 0.3s;
-        }
-        .btn-acao:hover { background-color: #555; }
-        .text-center { text-align: center; }
-        .badge-pedidos {
-            background-color: #222;
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-        }
-    </style>
+    
+    <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+    
+    <link rel="stylesheet" href="/magda-crew/public/assets/css/produtos.css">
 </head>
 <body>
 
@@ -50,32 +33,33 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <main class="main-content">
     <section class="content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        
+        <div class="topo-produtos">
             <div>
                 <h1>Clientes</h1>
                 <p style="color: #666; margin-top: 5px;">Gerencie os usuários cadastrados na sua loja.</p>
             </div>
-        </div>
+            </div>
 
         <table class="tabela">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th style="width: 80px;">ID</th>
                     <th>Email</th>
-                    <th class="text-center">Ações</th>
+                    <th style="width: 150px; text-align: center;">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach($usuarios as $usuario): ?>
                 <tr>
-                    <td><strong>#<?= $usuario['id'] ?></strong></td>
-                    
+                    <td><?= $usuario['id'] ?></td>
                     
                     <td><?= htmlspecialchars($usuario['email']) ?></td>
                     
-                    
-                    <td class="text-center">
-                        <a href="cliente_detalhes.php?id=<?= $usuario['id'] ?>" class="btn-acao">Ver Detalhes</a>
+                    <td style="text-align: center;">
+                        <div class="acoes">
+                            <a href="cliente_detalhes.php?id=<?= $usuario['id'] ?>" class="btn-acao">Ver Detalhes</a>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>

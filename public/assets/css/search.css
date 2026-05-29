@@ -1,0 +1,368 @@
+/* Reset total para eliminar bordas brancas e espaços indesejados */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #1c1d21; /* Fundo idêntico ao print */
+    color: #ffffff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+}
+
+.search-page {
+    padding-top: 80px; /* Espaço para não bater no header */
+    min-height: 100vh;
+}
+
+.search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.search-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+}
+
+/* Barra de Busca Central */
+.search-bar-wrapper {
+    max-width: 650px;
+    margin: 0 auto 50px auto;
+}
+
+.search-input-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid #333;
+    border-radius: 50px;
+    padding: 12px 25px;
+    background: transparent;
+    transition: border-color 0.3s;
+}
+
+.search-input-group:focus-within {
+    border-color: #666;
+}
+
+.search-input-group input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-input-group i {
+    color: #888;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+/* Botões de Filtro */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 35px;
+}
+
+.btn-magda {
+    background: transparent;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-magda:hover {
+    background: #fff;
+    color: #000;
+}
+
+/* Grid de Produtos (4 colunas como solicitado) */
+.magda-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px 20px;
+    padding-bottom: 100px;
+}
+
+.product-card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.product-img-box {
+    background-color: #f6f6f6; /* Fundo claro para destacar a roupa */
+    aspect-ratio: 1 / 1;
+    border-radius: 15px; /* Bordas arredondadas do print */
+    overflow: hidden;
+    margin-bottom: 15px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-img-box img {
+    transform: scale(1.05);
+}
+
+.badge-status {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.product-info h3 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.product-info p {
+    font-size: 13px;
+    margin-top: 5px;
+    color: #ffffff;
+    font-weight: 400;
+}
+
+/* ==========================================
+   ESTILOS DA BARRA DE CONTROLE (SHOP)
+========================================== */
+
+/* Container que separa Categorias (esquerda) e Filtros (direita) */
+.shop-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Container dos botões da direita (Filtrar e Ordenar) */
+.filtros-container {
+    display: flex;
+    gap: 15px;
+    padding-right: 55px;
+}
+
+/* Botões brancos em formato de pílula */
+.btn-filtro-topo {
+    background-color: #fff;
+    color: #111;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-filtro-topo:hover {
+    background-color: #e7e9eb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================
+   ESTILOS DOS MENUS DROPDOWN (DARK GLASS)
+========================================== */
+.dropdown-group {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    width: 280px;
+    border-radius: 16px;
+    padding: 24px;
+    z-index: 100;
+    color: #e7e9eb;
+    
+    /* Efeito Dark Glassmorphism */
+    background: rgba(30, 30, 35, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+
+    /* Animação de entrada */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-menu { 
+    cursor: pointer; 
+    color: #888; 
+    font-size: 14px;
+    padding: 4px;
+}
+
+.close-menu:hover { color: #fff; }
+
+/* ==========================================
+   INTERIOR DO FILTRO: SANFONAS E OPÇÕES
+========================================== */
+
+/* Cabeçalho expansível (Tamanho, Preço) */
+.dropdown-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e7e9eb;
+    padding: 12px 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Setinha que gira */
+.dropdown-arrow {
+    transition: transform 0.3s ease;
+    color: #888;
+}
+
+.dropdown-arrow.rotated {
+    transform: rotate(180deg);
+}
+
+/* Painel que esconde/mostra as opções */
+.dropdown-panel {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px 0 20px 0;
+}
+
+.dropdown-panel.visible {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos de Checkbox e Radio */
+.checkbox-label, .radio-label { 
+    display: flex; 
+    align-items: center;
+    font-size: 14px; 
+    color: #ccc; 
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.checkbox-label:hover, .radio-label:hover { color: #fff; }
+
+.checkbox-label input, .radio-label input { 
+    margin-right: 12px; 
+    width: 16px;
+    height: 16px;
+    accent-color: #fff; /* Tique branco */
+}
+
+/* Botões de Ação (Aplicar e Remover) */
+.dropdown-actions { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-aplicar { 
+    background: #fff; 
+    color: #111; 
+    border: none; 
+    padding: 10px 15px; 
+    border-radius: 8px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    flex: 1;
+}
+
+.btn-remover { 
+    background: rgba(255, 255, 255, 0.05); 
+    color: #ccc; 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    padding: 10px 15px; 
+    border-radius: 8px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    flex: 1;
+}
+
+/* Responsividade mobile */
+@media (max-width: 768px) {
+    .filtros-container { padding-right: 0; width: 100%; }
+    .btn-filtro-topo { flex: 1; justify-content: center; }
+    .dropdown-menu { width: 100%; right: auto; left: 0; }
+}
+
+/* Responsividade para celular */
+@media (max-width: 992px) {
+    .magda-grid { grid-template-columns: repeat(2, 1fr); }
+}

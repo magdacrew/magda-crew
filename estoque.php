@@ -50,7 +50,12 @@ $mapaCoresHex = [
     <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estoque - Magda Crew</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
+    
+    <!-- CSS Global (Sidebar, Cores de Fundo, Tabela Padrão) -->
+    <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+    
+    <!-- CSS dos elementos visuais compartilhados (Botões, Topo, Miniaturas e Ações) -->
+    <link rel="stylesheet" href="/magda-crew/public/assets/css/produtos.css">
 </head>
 <body>
 
