@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -102,15 +102,15 @@ $tamanhos = $pdo->query("SELECT id, nome FROM tamanhos ORDER BY id")->fetchAll(P
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link class="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Cadastrar Entrada - Magda Crew</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/adicionar-estoque.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/AdicionarEstoque.css">
 </head>
 <body>
 
 <main class="container-admin">
-    <a href="estoque.php">
-        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+    <a href="Estoque.php">
+        <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="botao-x">
     </a>
 
     <h1>Cadastrar Entrada</h1>
@@ -138,7 +138,7 @@ $tamanhos = $pdo->query("SELECT id, nome FROM tamanhos ORDER BY id")->fetchAll(P
             <div class="custom-options-container" id="productOptions">
                 <?php foreach ($produtos as $p): 
                     // Garante o caminho correto da imagem com base nos seus UPDATES do banco
-                    $caminhoImg = !empty($p['caminho_imagem']) ? '/magda-crew/' . $p['caminho_imagem'] : '/magda-crew/public/assets/images/15.png';
+                    $caminhoImg = !empty($p['caminho_imagem']) ? '/MagdaCrew/' . $p['caminho_imagem'] : '/MagdaCrew/public/assets/images/15.png';
                 ?>
                     <div class="custom-option" data-value="<?= $p['id'] ?>" onclick="selectProduct(this, '<?= htmlspecialchars($p['nome']) ?>', '<?= $caminhoImg ?>')">
                         <img src="<?= $caminhoImg ?>" alt="Produto">

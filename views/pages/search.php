@@ -1,7 +1,7 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$base_path = "C:/xampp/htdocs/magda-crew";
+$base_path = "C:/xampp/htdocs/MagdaCrew";
 
 require_once $base_path . '/src/Config/Database.php'; 
 require_once $base_path . '/src/Models/Produto.php';
@@ -90,7 +90,8 @@ $tituloDaPagina = "Resultados para: " . htmlspecialchars($termo);
 include __DIR__ . '/../components/header.php';
 ?>
 
-<link rel="stylesheet" href="/magda-crew/public/assets/css/search.css">
+<link rel="stylesheet" href="/MagdaCrew/public/assets/css/Search.css">
+<link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <main class="search-page">
@@ -106,57 +107,100 @@ include __DIR__ . '/../components/header.php';
             </form>
         </div>
 
-        <div class="filtros-container">
+       <div class="filtros-container">
+    
+    <div class="dropdown-group">
+        <button class="btn-filtro-topo" id="btnFiltrar">
+            Filtrar 
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6"></path>
+            </svg>
+        </button>
+        
+        <div class="dropdown-menu dark-glass" id="menuFiltrar">
+            <div class="dropdown-header">Filtrar:</div>
             
-            <div class="dropdown-group">
-                <button class="btn-filtro-topo" id="btnFiltrar">
-                    Filtrar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6"></path></svg>
-                </button>
-                
-                <div class="dropdown-menu dark-glass" id="menuFiltrar">
-                    <div class="dropdown-header">Filtrar por:</div>
-                    
-                    <div class="dropdown-section-header" id="headerTamanho">
-                        Tamanho <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12l-7 7-7-7"></path></svg>
-                    </div>
-                    <div class="dropdown-panel" id="panelTamanho">
-                        <?php $opcoes = ['PP', 'P', 'M', 'G', 'GG', 'XGG']; 
-                        foreach($opcoes as $op): ?>
-                            <label class="checkbox-label">
-                                <input type="checkbox" class="check-tamanho" value="<?= $op ?>" <?= in_array($op, $tamanhosMarcados) ? 'checked' : '' ?>> <?= $op ?>
-                            </label>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <div class="dropdown-section-header" id="headerPreco">
-                        Preço <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12l-7 7-7-7"></path></svg>
-                    </div>
-                    <div class="dropdown-panel" id="panelPreco">
-                        <div style="display: flex; gap: 5px;">
-                            <input type="number" id="inputPrecoMin" placeholder="Mín" style="width:50%">
-                            <input type="number" id="inputPrecoMax" placeholder="Máx" style="width:50%">
-                        </div>
-                    </div>
-
-                    <div class="dropdown-actions">
-                        <button type="button" class="btn-aplicar">Aplicar</button>
-                        <button type="button" class="btn-remover" id="btnRemoverTudo">Limpar</button>
-                    </div>
-                </div>
+            <div class="dropdown-section-header" id="headerTamanho">
+                Tamanho
+                <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M19 12l-7 7-7-7"></path>
+                </svg>
             </div>
 
-            <div class="dropdown-group">
-                <button class="btn-filtro-topo" id="btnOrdenar">
-                    Ordenar por <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"></path></svg>
-                </button>
-                <div class="dropdown-menu dark-glass" id="menuOrdenar">
-                    <label class="radio-label"><input type="radio" name="ordem" value="price_asc" <?= $ordem == 'price_asc' ? 'checked' : '' ?>> Menor Preço</label>
-                    <label class="radio-label"><input type="radio" name="ordem" value="price_desc" <?= $ordem == 'price_desc' ? 'checked' : '' ?>> Maior Preço</label>
-                    <label class="radio-label"><input type="radio" name="ordem" value="name_az" <?= $ordem == 'name_az' ? 'checked' : '' ?>> Nome A-Z</label>
-                </div>
+            <div class="dropdown-panel" id="panelTamanho">
+                <?php 
+                $opcoes = ['PP', 'P', 'M', 'G', 'GG', 'XGG']; 
+                foreach ($opcoes as $op): 
+                ?>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="check-tamanho" value="<?= $op ?>" <?= in_array($op, array_map('strtoupper', $tamanhosMarcados)) ? 'checked' : '' ?>>
+                        <?= $op ?>
+                    </label>
+                <?php endforeach; ?>
             </div>
 
+            <div class="dropdown-section-header" id="headerPreco">
+                Preço
+                <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M19 12l-7 7-7-7"></path>
+                </svg>
+            </div>
+
+            <div class="dropdown-panel" id="panelPreco">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <input type="number" id="inputPrecoMin" placeholder="Mín" min="0" max="1000" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white;">
+                    <span style="color: white;">-</span>
+                    <input type="number" id="inputPrecoMax" placeholder="Máx" min="0" max="1000" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white;">
+                </div>
+                <small style="color: #aaa;">Máximo: R$ 1000,00</small>
+            </div>
+
+            <div class="dropdown-actions">
+                <button type="button" class="btn-aplicar">Aplicar</button>
+                <button type="button" class="btn-remover" id="btnRemoverTudo">Remover tudo</button>
+            </div>
         </div>
+    </div>
+
+    <div class="dropdown-group">
+        <button class="btn-filtro-topo" id="btnOrdenar">
+            Ordenar por 
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M19 12l-7 7-7-7"></path>
+            </svg>
+        </button>
+        
+        <div class="dropdown-menu dark-glass" id="menuOrdenar">
+            <div class="dropdown-header">
+                Ordenar por <span class="close-menu" id="closeOrdenar">X</span>
+            </div>
+            
+            <div class="dropdown-section">Preço</div>
+            <label class="radio-label">
+                <input type="radio" name="ordem" value="price_asc" <?= $ordem == 'price_asc' ? 'checked' : '' ?>>
+                Preço, ordem crescente
+            </label>
+
+            <label class="radio-label">
+                <input type="radio" name="ordem" value="price_desc" <?= $ordem == 'price_desc' ? 'checked' : '' ?>>
+                Preço, ordem decrescente
+            </label>
+            
+            <div class="dropdown-section">Título</div>
+            <label class="radio-label">
+                <input type="radio" name="ordem" value="name_az" <?= $ordem == 'name_az' ? 'checked' : '' ?>>
+                Ordem alfabética, A-Z
+            </label>
+
+            <label class="radio-label">
+                <input type="radio" name="ordem" value="name_za" <?= $ordem == 'name_za' ? 'checked' : '' ?>>
+                Ordem alfabética, Z-A
+            </label>
+        </div>
+    </div>
+
+</div>
+
 
         <div class="magda-grid">
             <?php if (empty($produtos)): ?>
@@ -165,10 +209,10 @@ include __DIR__ . '/../components/header.php';
                 </div>
             <?php else: ?>
                 <?php foreach ($produtos as $produto): ?>
-                    <a href="/magda-crew/public/produtos/detalhes/<?= $produto['id'] ?>" class="product-card">
+                    <a href="/MagdaCrew/public/produtos/detalhes/<?= $produto['id'] ?>" class="product-card">
                         <div class="product-img-box">
                             <?= ($produto['total_estoque'] <= 0) ? '<span class="badge-status">Esgotado</span>' : '' ?>
-                            <img src="/magda-crew/<?= $produto['caminho_imagem'] ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
+                            <img src="/MagdaCrew/<?= $produto['caminho_imagem'] ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
                         </div>
                         <div class="product-info">
                             <h3><?= htmlspecialchars($produto['nome']) ?></h3>
@@ -184,59 +228,119 @@ include __DIR__ . '/../components/header.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Abre/Fecha Dropdowns
-    const setupDropdown = (btnId, menuId) => {
-        const btn = document.getElementById(btnId);
-        const menu = document.getElementById(menuId);
-        btn?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.querySelectorAll('.dropdown-menu').forEach(m => m !== menu && m.classList.remove('show'));
-            menu.classList.toggle('show');
-        });
-    };
+    const btnFiltrar = document.getElementById('btnFiltrar');
+    const menuFiltrar = document.getElementById('menuFiltrar');
+    const btnOrdenar = document.getElementById('btnOrdenar');
+    const menuOrdenar = document.getElementById('menuOrdenar');
+    const closeOrdenar = document.getElementById('closeOrdenar');
 
-    setupDropdown('btnFiltrar', 'menuFiltrar');
-    setupDropdown('btnOrdenar', 'menuOrdenar');
+    const urlAtual = new URL(window.location.href);
+    const precoUrl = urlAtual.searchParams.get('preco');
 
-    // Accordion dentro do filtro
+    if (precoUrl) {
+        const [minUrl, maxUrl] = precoUrl.split('-');
+        document.getElementById('inputPrecoMin').value = minUrl;
+        document.getElementById('inputPrecoMax').value = maxUrl;
+    }
+
+    btnFiltrar?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuFiltrar.classList.toggle('show');
+        menuOrdenar.classList.remove('show');
+    });
+
+    btnOrdenar?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuOrdenar.classList.toggle('show');
+        menuFiltrar.classList.remove('show');
+    });
+
+    closeOrdenar?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuOrdenar.classList.remove('show');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (menuFiltrar && !menuFiltrar.contains(e.target) && !btnFiltrar.contains(e.target)) {
+            menuFiltrar.classList.remove('show');
+        }
+
+        if (menuOrdenar && !menuOrdenar.contains(e.target) && !btnOrdenar.contains(e.target)) {
+            menuOrdenar.classList.remove('show');
+        }
+    });
+
     document.querySelectorAll('.dropdown-section-header').forEach(header => {
-        header.addEventListener('click', () => {
-            const panel = header.nextElementSibling;
-            panel.classList.toggle('visible');
-            header.querySelector('.dropdown-arrow').classList.toggle('rotated');
+        header.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            const panelId = header.id.replace('header', 'panel');
+            const panel = document.getElementById(panelId);
+            const arrow = header.querySelector('.dropdown-arrow');
+
+            panel?.classList.toggle('visible');
+            arrow?.classList.toggle('rotated');
         });
     });
 
-    // Aplicar Filtros
-    document.querySelector('.btn-aplicar')?.addEventListener('click', () => {
+    document.querySelector('.btn-aplicar')?.addEventListener('click', (e) => {
+        e.preventDefault();
+
         const url = new URL(window.location.href);
         const tamanhos = Array.from(document.querySelectorAll('.check-tamanho:checked')).map(c => c.value);
+
         const min = document.getElementById('inputPrecoMin').value;
         const max = document.getElementById('inputPrecoMax').value;
 
-        if (tamanhos.length) url.searchParams.set('tamanho', tamanhos.join(','));
-        else url.searchParams.delete('tamanho');
+        if (tamanhos.length > 0) {
+            url.searchParams.set('tamanho', tamanhos.join(','));
+        } else {
+            url.searchParams.delete('tamanho');
+        }
 
-        if (min || max) url.searchParams.set('preco', `${min || 0}-${max || 1000}`);
-        else url.searchParams.delete('preco');
+        if (min || max) {
+            url.searchParams.set('preco', `${min || 0}-${max || 1000}`);
+        } else {
+            url.searchParams.delete('preco');
+        }
 
         window.location.href = url.toString();
     });
 
-    // Ordenação
+    document.getElementById('btnRemoverTudo')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const url = new URL(window.location.href);
+
+        url.searchParams.delete('tamanho');
+        url.searchParams.delete('preco');
+
+        document.querySelectorAll('.check-tamanho').forEach(cb => cb.checked = false);
+        document.getElementById('inputPrecoMin').value = '';
+        document.getElementById('inputPrecoMax').value = '';
+
+        window.location.href = url.toString();
+    }, true);
+
     document.querySelectorAll('input[name="ordem"]').forEach(radio => {
-        radio.addEventListener('change', () => {
+        radio.addEventListener('click', (e) => {
             const url = new URL(window.location.href);
-            url.searchParams.set('order', radio.value);
+            const ordemAtual = url.searchParams.get('order');
+
+            if (ordemAtual === radio.value) {
+                e.preventDefault();
+                radio.checked = false;
+                url.searchParams.delete('order');
+            } else {
+                url.searchParams.set('order', radio.value);
+            }
+
             window.location.href = url.toString();
         });
     });
-
-    // Fechar ao clicar fora
-    document.addEventListener('click', () => document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')));
 });
 </script>
-
 <div style="padding: 15px 55px;">
-    <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
+    <?php include $_SERVER['DOCUMENT_ROOT']. '/MagdaCrew/views/components/footer.php';?>
 </div>

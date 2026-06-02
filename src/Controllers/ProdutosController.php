@@ -25,7 +25,7 @@ class ProdutosController { // Adicione o S aqui
 
     public function detalhes($id = null) {
         if (!$id) {
-            header("Location: /MAGDA-CREW/public/index.php");
+            header("Location: /MagdaCrew/public/index.php");
             exit;
         }
 
@@ -42,8 +42,8 @@ class ProdutosController { // Adicione o S aqui
         $categorias = $categoriaModel->buscarTodas();
         
         $tituloDaPagina = "Magda Crew - " . $produto['nome'];
-        $cssExtra = '<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/produto.css">';
+        $cssExtra = '<link rel="stylesheet" href="/MagdaCrew/public/assets/css/produto.css">';
 
-        require_once __DIR__ . '/../../views/pages/produto-detalhe.php';
+        require_once __DIR__ . '/../../views/pages/ProdutoDetalhe.php';
     }
 }

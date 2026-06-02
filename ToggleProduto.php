@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -29,5 +29,5 @@ $update->execute([
     $id
 ]);
 
-header("Location: produtos.php");
+header("Location: Produtos.php");
 exit;

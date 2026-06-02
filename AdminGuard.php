@@ -75,7 +75,7 @@ if (empty($_SESSION['_session_created'])) {
 
 // ── Helper: redirecionar para o login ─────────────────────────────────────────
 function _redirecionar_login(string $motivo = '') {
-    $url = '/magda-crew/admin-login.php';
+    $url = '/MagdaCrew/AdminLogin.php';
     if ($motivo) {
         $url .= '?motivo=' . urlencode($motivo);
     }

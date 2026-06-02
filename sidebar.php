@@ -13,19 +13,19 @@ $nomeUsuario = $_SESSION['usuario_nome'] ?? $_SESSION['admin_nome'] ?? 'Admin';
 
 <aside class="sidebar" id="sidebar">
     <div class="logo-container">
-        <a href="/magda-crew/public/index.php">
-            <img src="/magda-crew/public/assets/images/MagdaWhiteLogo.png" alt="Logo Magda Crew" class="logo-img">
+        <a href="/MagdaCrew/public/Index.php">
+            <img src="/MagdaCrew/public/assets/images/MagdaWhiteLogo.png" alt="Logo Magda Crew" class="logo-img">
         </a>
     </div>
 
     <nav>
         <ul>
-            <li><a href="painel.php" class="<?= $paginaAtual == 'painel.php' ? 'active' : '' ?>">Dashboard</a></li>
-            <li><a href="produtos.php" class="<?= $paginaAtual == 'produtos.php' ? 'active' : '' ?>">Produtos</a></li>
-            <li><a href="categorias.php" class="<?= $paginaAtual == 'categorias.php' ? 'active' : '' ?>">Categorias</a></li>
-            <li><a href="vendas.php" class="<?= $paginaAtual == 'vendas.php' ? 'active' : '' ?>">Vendas</a></li>
-            <li><a href="clientes.php" class="<?= $paginaAtual == 'clientes.php' ? 'active' : '' ?>">Clientes</a></li>
-            <li><a href="estoque.php" class="<?= $paginaAtual == 'estoque.php' ? 'active' : '' ?>">Estoque</a></li>
+            <li><a href="Painel.php" class="<?= $paginaAtual == 'Painel.php' ? 'active' : '' ?>">Dashboard</a></li>
+            <li><a href="Produtos.php" class="<?= $paginaAtual == 'Produtos.php' ? 'active' : '' ?>">Produtos</a></li>
+            <li><a href="Categorias.php" class="<?= $paginaAtual == 'Categorias.php' ? 'active' : '' ?>">Categorias</a></li>
+            <li><a href="Vendas.php" class="<?= $paginaAtual == 'Vendas.php' ? 'active' : '' ?>">Vendas</a></li>
+            <li><a href="Clientes.php" class="<?= $paginaAtual == 'Clientes.php' ? 'active' : '' ?>">Clientes</a></li>
+            <li><a href="Estoque.php" class="<?= $paginaAtual == 'Estoque.php' ? 'active' : '' ?>">Estoque</a></li>
         </ul>
     </nav>
 </aside>
@@ -36,8 +36,8 @@ $nomeUsuario = $_SESSION['usuario_nome'] ?? $_SESSION['admin_nome'] ?? 'Admin';
 
         <div class="user-info">
             <span>Bem-vindo(a), <?= htmlspecialchars($nomeUsuario) ?></span>
-            <a href="/magda-crew/public/index.php" class="btn-sair">Voltar à Loja</a>
+            <a href="/MagdaCrew/public/index.php" class="btn-sair">Voltar à Loja</a>
         </div>
     </header>
 
-    <script src="/magda-crew/public/assets/js/main.js"></script>
+    <script src="/MagdaCrew/public/assets/js/main.js"></script>

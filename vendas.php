@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -24,12 +24,12 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Vendas - Magda Crew</title>
     
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Gestao.css">
     
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/produtos.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Produtos.css">
 </head>
 <body>
 
@@ -79,7 +79,7 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <td style="text-align: center;">
                         <div class="acoes">
-                            <a href="venda_detalhes.php?id=<?= $venda['id'] ?>" class="btn-acao">Ver Detalhes</a>
+                            <a href="VendaDetalhe.php?id=<?= $venda['id'] ?>" class="btn-acao">Ver Detalhes</a>
                         </div>
                     </td>
                 </tr>

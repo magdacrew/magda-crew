@@ -33,7 +33,7 @@ emailjs.send("service_4qi1zs9", "template_8bqxgl3", {
 .then(function(response) {
 
     window.location.href =
-    "/magda-crew/views/pages/verificar-codigo.php";
+    "/MagdaCrew/views/pages/verificar-codigo.php";
 
 })
 .catch(function(error) {

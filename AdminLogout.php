@@ -27,5 +27,5 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-header('Location: /magda-crew/admin-login.php');
+header('Location: /MagdaCrew/AdminLogin.php');
 exit;

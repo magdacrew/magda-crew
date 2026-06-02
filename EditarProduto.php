@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -185,8 +185,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Produto</title>
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/adicionar-produto.css">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/AdicionarProduto.css">
     
     <style>
         .alerta-erro {
@@ -204,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <main class="container-admin">
     <a href="javascript:history.back()">
-        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+        <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="botao-x">
     </a>
 
     <h1>Editar Produto</h1>
@@ -286,7 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h3>Imagens atuais</h3>
         <div class="preview-imagens">
             <?php foreach($listaImagens as $img): ?>
-                <?php $caminhoImagem = '/magda-crew/' . trim($img['caminho_imagem']); ?>
+                <?php $caminhoImagem = '/MagdaCrew/' . trim($img['caminho_imagem']); ?>
                 <div class="preview-item" id="imagem-existente-<?= $img['id'] ?>">
                     
                     <button type="button" class="btn-remover" onclick="removerImagemExistente(<?= $img['id'] ?>)"></button>

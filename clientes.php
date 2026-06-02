@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -20,16 +20,16 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Clientes - Magda Crew</title>
     
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Gestao.css">
     
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/produtos.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Produtos.css">
 </head>
 <body>
 
-<?php include 'sidebar.php'; ?>
+<?php include 'Sidebar.php'; ?>
 
 <main class="main-content">
     <section class="content">
@@ -58,7 +58,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     
                     <td style="text-align: center;">
                         <div class="acoes">
-                            <a href="cliente_detalhes.php?id=<?= $usuario['id'] ?>" class="btn-acao">Ver Detalhes</a>
+                            <a href="ClienteDetalhe.php?id=<?= $usuario['id'] ?>" class="btn-acao">Ver Detalhes</a>
                         </div>
                     </td>
                 </tr>

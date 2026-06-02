@@ -1,10 +1,10 @@
-<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/footer.css">
+<link rel="stylesheet" href="/MagdaCrew/public/assets/css/Footer.css">
 
 <footer class="site-footer">
     
     <div class="footer-left">
         <div class="brand-section">
-            <img src="/magda-crew/public/assets/images/MagdaWhiteLogo.png" alt="Magda Logo" class="footer-logo">
+            <img src="/MagdaCrew/public/assets/images/MagdaWhiteLogo.png" alt="Magda Logo" class="footer-logo">
             
             <form class="newsletter-form">
                 <input type="email" placeholder="E-mail" required>

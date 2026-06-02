@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -24,14 +24,14 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link class="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Produtos - Magda Crew</title>
     
     <!-- CSS Global (Sidebar, Cores de Fundo, Tabela Padrão) -->
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Gestao.css">
     
     <!-- CSS Específico desta página -->
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/produtos.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Produtos.css">
 </head>
 <body>
 
@@ -47,7 +47,7 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     Gerencie os produtos da loja.
                 </p>
             </div>
-            <a href="adicionar-produto.php" class="btn-adicionar">
+            <a href="AdicionarProduto.php" class="btn-adicionar">
                 + Novo Produto
             </a>
         </div>
@@ -69,7 +69,7 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td>
                         <div class="produto-info-cell">
                             <?php if (!empty($produto['caminho_imagem'])): ?>
-                                <img src="/magda-crew/<?= htmlspecialchars($produto['caminho_imagem']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>" class="thumb-produto">
+                                <img src="/MagdaCrew/<?= htmlspecialchars($produto['caminho_imagem']) ?>" alt="<?= htmlspecialchars($produto['nome']) ?>" class="thumb-produto">
                             <?php else: ?>
                                 <div class="thumb-produto placeholder">Sem Foto</div>
                             <?php endif; ?>
@@ -83,8 +83,8 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <td style="text-align: center;">
                         <div class="acoes">
-                            <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="btn-editar-img" title="Editar Produto">
-                                <img src="/magda-crew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
+                            <a href="EditarProduto.php?id=<?= $produto['id'] ?>" class="btn-editar-img" title="Editar Produto">
+                                <img src="/MagdaCrew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
                             </a>
 
                             <label class="switch" title="Ativar/Desativar">

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['novo_status'])) {
     $stmtUpdate->execute([$novo_status, $venda_id]);
     
     // Atualiza a página para mostrar o novo status
-    header("Location: venda_detalhes.php?id=" . $venda_id);
+    header("Location: VendaDetalhe.php?id=" . $venda_id);
     exit;
 }
 
@@ -48,9 +48,9 @@ $itens = $stmtItens->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/15.png">
     <title>Detalhes da Venda #<?= htmlspecialchars($venda['id']) ?> - Magda Crew</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/gestao.css">
 
 </head>
 <body>

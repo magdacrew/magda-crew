@@ -39,7 +39,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($tituloDaPagina) ? htmlspecialchars($tituloDaPagina) : 'Magda Crew' ?></title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/header.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Header.css">
     
     <style>
         .cart-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out; backdrop-filter: blur(2px); }
@@ -63,17 +63,17 @@ try {
 
 <header>
   <nav>
-    <a href="/MAGDA-CREW/views/pages/shop.php">Shop</a>
+    <a href="/MagdaCrew/views/pages/Shop.php">Shop</a>
     <a href="#">Archive</a>
     <a href="#">Flagship</a>
     <?php if (!empty($_SESSION["usuario_id"]) && !empty($_SESSION["is_admin"])): ?>
-        <a href="/MAGDA-CREW/painel.php">Painel</a>
+        <a href="/MagdaCrew/Painel.php">Painel</a>
     <?php endif; ?>
   </nav>
 
   <div class="logo">
-    <a href="/MAGDA-CREW/public/index.php" class="logo-link">
-      <img src="/MAGDA-CREW/public/assets/images/MagdaWhiteLogo.png" alt="Magda Crew" class="logo-img">
+    <a href="/MagdaCrew/public/Index.php" class="logo-link">
+      <img src="/MagdaCrew/public/assets/images/MagdaWhiteLogo.png" alt="Magda Crew" class="logo-img">
     </a>
   </div>
 
@@ -82,22 +82,22 @@ try {
       <input type="text" id="inputBusca" placeholder="Buscar" 
              onkeyup="if(event.key === 'Enter') executarBusca()"
              value="<?= isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '' ?>">
-      <img src="/MAGDA-CREW/public/assets/images/WhiteMagnifyingGlass.png" 
+      <img src="/MagdaCrew/public/assets/images/WhiteMagnifyingGlass.png" 
            alt="Buscar" class="icon" onclick="executarBusca()" style="cursor: pointer;">
     </div>
 
     <?php if (isset($_SESSION["usuario_id"])): ?>
-      <a href="/MAGDA-CREW/views/pages/Profile.php">
-        <img src="/MAGDA-CREW/public/assets/images/WhiteUser.png" alt="Perfil" class="icon">
+      <a href="/MagdaCrew/views/pages/Profile.php">
+        <img src="/MagdaCrew/public/assets/images/WhiteUser.png" alt="Perfil" class="icon">
       </a>
     <?php else: ?>
-      <a href="/MAGDA-CREW/views/pages/login.php">
-        <img src="/MAGDA-CREW/public/assets/images/WhiteUser.png" alt="Login" class="icon">
+      <a href="/MagdaCrew/views/pages/login.php">
+        <img src="/MagdaCrew/public/assets/images/WhiteUser.png" alt="Login" class="icon">
       </a>
     <?php endif; ?>
 
-    <a href="#"><img src="/MAGDA-CREW/public/assets/images/Sun.png" alt="Alternar tema" class="icon"></a>
-    <a href="#" onclick="abrirCarrinho(event)"><img src="/MAGDA-CREW/public/assets/images/WhiteBag.png" alt="Sacola" class="icon"></a>
+    <a href="#"><img src="/MagdaCrew/public/assets/images/Sun.png" alt="Alternar tema" class="icon"></a>
+    <a href="#" onclick="abrirCarrinho(event)"><img src="/MagdaCrew/public/assets/images/WhiteBag.png" alt="Sacola" class="icon"></a>
   </div>
 </header>
 
@@ -117,14 +117,14 @@ try {
                         $imgSrc = $item['caminho_imagem'];
                         // Ajuste simples para o caminho da imagem
                         if (strpos($imgSrc, 'http') === false) {
-                            $imgSrc = '/MAGDA-CREW/' . $imgSrc;
+                            $imgSrc = '/MagdaCrew/' . $imgSrc;
                         }
                     ?>
                     <img src="<?= htmlspecialchars($imgSrc) ?>" style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; background: #fff;">
                     <div style="flex: 1;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <h4 style="margin: 0; font-size: 0.95rem; text-transform: uppercase; padding-right: 25px;"><?= htmlspecialchars($item['nome']) ?></h4>
-                            <button class="btn-remover" onclick="removerItem(<?= $item['variante_id'] ?>)"><img src="/MAGDA-CREW/public/assets/images/WhiteTrash.png" alt="Remover"></button>
+                            <button class="btn-remover" onclick="removerItem(<?= $item['variante_id'] ?>)"><img src="/MagdaCrew/public/assets/images/WhiteTrash.png" alt="Remover"></button>
                         </div>
                         <p style="margin: 5px 0; color: #aaa; font-size: 0.85rem;">Tamanho: <?= htmlspecialchars($item['tamanho_nome']) ?> <br> Quantidade: <?= $item['quantidade'] ?></p>
                         <p style="margin: 0; font-weight: bold;">R$ <?= number_format($item['preco'] * $item['quantidade'], 2, ',', '.') ?></p>
@@ -147,7 +147,7 @@ try {
         
         if (termo.length >= 2) { 
             // Redireciona para a nova página de pesquisa dedicada
-            window.location.href = '/MAGDA-CREW/views/pages/search.php?q=' + encodeURIComponent(termo);
+            window.location.href = '/MagdaCrew/views/pages/search.php?q=' + encodeURIComponent(termo);
         } else {
             input.focus();
             input.style.borderBottom = "1px solid red"; 
@@ -160,7 +160,7 @@ try {
     function removerItem(varianteId) {
         const formData = new FormData();
         formData.append('variante_id', varianteId);
-        fetch('/MAGDA-CREW/src/Controllers/remover-carrinho.php', { method: 'POST', body: formData })
+        fetch('/MagdaCrew/src/Controllers/RemoverCarrinho.php', { method: 'POST', body: formData })
         .then(res => res.json()).then(data => { if(data.success) location.reload(); });
     }
 </script>

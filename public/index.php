@@ -1,5 +1,5 @@
 <?php
-// Arquivo: public/index.php
+// Arquivo: public/Index.php
 
 // 1. Inicia a sessão (necessário para login e carrinho)
 session_start();

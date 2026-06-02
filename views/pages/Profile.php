@@ -1,8 +1,18 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => false,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+
+    session_start();
+}
 
 if (!isset($_SESSION["usuario_id"])) {
-    header("Location: /magda-crew/views/pages/login.php");
+    header("Location: /MagdaCrew/views/pages/login.php");
     exit;
 }
 
@@ -84,7 +94,8 @@ $lista_estados = ["AC"=>"Acre", "AL"=>"Alagoas", "AP"=>"Amapá", "AM"=>"Amazonas
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="/magda-crew/public/assets/css/perfil.css">
+<link rel="stylesheet" href="/MagdaCrew/public/assets/css/Profile.css">
+<link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
 <title>Perfil - Magda Crew</title>
 </head>
 <body>
@@ -92,14 +103,14 @@ $lista_estados = ["AC"=>"Acre", "AL"=>"Alagoas", "AP"=>"Amapá", "AM"=>"Amazonas
 <div class="topbar">
     <div class="top-content">
         <div class="menu">
-            <a href="/magda-crew/public/index.php">
-                <img src="/magda-crew/public/assets/images/MagdaWhiteLogo.png" class="logo" alt="Logo">
+            <a href="/MagdaCrew/public/index.php">
+                <img src="/MagdaCrew/public/assets/images/MagdaWhiteLogo.png" class="logo" alt="Logo">
             </a>
-            <a href="/magda-crew/views/pages/orders.php">Orders</a>
-            <a href="/magda-crew/views/pages/Profile.php">Profile</a>
+            <a href="/MagdaCrew/views/pages/orders.php">Orders</a>
+            <a href="/MagdaCrew/views/pages/Profile.php">Profile</a>
         </div>
             <a href="javascript:history.back()">
-        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="profile-icon">
+        <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="profile-icon">
     </a>
     </div>
 </div>
@@ -145,7 +156,7 @@ $lista_estados = ["AC"=>"Acre", "AL"=>"Alagoas", "AP"=>"Amapá", "AM"=>"Amazonas
         <?php endif; ?>
     </div>
 
-    <form action="/magda-crew/views/pages/logout.php" method="POST">
+    <form action="/MagdaCrew/views/pages/logout.php" method="POST">
         <button class="logout-btn">Sair</button>
     </form>
 </div>

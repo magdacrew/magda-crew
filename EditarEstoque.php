@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -11,7 +11,7 @@ try {
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
-    header("Location: estoque.php");
+    header("Location: Estoque.php");
     exit;
 }
 
@@ -73,7 +73,7 @@ $mapaCoresHex = [
 $nomeCor = $variante['cor'];
 $hexColor = isset($mapaCoresHex[$nomeCor]) ? $mapaCoresHex[$nomeCor] : '#333333';
 $borderStyle = strtoupper($hexColor) === '#FFFFFF' ? '1px solid #888' : '1px solid #333';
-$caminhoImg = !empty($variante['caminho_imagem']) ? '/magda-crew/' . $variante['caminho_imagem'] : '/magda-crew/public/assets/images/15.png';
+$caminhoImg = !empty($variante['caminho_imagem']) ? '/MagdaCrew/' . $variante['caminho_imagem'] : '/MagdaCrew/public/assets/images/15.png';
 ?>
 
 <!DOCTYPE html>
@@ -81,15 +81,15 @@ $caminhoImg = !empty($variante['caminho_imagem']) ? '/magda-crew/' . $variante['
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link class="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Editar Estoque - Magda Crew</title>
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/editar-estoque.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/EditarEstoque.css">
 </head>
 <body>
 
 <main class="container-admin">
-    <a href="estoque.php">
-        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+    <a href="Estoque.php">
+        <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="botao-x">
     </a>
 
     <h1>Editar Estoque</h1>

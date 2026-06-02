@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -50,13 +50,13 @@ function getStatusClass($status) {
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Perfil do Cliente - Magda Crew</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Gestao.css">
 </head>
 <body>
 
-<?php include 'sidebar.php'; ?>
+<?php include 'Sidebar.php'; ?>
 
 <main class="main-content">
     <section class="content">

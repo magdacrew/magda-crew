@@ -96,11 +96,12 @@ if (isset($produto['id'])) {
 }
 
 // 6. CARREGA O HEADER
-require_once __DIR__ . '/../components/header.php'; 
+require_once __DIR__ . '/../components/Header.php'; 
 ?>
 
-<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/detalhe-produto.css">
-<link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/footer.css">
+<link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
+<link rel="stylesheet" href="/MagdaCrew/public/assets/css/ProdutoDetalhe.css">
+<link rel="stylesheet" href="/MagdaCrew/public/assets/css/Footer.css">
 
 <div class="container-produto">
     <div class="produto-galeria">
@@ -113,7 +114,7 @@ require_once __DIR__ . '/../components/header.php';
                             $src_imagem = 'public/assets/images/produtos/' . $src_imagem;
                         }
                     ?>
-                    <img id="imagem-principal" src="/MAGDA-CREW/<?= $src_imagem ?>" alt="<?= htmlspecialchars($produto['nome'] ?? '') ?>">
+                    <img id="imagem-principal" src="/MagdaCrew/<?= $src_imagem ?>" alt="<?= htmlspecialchars($produto['nome'] ?? '') ?>">
                     
                     <?php if (count($galeria_imagens) > 1): ?>
                         <button class="seta-galeria esq" onclick="mudarImagem(-1)">&#10094;</button>
@@ -129,7 +130,7 @@ require_once __DIR__ . '/../components/header.php';
                 <?php 
                     $thumb = (strpos($caminho, 'public/') === false) ? 'public/assets/images/produtos/' . $caminho : $caminho;
                 ?>
-                <img src="/MAGDA-CREW/<?= $thumb ?>" class="miniatura <?= $index === 0 ? 'ativa' : '' ?>" onclick="selecionarImagem(<?= $index ?>)" data-src="/MAGDA-CREW/<?= $thumb ?>">
+                <img src="/MagdaCrew/<?= $thumb ?>" class="miniatura <?= $index === 0 ? 'ativa' : '' ?>" onclick="selecionarImagem(<?= $index ?>)" data-src="/MagdaCrew/<?= $thumb ?>">
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
@@ -141,7 +142,7 @@ require_once __DIR__ . '/../components/header.php';
         <div class="preco">R$ <?= number_format($produto['preco'] ?? 0, 2, ',', '.') ?></div>
         <p class="descricao"><?= nl2br(htmlspecialchars($produto['descricao'] ?? '')) ?></p>
 
-        <form class="form-compra" method="POST" action="/MAGDA-CREW/src/Controllers/adicionar.php">
+        <form class="form-compra" method="POST" action="/MagdaCrew/src/Controllers/adicionar.php">
             <input type="hidden" name="variante_id" id="variante-selecionada" value="<?php echo $variante_pre_selecionada; ?>">
 
             <label>Escolha o Tamanho:</label>
@@ -177,7 +178,7 @@ require_once __DIR__ . '/../components/header.php';
     <div class="vitrine" id="vitrine-container">
         <?php foreach ($produtos_relacionados as $rel_produto): ?>
             <div class="card-produto">
-                <a href="/MAGDA-CREW/public/produtos/detalhes/<?= $rel_produto['id'] ?>" class="link-card-produto">
+                <a href="/MagdaCrew/public/produtos/detalhes/<?= $rel_produto['id'] ?>" class="link-card-produto">
                     <div class="imagem-produto-vitrine">
                         <?php if (isset($rel_produto['total_estoque']) && $rel_produto['total_estoque'] <= 0): ?>
                             <div class="overlay-esgotado"></div>
@@ -185,7 +186,7 @@ require_once __DIR__ . '/../components/header.php';
                         <?php endif; ?>
 
                         <?php if (!empty($rel_produto['caminho_imagem'])): ?>
-                            <img src="/magda-crew/<?= $rel_produto['caminho_imagem'] ?>" 
+                            <img src="/MagdaCrew/<?= $rel_produto['caminho_imagem'] ?>" 
                                  alt="<?= htmlspecialchars($rel_produto['nome']) ?>">
                         <?php else: ?>
                             <div class="imagem-placeholder">
@@ -206,7 +207,7 @@ require_once __DIR__ . '/../components/header.php';
 <?php endif; ?>
 
 <div style="padding: 15px 55px;">
-    <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
+    <?php include $_SERVER['DOCUMENT_ROOT']. '/MagdaCrew/views/components/footer.php';?>
 </div>
 
 <script>

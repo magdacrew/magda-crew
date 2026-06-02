@@ -1,6 +1,6 @@
 <?php
 /**
- * admin-login.php — Login exclusivo do painel admin MAGDA CREW
+ * AdminLogin.php — Login exclusivo do painel admin MAGDA CREW
  *
  * Fluxo:
  *   1. Admin digita o e-mail
@@ -29,7 +29,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Se já está logado como admin, vai direto para o painel
 if (!empty($_SESSION['usuario_id']) && !empty($_SESSION['is_admin'])) {
-    header('Location: /magda-crew/painel.php');
+    header('Location: /MagdaCrew/painel.php');
     exit;
 }
 
@@ -109,7 +109,7 @@ if (!$bloqueado && $_SERVER['REQUEST_METHOD'] === 'POST' && $etapa === 'email') 
         $_SESSION['admin_login_etapa'] = 'codigo';
         $_SESSION['admin_enviar_email'] = true;
 
-        header('Location: /magda-crew/admin-login.php');
+        header('Location: /MagdaCrew/AdminLogin.php');
         exit;
     }
 }
@@ -166,7 +166,7 @@ if (!$bloqueado && $_SERVER['REQUEST_METHOD'] === 'POST' && $etapa === 'codigo')
                 $_SESSION[$chave_bloqueio]
             );
 
-            header('Location: /magda-crew/painel.php');
+            header('Location: /MagdaCrew/painel.php');
             exit;
 
         } else {
@@ -197,9 +197,9 @@ if (isset($_SESSION['admin_enviar_email'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
-    <title>Magda Crew - Admin</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/admin-login.css">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
+    <title>Admin - Magda Crew</title>
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/AdminLogin.css">
 </head>
 <body>
 
@@ -207,19 +207,19 @@ if (isset($_SESSION['admin_enviar_email'])) {
 
     <!-- Botão de Voltar (X) -->
     <?php if ($etapa === 'email'): ?>
-        <a href="/magda-crew/public/index.php">
-            <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+        <a href="/MagdaCrew/public/index.php">
+            <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="botao-x">
         </a>
     <?php else: ?>
-        <a href="/magda-crew/admin-login.php?reset=1">
-            <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+        <a href="/MagdaCrew/AdminLogin.php?reset=1">
+            <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="botao-x">
         </a>
     <?php endif; ?>
 
     <!-- Logo centralizada -->
     <div class="logo">
-        <a href="/magda-crew/public/index.php">
-            <img src="/magda-crew/public/assets/images/MagdaWhiteLogo.png" class="logo-img" alt="Magda Crew">
+        <a href="/MagdaCrew/public/Index.php">
+            <img src="/MagdaCrew/public/assets/images/MagdaWhiteLogo.png" class="logo-img" alt="Magda Crew">
         </a>
     </div>
 
@@ -291,7 +291,7 @@ if (isset($_SESSION['admin_enviar_email'])) {
         </form>
 
         <div class="links" style="margin-top: 20px;">
-            <a href="/magda-crew/admin-login.php?reset=1">Usar outro e-mail</a>
+            <a href="/MagdaCrew/AdminLogin.php?reset=1">Usar outro e-mail</a>
         </div>
     <?php endif; ?>
 
@@ -314,7 +314,7 @@ emailjs.send("service_4qi1zs9", "template_8bqxgl3", {
 // Limpa reset de etapa se solicitado
 if (isset($_GET['reset'])) {
     session_unset();
-    header('Location: /magda-crew/admin-login.php');
+    header('Location: /MagdaCrew/AdminLogin.php');
     exit;
 }
 ?>

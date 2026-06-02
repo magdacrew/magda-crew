@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -14,14 +14,14 @@ $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Categorias - Magda Crew</title>
     
     <!-- CSS Global (Sidebar, Cores de Fundo, Tabela Padrão) -->
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Gestao.css">
     
     <!-- CSS dos elementos visuais compartilhados (Botões, Topo e Ações) -->
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/produtos.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Produtos.css">
 </head>
 <body>
 
@@ -38,7 +38,7 @@ $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     Gerencie as categorias dos produtos da loja.
                 </p>
             </div>
-            <a href="adicionar-categoria.php" class="btn-adicionar">+ Nova Categoria</a>
+            <a href="AdicionarCategoria.php" class="btn-adicionar">+ Nova Categoria</a>
         </div>
 
         <table class="tabela">
@@ -65,15 +65,15 @@ $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td style="text-align: center;">
                         <!-- Div Ações padronizada para o Lápis e o Switch -->
                         <div class="acoes">
-                            <a href="editar-categoria.php?id=<?= $categoria['id'] ?>" class="btn-editar-img" title="Editar Categoria">
-                                <img src="/magda-crew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
+                            <a href="EditarCategoria.php?id=<?= $categoria['id'] ?>" class="btn-editar-img" title="Editar Categoria">
+                                <img src="/MagdaCrew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
                             </a>
 
                             <label class="switch" title="Ativar/Desativar">
                                 <input 
                                     type="checkbox" 
                                     <?= ($is_ativo == 1) ? 'checked' : '' ?>
-                                    onchange="window.location.href='status-categoria.php?id=<?= $categoria['id'] ?>'"
+                                    onchange="window.location.href='StatusCategoria.php?id=<?= $categoria['id'] ?>'"
                                 >
                                 <span class="slider round"></span>
                             </label>

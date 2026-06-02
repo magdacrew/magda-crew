@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -47,15 +47,15 @@ $mapaCoresHex = [
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estoque - Magda Crew</title>
     
     <!-- CSS Global (Sidebar, Cores de Fundo, Tabela Padrão) -->
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/gestao.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Gestao.css">
     
     <!-- CSS dos elementos visuais compartilhados (Botões, Topo, Miniaturas e Ações) -->
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/produtos.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Produtos.css">
 </head>
 <body>
 
@@ -71,7 +71,7 @@ $mapaCoresHex = [
                         Gerencie a quantidade disponível de variantes em tempo real.
                     </p>
                 </div>
-                <a href="adicionar-estoque.php" class="btn-add">Adicionar Estoque</a>
+                <a href="AdicionarEstoque.php" class="btn-add">Adicionar Estoque</a>
             </div>
 
             <table class="tabela">
@@ -99,7 +99,7 @@ $mapaCoresHex = [
                                 <td>
                                     <div class="produto-info-cell">
                                         <?php if (!empty($item['caminho_imagem'])): ?>
-                                            <img src="/magda-crew/<?= htmlspecialchars($item['caminho_imagem']) ?>" alt="<?= htmlspecialchars($item['produto']) ?>" class="thumb-produto">
+                                            <img src="/MagdaCrew/<?= htmlspecialchars($item['caminho_imagem']) ?>" alt="<?= htmlspecialchars($item['produto']) ?>" class="thumb-produto">
                                         <?php else: ?>
                                             <div class="thumb-produto placeholder">Sem Foto</div>
                                         <?php endif; ?>
@@ -124,8 +124,8 @@ $mapaCoresHex = [
                                 
                                 <td style="text-align: center;">
                                     <div class="acoes">
-                                        <a href="editar-estoque.php?id=<?= $item['id'] ?>" class="btn-editar-img" title="Editar Estoque">
-                                            <img src="/magda-crew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
+                                        <a href="EditarEstoque.php?id=<?= $item['id'] ?>" class="btn-editar-img" title="Editar Estoque">
+                                            <img src="/MagdaCrew/public/assets/images/BlackPencil.png" alt="Editar" class="icon-editar">
                                         </a>
                                     </div>
                                 </td>

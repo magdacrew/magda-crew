@@ -155,13 +155,13 @@ CREATE TABLE itens_venda (
 UPDATE produto_imagens
 SET caminho_imagem = REPLACE(
     caminho_imagem,
-    '/magda-crew/public/assets/images/produtos/',
+    '/MagdaCrew/public/assets/images/produtos/',
     'assets/images/produtos/'
 );
 
 UPDATE produto_imagens
 SET caminho_imagem = REPLACE(
     caminho_imagem,
-    '/magda-crew/',
+    '/MagdaCrew/',
     ''
 );

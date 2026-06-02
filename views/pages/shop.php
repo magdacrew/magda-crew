@@ -109,11 +109,12 @@ if (!empty($produtos)) {
 // 4. CONFIGURAÇÕES DO CABEÇALHO
 $tituloDaPagina = 'Todos os Itens - Magda Crew';
 
-include_once $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/header.php'; 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/MagdaCrew/views/components/Header.php'; 
 ?>
 
-<link rel="stylesheet" href="/magda-crew/public/assets/css/footer.css">
-<link rel="stylesheet" href="/magda-crew/public/assets/css/style.css">
+<link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
+<link rel="stylesheet" href="/MagdaCrew/public/assets/css/Footer.css">
+<link rel="stylesheet" href="/MagdaCrew/public/assets/css/Shop.css">
 
 <main>
 
@@ -213,7 +214,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/header.ph
         <?php if (!empty($produtos)): ?>
             <?php foreach ($produtos as $produto): ?>
                 <div class="card-produto">
-                    <a href="/magda-crew/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
+                    <a href="/MagdaCrew/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
                         
                         <div class="imagem-produto">
                             <?php 
@@ -228,7 +229,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/header.ph
                             $caminhoImagem = $produto['caminho_imagem'] ?? $produto['imagem'] ?? $produto['foto'] ?? $produto['imagem_url'] ?? '';
                             
                             if (!empty($caminhoImagem)): ?>
-                                <img src="/magda-crew/<?= $caminhoImagem ?>" 
+                                <img src="/MagdaCrew/<?= $caminhoImagem ?>" 
                                      alt="<?= htmlspecialchars($produto['nome']) ?>">
                             <?php else: ?>
                                 <div class="imagem-placeholder">
@@ -257,7 +258,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/header.ph
 </main>
 
 <div style="padding: 15px 55px;">
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/magda-crew/views/components/footer.php'; ?>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/MagdaCrew/views/components/footer.php'; ?>
 </div>
 
 <script>
@@ -513,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<script src="/magda-crew/public/assets/js/script.js"></script>
+<script src="/MagdaCrew/public/assets/js/script.js"></script>
 
 </body>
 </html>

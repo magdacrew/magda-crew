@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -95,11 +95,11 @@ $ticketMedioFmt = 'R$ ' . number_format($ticketMedio, 2, ',', '.');
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel – Magda Crew</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/gestao.css">
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/painel.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/gestao.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/painel.css">
     <!-- Chart.js para os gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>

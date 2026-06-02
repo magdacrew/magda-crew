@@ -2,12 +2,12 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($tituloDaPagina) ?></title>
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/index.css">
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/header.css">
-    <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/header.php';?>
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/index.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Header.css">
+    <?php include $_SERVER['DOCUMENT_ROOT']. '/MagdaCrew/views/components/Header.php';?>
 </head>
 <body>
 
@@ -17,12 +17,12 @@
   <div class="arrow left" id="prevBtn">
     ‹</div>
 
-  <div class="hero-content active" data-bg="/magda-crew/public/assets/images/background3.png">
+  <div class="hero-content active" data-bg="/MagdaCrew/public/assets/images/background3.png">
     <h1>FALL ’26 COLLECTION ©</h1>
     <a href="#">Compre Agora</a>
   </div>
 
-  <div class="hero-content" data-bg="/magda-crew/public/assets/images/background2.png">
+  <div class="hero-content" data-bg="/MagdaCrew/public/assets/images/background2.png">
         <h1>ROMANTIC ’26 ©</h1>
     <a href="#">Compre Agora</a>
   </div>
@@ -70,7 +70,7 @@
         <?php if (!empty($produtos)): ?>
             <?php foreach ($produtos as $produto): ?>
                 <div class="card-produto">
-                    <a href="/MAGDA-CREW/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
+                    <a href="/MagdaCrew/public/produtos/detalhes/<?= $produto['id'] ?>" class="link-card-produto">
                         
                         <div class="imagem-produto">
                             
@@ -81,7 +81,7 @@
                             <?php endif; ?>
 
                             <?php if (!empty($produto['caminho_imagem'])): ?>
-                                <img src="/magda-crew/<?= $produto['caminho_imagem'] ?>" 
+                                <img src="/MagdaCrew/<?= $produto['caminho_imagem'] ?>" 
                                      alt="<?= htmlspecialchars($produto['nome']) ?>">
                             <?php else: ?>
                                 <div class="imagem-placeholder">
@@ -123,7 +123,7 @@
 </button>
 
 <div style="padding: 15px 55px;">
-    <?php include $_SERVER['DOCUMENT_ROOT']. '/magda-crew/views/components/footer.php';?>
+    <?php include $_SERVER['DOCUMENT_ROOT']. '/MagdaCrew/views/components/footer.php';?>
 </div>
 
 <script>
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<script src="/MAGDA-CREW/public/assets/js/script.js"></script>
+<script src="/MagdaCrew/public/assets/js/script.js"></script>
 
 </body>
 </html>

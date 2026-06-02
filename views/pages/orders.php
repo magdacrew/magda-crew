@@ -32,9 +32,10 @@ $stmtItens = $pdo->prepare("
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meus Pedidos - Magda Crew</title>
-    <link rel="stylesheet" href="/magda-crew/public/assets/css/orders.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Orders.css">
     <style>
         /* Estilos inline para garantir a aparência profissional */
         :root { --dark-card: #111; --border-color: #222; --text-muted: #888; }
@@ -130,14 +131,14 @@ $stmtItens = $pdo->prepare("
     <div class="topbar">
         <div class="top-content">
             <div class="menu">
-                <a href="/magda-crew/public/index.php">
-                    <img src="/magda-crew/public/assets/images/MagdaWhiteLogo.png" class="logo" alt="Logo">
+                <a href="/MagdaCrew/public/index.php">
+                    <img src="/MagdaCrew/public/assets/images/MagdaWhiteLogo.png" class="logo" alt="Logo">
                 </a>
-                <a href="/magda-crew/views/pages/orders.php" style="text-decoration: underline;">Orders</a>
-                <a href="/magda-crew/views/pages/Profile.php">Profile</a>
+                <a href="/MagdaCrew/views/pages/orders.php" style="text-decoration: underline;">Orders</a>
+                <a href="/MagdaCrew/views/pages/Profile.php">Profile</a>
             </div>
             <a href="javascript:history.back()">
-                <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="profile-icon">
+                <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="profile-icon">
             </a>
         </div>
     </div>
@@ -148,7 +149,7 @@ $stmtItens = $pdo->prepare("
         <?php if (empty($pedidos)): ?>
             <div class="order-card" style="text-align: center; padding: 60px;">
                 <p style="color: var(--text-muted);">Você ainda não realizou nenhum pedido.</p>
-                <a href="/magda-crew/public/index.php" style="color: #fff; text-decoration: underline; font-size: 0.9rem;">Ir para a loja</a>
+                <a href="/MagdaCrew/public/index.php" style="color: #fff; text-decoration: underline; font-size: 0.9rem;">Ir para a loja</a>
             </div>
         <?php else: ?>
             
@@ -173,15 +174,15 @@ $stmtItens = $pdo->prepare("
                         foreach($itens as $item): 
                             $valor_total_item = $item['preco_unitario'] * $item['quantidade'];
                             
-                            // Lógica inteligente para montar o caminho da imagem sem duplicar o /magda-crew/
+                            // Lógica inteligente para montar o caminho da imagem sem duplicar o /MagdaCrew/
                             $caminho_imagem = '';
                             if (!empty($item['caminho_imagem'])) {
                                 $caminho = $item['caminho_imagem'];
-                                // Se o caminho já vier do banco com "magda-crew", não adiciona de novo
-                                if (strpos($caminho, 'magda-crew') !== false) {
+                                // Se o caminho já vier do banco com "MagdaCrew", não adiciona de novo
+                                if (strpos($caminho, 'MagdaCrew') !== false) {
                                     $caminho_imagem = (strpos($caminho, '/') === 0 ? '' : '/') . $caminho;
                                 } else {
-                                    $caminho_imagem = '/magda-crew/' . ltrim($caminho, '/');
+                                    $caminho_imagem = '/MagdaCrew/' . ltrim($caminho, '/');
                                 }
                             }
                     ?>

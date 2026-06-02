@@ -1,5 +1,15 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => false,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+
+    session_start();
+}
 
 require_once __DIR__ . "/../../src/Config/Database.php";
 
@@ -15,7 +25,7 @@ $erro = "";
 
 if (!isset($_SESSION["email_login"])) {
 
-    header("Location: /magda-crew/views/pages/login.php");
+    header("Location: /MagdaCrew/views/pages/login.php");
     exit;
 }
 
@@ -75,11 +85,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $usuario &&
             strtotime($usuario["codigo_expira"]) > time()
         ) {
+            session_regenerate_id(true);
 
             $_SESSION["usuario_id"] = $usuario["id"];
             $_SESSION["email"] = $usuario["email"];
             $_SESSION["usuario_email"] = $usuario["email"];
-            $_SESSION["is_admin"] = $usuario["is_admin"];
+            $_SESSION["is_admin"] = $usuario["is_admin"] ?? 0;
 
             $stmt = $pdo->prepare("
                 UPDATE usuarios
@@ -98,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             unset($_SESSION["email_login"]);
             unset($_SESSION["codigo_para_email"]);
 
-            header("Location: /magda-crew/public/index.php");
+            header("Location: /MagdaCrew/public/index.php");
             exit;
 
         } else {
@@ -113,14 +124,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html lang="pt-BR">
 
 <head>
-<link rel="icon" type="image/png" href="/magda-crew/public/assets/images/15.png">
+<link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
 <meta charset="UTF-8">
 
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet"
-href="/magda-crew/public/assets/css/login.css">
+href="/MagdaCrew/public/assets/css/login.css">
 
 <title>Verificar Código - Magda Crew</title>
 
@@ -131,15 +142,15 @@ href="/magda-crew/public/assets/css/login.css">
 <div class="login-container">
 
     <a href="javascript:history.back()">
-        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+        <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="botao-x">
     </a>
 
     <div class="logo">
 
-        <a href="/magda-crew/public/index.php">
+        <a href="/MagdaCrew/public/index.php">
 
             <img
-                src="/magda-crew/public/assets/images/MagdaWhiteLogo.png"
+                src="/MagdaCrew/public/assets/images/MagdaWhiteLogo.png"
                 class="logo-img"
             >
 

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -25,5 +25,5 @@ if ($id > 0) {
 }
 
 // 4. Volta automaticamente para a página de categorias
-header("Location: categorias.php");
+header("Location: Categorias.php");
 exit;

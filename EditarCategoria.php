@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/admin_guard.php';
+require_once __DIR__ . '/AdminGuard.php';
 
 require_once __DIR__ . '/src/Config/Database.php';
 
@@ -54,8 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Editar Categoria</title>
-    <link rel="stylesheet" href="/MAGDA-CREW/public/assets/css/adicionar-produto.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/AdicionarProduto.css">
     <style>
         .alerta-erro { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px; }
     </style>
@@ -64,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <main class="container-admin">
     <a href="categorias.php">
-        <img src="/magda-crew/public/assets/images/X.png" alt="Voltar" class="botao-x">
+        <img src="/MagdaCrew/public/assets/images/X.png" alt="Voltar" class="botao-x">
     </a>
 
     <h1>Editar Categoria</h1>
