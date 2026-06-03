@@ -1,3 +1,13 @@
+<?php
+if (!isset($bannersTopo) || !is_array($bannersTopo)) {
+    $bannersTopo = [];
+}
+
+if (!isset($bannerBaixo) || !is_array($bannerBaixo)) {
+    $bannerBaixo = null;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,29 +21,34 @@
 </head>
 <body>
 
-
 <main style="padding: 15px 55px;">
   <section class="hero" id="hero-container">
-  <div class="arrow left" id="prevBtn">
-    ‹</div>
+    <div class="arrow left" id="prevBtn">‹</div>
 
-  <div class="hero-content active" data-bg="/MagdaCrew/public/assets/images/background3.png">
-    <h1>FALL ’26 COLLECTION ©</h1>
-    <a href="#">Compre Agora</a>
-  </div>
+    <?php if (!empty($bannersTopo)): ?>
+        <?php foreach ($bannersTopo as $index => $banner): ?>
+            <div 
+                class="hero-content <?= $index === 0 ? 'active' : '' ?>" 
+                data-bg="<?= htmlspecialchars($banner['imagem_fundo']) ?>"
+            >
+                <h1><?= htmlspecialchars($banner['titulo']) ?></h1>
+                <a href="<?= htmlspecialchars($banner['link_botao']) ?>">
+                    <?= htmlspecialchars($banner['texto_botao']) ?>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
 
-  <div class="hero-content" data-bg="/MagdaCrew/public/assets/images/background2.png">
-        <h1>ROMANTIC ’26 ©</h1>
-    <a href="#">Compre Agora</a>
-  </div>
-
-  <div class="arrow right" id="nextBtn">›</div>
-  
-  <div class="dots">
-    <div class="dot active"></div>
-    <div class="dot"></div> </div>
-</section>
+    <div class="arrow right" id="nextBtn">›</div>
+    
+    <div class="dots">
+        <?php foreach ($bannersTopo as $index => $banner): ?>
+            <div class="dot <?= $index === 0 ? 'active' : '' ?>"></div>
+        <?php endforeach; ?>
+    </div>
+  </section>
 </main>
+        
 
 <ul class="categorias">
     <?php foreach ($categorias as $cat): ?>
@@ -57,7 +72,6 @@
     
     <div class="vitrine" id="vitrine-container">
         <?php 
-            // ORDENAÇÃO: Coloca os produtos com estoque primeiro e os esgotados no final
             if (!empty($produtos)) {
                 usort($produtos, function($a, $b) {
                     $esgotadoA = (isset($a['total_estoque']) && $a['total_estoque'] <= 0) ? 1 : 0;
@@ -76,7 +90,6 @@
                             
                             <?php if (isset($produto['total_estoque']) && $produto['total_estoque'] <= 0): ?>
                                 <div class="overlay-esgotado"></div>
-
                                 <span class="tag-esgotado">Esgotado</span>
                             <?php endif; ?>
 
@@ -106,13 +119,18 @@
 
 <main style="padding: 15px 55px;">
     <section class="banner" id="banner-section">
-    </div>
-<div class="banner-section">
-    <div class="banner-overlay" >
-        <h1>VAMPETA’26 | T-SHIRTS </h1>
-        <a href="#">Explore Agora</a>
-    </div>
-</div>
+        <div 
+            class="banner-section"
+            style="background-image: url('<?= htmlspecialchars($bannerBaixo['imagem_fundo'] ?? '/MagdaCrew/public/assets/images/background.png') ?>');"
+        >
+            <div class="banner-overlay">
+                <h1><?= htmlspecialchars($bannerBaixo['titulo'] ?? 'VAMPETA’26 | T-SHIRTS') ?></h1>
+                <a href="<?= htmlspecialchars($bannerBaixo['link_botao'] ?? '#') ?>">
+                    <?= htmlspecialchars($bannerBaixo['texto_botao'] ?? 'Explore Agora') ?>
+                </a>
+            </div>
+        </div>
+    </section>
 </main>
 
 <button id="btnTop" class="btn-topo" aria-label="Voltar ao topo">
@@ -128,8 +146,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- LÓGICA DA VITRINE (Já existente) ---
     const vitrine = document.getElementById('vitrine-container');
     const scrollbar = document.getElementById('custom-scrollbar');
 
@@ -149,26 +165,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- NOVA LÓGICA DO BOTÃO VOLTAR AO TOPO ---
     const btnTop = document.getElementById('btnTop');
 
     if (btnTop) {
-        // Verifica a rolagem da página inteira
         window.addEventListener('scroll', () => {
-            // Se desceu mais de 300 pixels, adiciona a classe "show" que faz ele aparecer
             if (window.scrollY > 300) {
                 btnTop.classList.add('show');
             } else {
-                // Se subiu de volta para o topo, remove a classe e ele some com fade
                 btnTop.classList.remove('show');
             }
         });
 
-        // Quando clicar no botão, sobe a página suavemente
         btnTop.addEventListener('click', () => {
             window.scrollTo({
                 top: 0,
-                behavior: 'smooth' /* O "smooth" faz rolar macio, não dar um pulo seco */
+                behavior: 'smooth'
             });
         });
     }

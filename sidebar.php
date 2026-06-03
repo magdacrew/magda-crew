@@ -1,14 +1,12 @@
 <?php
-// Inicia a sessão caso ainda não tenha sido iniciada (necessário para pegar o nome do usuário)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Pega o nome do arquivo atual para iluminar o menu
 $paginaAtual = basename($_SERVER['PHP_SELF']);
 
-// Tenta pegar o nome do usuário logado na sessão
-$nomeUsuario = $_SESSION['usuario_nome'] ?? $_SESSION['admin_nome'] ?? 'Admin';
+// Usando o e-mail da sessão (conforme o seu print_r anterior)
+$emailUsuario = $_SESSION['usuario_email'] ?? $_SESSION['email'] ?? 'admin@magda.com';
 ?>
 
 <aside class="sidebar" id="sidebar">
@@ -26,6 +24,7 @@ $nomeUsuario = $_SESSION['usuario_nome'] ?? $_SESSION['admin_nome'] ?? 'Admin';
             <li><a href="Vendas.php" class="<?= $paginaAtual == 'Vendas.php' ? 'active' : '' ?>">Vendas</a></li>
             <li><a href="Clientes.php" class="<?= $paginaAtual == 'Clientes.php' ? 'active' : '' ?>">Clientes</a></li>
             <li><a href="Estoque.php" class="<?= $paginaAtual == 'Estoque.php' ? 'active' : '' ?>">Estoque</a></li>
+            <li><a href="Banners.php" class="<?= $paginaAtual == 'Banners.php' ? 'active' : '' ?>">Banners</a></li>
         </ul>
     </nav>
 </aside>
@@ -35,8 +34,13 @@ $nomeUsuario = $_SESSION['usuario_nome'] ?? $_SESSION['admin_nome'] ?? 'Admin';
         <button id="menuToggle">☰</button>
 
         <div class="user-info">
-            <span>Bem-vindo(a), <?= htmlspecialchars($nomeUsuario) ?></span>
-            <a href="/MagdaCrew/public/index.php" class="btn-sair">Voltar à Loja</a>
+            <span style="font-size: 14px; color: #333; font-weight: 500;">
+                <?= htmlspecialchars($emailUsuario) ?>
+            </span>
+            
+            <a href="/MagdaCrew/public/index.php" class="btn-sair" style="display: flex; align-items: center;">
+                <img src="/MagdaCrew/public/assets/images/X.png" alt="Sair" style="width: 20px; height: 20px;">
+            </a>
         </div>
     </header>
 

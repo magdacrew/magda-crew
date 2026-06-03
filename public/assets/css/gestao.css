@@ -79,7 +79,7 @@ body {
 
 .header {
     background-color: #fff;
-    padding: 20px;
+    padding: 20px 30px; /* Adicionado um pouco mais de respiro */
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     display: flex;
     justify-content: space-between;
@@ -155,25 +155,24 @@ table.tabela tr:hover {
     font-size: 20px;
 }
 
-.user-info a {
-    margin-left: 15px;
-    color: #d9534f;
-    text-decoration: none;
-    font-weight: bold;
+.user-info {
+    display: flex;
+    align-items: center; /* Centraliza verticalmente o e-mail e o X */
+    gap: 20px; /* Espaço entre o e-mail e o X */
 }
 
-.btn-acao {
-    background-color: #333;
-    color: #fff;
-    padding: 6px 12px;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    transition: background 0.3s;
+/* Força a imagem do X a ficar preta */
+.btn-sair img {
+    width: 20px; 
+    height: 20px;
+    display: block;
+    filter: brightness(0); /* Isso transforma qualquer imagem (colorida ou branca) em preto puro */
+    transition: 0.2s;
 }
 
-.btn-acao:hover {
-    background-color: #555;
+/* Opcional: efeito ao passar o mouse */
+.btn-sair:hover img {
+    filter: brightness(0.4); /* Fica um cinza escuro ao passar o mouse */
 }
 
 /* ==========================================================================

@@ -91,7 +91,7 @@ $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <input 
                                     type="checkbox" 
                                     <?= (isset($produto['ativo']) && $produto['ativo'] == 1) ? 'checked' : '' ?>
-                                    onchange="window.location.href='toggle-produto.php?id=<?= $produto['id'] ?>'"
+                                    onchange="window.location.href='ToggleProduto.php?id=<?= $produto['id'] ?>'"
                                 >
                                 <span class="slider round"></span>
                             </label>
