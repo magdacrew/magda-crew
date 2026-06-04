@@ -39,6 +39,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($tituloDaPagina) ? htmlspecialchars($tituloDaPagina) : 'Magda Crew' ?></title>
+    <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Header.css">
     
     <style>
@@ -65,7 +66,7 @@ try {
   <nav>
     <a href="/MagdaCrew/views/pages/Shop.php">Shop</a>
     <a href="#">Archive</a>
-    <a href="#">Flagship</a>
+    <a href="/MagdaCrew/views/pages/Flagship.php">Flagship</a>
     <?php if (!empty($_SESSION["usuario_id"]) && !empty($_SESSION["is_admin"])): ?>
         <a href="/MagdaCrew/Painel.php">Painel</a>
     <?php endif; ?>

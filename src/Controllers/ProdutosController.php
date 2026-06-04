@@ -41,7 +41,7 @@ class ProdutosController { // Adicione o S aqui
         $categoriaModel = new Categoria();
         $categorias = $categoriaModel->buscarTodas();
         
-        $tituloDaPagina = "Magda Crew - " . $produto['nome'];
+        $tituloDaPagina = $produto['nome'] . " - Magda Crew";
         $cssExtra = '<link rel="stylesheet" href="/MagdaCrew/public/assets/css/produto.css">';
 
         require_once __DIR__ . '/../../views/pages/ProdutoDetalhe.php';

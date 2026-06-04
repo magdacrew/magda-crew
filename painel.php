@@ -114,8 +114,11 @@ $ticketMedioFmt = 'R$ ' . number_format($ticketMedio, 2, ',', '.');
         <div>
             <h1>Visão Geral</h1>
             <p class="dash-subtitle">Resumo executivo da MAGDA CREW</p>
+            <?php
+date_default_timezone_set('America/Sao_Paulo');
+?>
         </div>
-        <span class="dash-date"><?= date('d/m/Y') ?></span>
+        <span class="dash-date"><?= date('d/m/Y H:i') ?></span>
     </div>
 
     <!-- ── KPI Cards ── -->

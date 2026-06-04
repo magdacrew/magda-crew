@@ -99,7 +99,6 @@ if (isset($produto['id'])) {
 require_once __DIR__ . '/../components/Header.php'; 
 ?>
 
-<link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
 <link rel="stylesheet" href="/MagdaCrew/public/assets/css/ProdutoDetalhe.css">
 <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Footer.css">
 
@@ -167,7 +166,11 @@ require_once __DIR__ . '/../components/Header.php';
                 <?php endforeach; ?>
             </div>
 
+            <?php if ($variante_pre_selecionada === null): ?>
+            <button type="button" class="btn-comprar btn-esgotado" disabled>ESGOTADO</button>
+        <?php else: ?>
             <button type="submit" class="btn-comprar">ADICIONAR À SACOLA</button>
+        <?php endif; ?>
         </form>
     </div>
 </div>

@@ -21,7 +21,7 @@ class Database {
             
             $host = $env['DB_HOST'];
             $port = $env['DB_PORT'];
-            $dbname = $env['DB_NAME'];
+            $dbname = $env['DB_NAME']; 
             $user = $env['DB_USER'];
             $pass = $env['DB_PASS'] ?? ''; 
 

@@ -219,7 +219,6 @@ body {
     background-color: #777;
     color: #44444c;
     cursor: not-allowed;
-    pointer-events: none;
 }
 
 .btn-comprar {
@@ -239,6 +238,14 @@ body {
 .btn-comprar:hover {
     background-color: transparent;
     color: #e7e9eb;
+}
+
+/* Estilo para quando o produto inteiro estiver sem estoque */
+.btn-comprar.btn-esgotado {
+    background-color: #777;
+    color: #44444c;
+    border-color: #777; /* Deixa a borda igual ao fundo */
+    cursor: not-allowed;
 }
 
 /* ==========================================================================

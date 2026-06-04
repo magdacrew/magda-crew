@@ -1,8 +1,1 @@
-categoria  
-cliente_detalhes 
-cliente 
-estoque 
-painel 
-produtos 
-venda_detalhes 
-vendas
+fala galerinha do yutubas 

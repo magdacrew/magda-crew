@@ -191,8 +191,9 @@ h3 {
     right: -5px;
     width: 22px;
     height: 22px;
-    background: #000 url('/magda-crew/public/assets/images/X.png') no-repeat center;
-    background-size: 10px; /* Tamanho do ícone dentro do círculo */
+    /* Correção na linha abaixo: usando ../images/ para evitar erros de nome de pasta */
+    background: #000 url('../images/X.png') no-repeat center;
+    background-size: 10px;
     border: 1px solid #242424;
     border-radius: 50%;
     cursor: pointer;
