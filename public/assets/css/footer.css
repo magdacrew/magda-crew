@@ -15,6 +15,7 @@
 
 /* =========================================
    Dark Mode Automático (Pref. do Sistema)
+   Mantido como fallback para quem ainda não usou o botão de tema.
    ========================================= */
 @media (prefers-color-scheme: dark) {
     :root {
@@ -28,6 +29,36 @@
         --btn-bg: #444444;
         --btn-hover: #555555;
     }
+}
+
+/* =========================================
+   Alternância Manual de Tema (botão do sol no header)
+   Estes seletores têm especificidade maior que o @media acima,
+   então SEMPRE vencem a preferência do sistema quando o usuário
+   clica no ícone de tema (ver views/components/header.php).
+   ========================================= */
+:root[data-theme="dark"] {
+    --bg-body: #121212;
+    --bg-footer: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --border-ui: #333333;
+    --input-bg: #ffffff;
+    --input-border: #ffffff;
+    --btn-bg: #444444;
+    --btn-hover: #555555;
+}
+
+:root[data-theme="light"] {
+    --bg-body: #ffffff;
+    --bg-footer: #f5f5f5;
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+    --border-ui: #e0e0e0;
+    --input-bg: #ffffff;
+    --input-border: #333333;
+    --btn-bg: #ffffff;
+    --btn-hover: #e0e0e0;
 }
 
 /* =========================================

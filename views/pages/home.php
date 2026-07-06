@@ -6,6 +6,63 @@ if (!isset($bannersTopo) || !is_array($bannersTopo)) {
 if (!isset($bannerBaixo) || !is_array($bannerBaixo)) {
     $bannerBaixo = null;
 }
+
+if (!function_exists('resolverLinkBanner')) {
+    function resolverLinkBanner($link) {
+        $link = trim((string)$link);
+
+        if ($link === '' || $link === '#') {
+            return '#';
+        }
+
+        // Mantém links externos, âncoras, telefone e e-mail funcionando normalmente.
+        if (preg_match('~^(https?:)?//|^mailto:|^tel:|^#~i', $link)) {
+            return $link;
+        }
+
+        $link = str_replace('\\', '/', $link);
+
+        // Se já veio com o caminho correto do projeto, não altera.
+        if (stripos($link, '/MagdaCrew/') === 0) {
+            return $link;
+        }
+
+        $linkLimpo = ltrim($link, '/');
+
+        // Se o admin colocar views/pages/shop.php ou public/index.php, completa só a pasta do projeto.
+        if (stripos($linkLimpo, 'views/pages/') === 0 || stripos($linkLimpo, 'public/') === 0) {
+            return '/MagdaCrew/' . $linkLimpo;
+        }
+
+        // Atalhos: agora basta colocar shop.php, flagship.php, login.php etc.
+        $paginasDiretas = [
+            'home.php' => '/MagdaCrew/public/index.php',
+            'index.php' => '/MagdaCrew/public/index.php',
+            'shop.php' => '/MagdaCrew/views/pages/shop.php',
+            'flagship.php' => '/MagdaCrew/views/pages/flagship.php',
+            'login.php' => '/MagdaCrew/views/pages/login.php',
+            'profile.php' => '/MagdaCrew/views/pages/Profile.php',
+            'orders.php' => '/MagdaCrew/views/pages/orders.php',
+            'search.php' => '/MagdaCrew/views/pages/search.php',
+        ];
+
+        $chave = strtolower(basename(parse_url($linkLimpo, PHP_URL_PATH) ?: $linkLimpo));
+        $query = parse_url($linkLimpo, PHP_URL_QUERY);
+
+        if (isset($paginasDiretas[$chave])) {
+            return $paginasDiretas[$chave] . ($query ? '?' . $query : '');
+        }
+
+        // Se for qualquer outro arquivo PHP existente dentro de views/pages, monta o caminho sozinho.
+        $arquivoPagina = __DIR__ . '/' . basename($linkLimpo);
+        if (preg_match('/\.php$/i', $linkLimpo) && file_exists($arquivoPagina)) {
+            return '/MagdaCrew/views/pages/' . basename($linkLimpo) . ($query ? '?' . $query : '');
+        }
+
+        // Fallback para rotas do public: produtos/detalhes/1, home, shop, etc.
+        return '/MagdaCrew/public/' . $linkLimpo;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +89,7 @@ if (!isset($bannerBaixo) || !is_array($bannerBaixo)) {
                 data-bg="<?= htmlspecialchars($banner['imagem_fundo']) ?>"
             >
                 <h1><?= htmlspecialchars($banner['titulo']) ?></h1>
-                <a href="<?= htmlspecialchars($banner['link_botao']) ?>">
+                <a href="<?= htmlspecialchars(resolverLinkBanner($banner['link_botao'] ?? '#')) ?>">
                     <?= htmlspecialchars($banner['texto_botao']) ?>
                 </a>
             </div>
@@ -125,7 +182,7 @@ if (!isset($bannerBaixo) || !is_array($bannerBaixo)) {
         >
             <div class="banner-overlay">
                 <h1><?= htmlspecialchars($bannerBaixo['titulo'] ?? 'VAMPETA’26 | T-SHIRTS') ?></h1>
-                <a href="<?= htmlspecialchars($bannerBaixo['link_botao'] ?? '#') ?>">
+                <a href="<?= htmlspecialchars(resolverLinkBanner($bannerBaixo['link_botao'] ?? '#')) ?>">
                     <?= htmlspecialchars($bannerBaixo['texto_botao'] ?? 'Explore Agora') ?>
                 </a>
             </div>

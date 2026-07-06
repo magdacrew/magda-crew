@@ -6,9 +6,10 @@
 }
 
 body {
-  background: #1c1c20;
-  color: #e7e9eb;
+  background: var(--body-bg); /* Antes: #1c1c20 fixo. Variáveis definidas em header.css (:root). */
+  color: var(--body-text); /* Antes: #e7e9eb fixo. */
   font-family: "Cinzel", serif;
+  transition: background-color .3s ease, color .3s ease; /* Troca suave ao alternar tema */
 }
 
 /* SEÇÃO HERO */
@@ -211,16 +212,18 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 10px 0 5px 0;
-    color: #e7e9eb;
+    color: var(--body-text); /* Antes: #e7e9eb fixo, ilegível sobre fundo branco no modo claro. */
     line-height: 1.4;
     text-align: left;
+    transition: color .3s ease;
 }
 
 .card-produto .preco { 
-    color: #e7e9eb;
+    color: var(--body-text); /* Antes: #e7e9eb fixo. */
     font-size: 13px; 
     font-weight: 500;
     text-align: left;
+    transition: color .3s ease;
 }
 
 .imagem-produto {
@@ -263,12 +266,13 @@ body {
     width: 100%;
     max-width: 800px;
     height: 11px;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--scrollbar-track); /* Antes: rgba(255,255,255,0.1) fixo. */
     margin: 28px auto;
     display: block;
     border-radius: 10px;
     outline: none;
     cursor: pointer;
+    transition: background-color .3s ease;
 }
 
 .embla__scrollbar::-webkit-slider-thumb {
@@ -276,7 +280,7 @@ body {
     appearance: none;
     width: 150px;
     height: 11px;
-    background-color: #fff;
+    background-color: var(--scrollbar-thumb); /* Antes: #fff fixo, invisível sobre trilho claro. */
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -285,10 +289,11 @@ body {
 .embla__scrollbar::-moz-range-thumb {
     width: 150px;
     height: 11px;
-    background-color: #fff;
+    background-color: var(--scrollbar-thumb); /* Antes: #fff fixo. */
     border-radius: 10px;
     border: none;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 /* SEÇÃO BANNER */
@@ -372,9 +377,9 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #ffffff;
+    background-color: var(--btn-topo-bg); /* Antes: rgba(255,255,255,0.15) fixo. */
+    border: 1px solid var(--btn-topo-border); /* Antes: rgba(255,255,255,0.3) fixo. */
+    color: var(--btn-topo-text); /* Antes: #ffffff fixo. */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -383,7 +388,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transform: translateY(0);
-    transition: opacity 0.4s ease, visibility 0.4s ease, background-color 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.4s ease, visibility 0.4s ease, background-color 0.3s ease, transform 0.3s ease, border-color .3s ease, color .3s ease;
     backdrop-filter: blur(5px);
 }
 
@@ -398,7 +403,7 @@ body {
 }
 
 .btn-topo.show:hover {
-    background-color: rgba(255, 255, 255, 0.35);
+    background-color: var(--btn-topo-bg-hover); /* Antes: rgba(255,255,255,0.35) fixo. */
     transform: translateY(-6px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }

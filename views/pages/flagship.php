@@ -1,102 +1,136 @@
 <?php
 $tituloDaPagina = "Flagship - Magda Crew";
-include_once $_SERVER['DOCUMENT_ROOT'] . '/MagdaCrew/views/components/Header.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/MagdaCrew/views/components/header.php';
+
+function flagshipAsset($path, $fallback) {
+    $root = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\');
+    $absolute = $root . $path;
+    return file_exists($absolute) ? $path : $fallback;
+}
+
+$hero = flagshipAsset(
+    '/MagdaCrew/public/assets/images/flagship/hero.jpg',
+    '/MagdaCrew/public/assets/images/background4.jpg'
+);
 
 $imagens = [
-    '/MagdaCrew/public/assets/images/flagship/loja1.jpg',
-    '/MagdaCrew/public/assets/images/flagship/loja2.jpg',
-    '/MagdaCrew/public/assets/images/flagship/loja3.jpg',
-    '/MagdaCrew/public/assets/images/flagship/loja4.jpg',
+    flagshipAsset('/MagdaCrew/public/assets/images/flagship/loja1.jpg', '/MagdaCrew/public/assets/images/background.png'),
+    flagshipAsset('/MagdaCrew/public/assets/images/flagship/loja2.jpg', '/MagdaCrew/public/assets/images/background2.png'),
+    flagshipAsset('/MagdaCrew/public/assets/images/flagship/loja3.jpg', '/MagdaCrew/public/assets/images/background3.png'),
+    flagshipAsset('/MagdaCrew/public/assets/images/flagship/loja4.jpg', '/MagdaCrew/public/assets/images/background5.png'),
 ];
 
-$hero = '/MagdaCrew/public/assets/images/flagship/hero.jpg';
+$endereco = 'Av. Cel. Procópio Gomes, 911 - Bucarein, Joinville - SC';
+$rota = 'https://maps.app.goo.gl/zSRDkUnrapQoF7HL8';
+$mapa = 'https://www.google.com/maps?q=' . rawurlencode($endereco) . '&output=embed';
 ?>
 
 <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Flagship.css">
 
 <main class="flagship-page">
-
-    <section class="flagship-hero">
-        <img src="<?= $hero ?>" alt="Flagship Store" onerror="this.style.display='none'; this.parentElement.classList.add('sem-imagem');">
+    <section class="flagship-hero" style="background-image: url('<?= htmlspecialchars($hero) ?>');">
+        <div class="hero-glow"></div>
         <div class="hero-overlay">
-            <span>MAGDA CREW</span>
+            <span class="eyebrow">MAGDA CREW • JOINVILLE</span>
             <h1>FLAGSHIP STORE</h1>
-            <p>Conheça nossa loja física em Joinville - SC.</p>
+            <p>Um espaço feito para o cliente conhecer a marca, provar as peças e viver a experiência Magda de perto.</p>
+
+            <div class="hero-actions">
+                <a class="btn-principal" href="<?= htmlspecialchars($rota) ?>" target="_blank" rel="noopener">Ver rota</a>
+                <a class="btn-secundario" href="/MagdaCrew/views/pages/shop.php">Ver coleção</a>
+            </div>
         </div>
     </section>
+ <br><br>
 
     <section class="flagship-info">
-        <div class="mapa">
-            <iframe 
-                src="https://maps.app.goo.gl/CfN4uGKEB7HLukYP8"
-                loading="lazy">
+        <div class="mapa-card">
+            <iframe
+                title="Mapa da Magda Flagship Store"
+                src="<?= htmlspecialchars($mapa) ?>"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
             </iframe>
         </div>
 
-        <div class="info-texto">
+        <div class="info-card">
             <span class="tag">STORE LOCATION</span>
             <h2>MAGDA FLAGSHIP STORE</h2>
+            <p class="descricao">Visite nossa loja física e veja de perto as peças da coleção.</p>
 
             <div class="info-lista">
-                <p>Rua Av. Cel Procópio Gomes, 911 - Bucarein</p>
-                <p>Joinville - Santa Catarina </p>
-                <p>09090-720</p>
-                <p>Terça a Sábado - 11h às 20h</p>
+                <div class="info-item">
+                    <strong>Endereço</strong>
+                    <p><?= htmlspecialchars($endereco) ?></p>
+                </div>
+                <div class="info-item">
+                    <strong>Horário</strong>
+                    <p>Terça a sábado • 11h às 20h</p>
+                </div>
+                <div class="info-item">
+                    <strong>CEP</strong>
+                    <p>09090-720</p>
+                </div>
             </div>
 
-            <a class="btn-rota" href="https://maps.app.goo.gl/zSRDkUnrapQoF7HL8" target="_blank">
-                Ver rota
-            </a>
+            <a class="btn-rota" href="<?= htmlspecialchars($rota) ?>" target="_blank" rel="noopener">Abrir no Google Maps</a>
         </div>
     </section>
 
     <section class="galeria-loja">
-        <div class="thumbs">
-            <?php foreach ($imagens as $index => $img): ?>
-                <button class="thumb <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>">
-                    <img src="<?= $img ?>" alt="Imagem <?= $index + 1 ?>" onerror="this.style.display='none';">
-                </button>
-            <?php endforeach; ?>
+        <div class="galeria-header">
+            <span class="tag">AMBIENTE</span>
+            <h2>Conheça a loja</h2>
+
         </div>
 
-        <div class="imagem-principal">
-            <button class="seta esquerda" id="btnAnterior">‹</button>
+        <div class="galeria-grid">
+            <div class="thumbs" aria-label="Miniaturas da galeria">
+                <?php foreach ($imagens as $index => $img): ?>
+                    <button class="thumb <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>" aria-label="Ver imagem <?= $index + 1 ?>">
+                        <img src="<?= htmlspecialchars($img) ?>" alt="Imagem <?= $index + 1 ?> da loja">
+                    </button>
+                <?php endforeach; ?>
+            </div>
 
-            <img 
-                id="imagemGrande" 
-                src="<?= $imagens[0] ?>" 
-                alt="Loja Magda Crew"
-                onerror="this.style.display='none'; this.parentElement.classList.add('sem-imagem');"
-            >
-
-            <button class="seta direita" id="btnProximo">›</button>
+            <div class="imagem-principal">
+                <button class="seta esquerda" id="btnAnterior" aria-label="Imagem anterior">‹</button>
+                <img id="imagemGrande" src="<?= htmlspecialchars($imagens[0]) ?>" alt="Loja Magda Crew">
+                <div class="imagem-legenda">
+                    <span id="contadorGaleria">01 / <?= str_pad((string) count($imagens), 2, '0', STR_PAD_LEFT) ?></span>
+                    <strong>Flagship Experience</strong>
+                </div>
+                <button class="seta direita" id="btnProximo" aria-label="Próxima imagem">›</button>
+            </div>
         </div>
     </section>
-
 </main>
 
 <button id="btnTop" class="btn-topo" aria-label="Voltar ao topo">↑</button>
 
-<div style="padding: 15px 55px;">
+<div class="footer-flagship">
     <?php include $_SERVER['DOCUMENT_ROOT']. '/MagdaCrew/views/components/footer.php'; ?>
 </div>
 
 <script>
-const imagens = <?= json_encode($imagens) ?>;
+const imagens = <?= json_encode($imagens, JSON_UNESCAPED_SLASHES) ?>;
 let imagemAtual = 0;
 
 const imagemGrande = document.getElementById("imagemGrande");
 const thumbs = document.querySelectorAll(".thumb");
-const imagemBox = document.querySelector(".imagem-principal");
+const contadorGaleria = document.getElementById("contadorGaleria");
 
 function atualizarImagem() {
-    imagemBox.classList.remove("sem-imagem");
-    imagemGrande.style.display = "block";
+    imagemGrande.classList.remove("trocar");
+    void imagemGrande.offsetWidth;
+    imagemGrande.classList.add("trocar");
     imagemGrande.src = imagens[imagemAtual];
 
     thumbs.forEach((thumb, index) => {
         thumb.classList.toggle("active", index === imagemAtual);
     });
+
+    contadorGaleria.textContent = String(imagemAtual + 1).padStart(2, "0") + " / " + String(imagens.length).padStart(2, "0");
 }
 
 document.getElementById("btnProximo").addEventListener("click", () => {

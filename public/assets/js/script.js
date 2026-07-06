@@ -20,7 +20,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 containerVitrine.style.opacity = '0.5';
 
                 // URL para o filtro no PHP
-                const url = `/MAGDA-CREW/public/produtos/categoria/${categoriaId}`;
+                // CORREÇÃO: a pasta do projeto é "/MagdaCrew/" (mesma grafia usada em todo o site).
+                // O caminho antigo "/MAGDA-CREW/" não existe no servidor (URLs são case-sensitive
+                // em Linux/Apache), então o fetch sempre falhava (404) e a vitrine nunca era
+                // atualizada, mantendo sempre os produtos carregados no load inicial da Home.
+                const url = `/MagdaCrew/public/produtos/categoria/${categoriaId}`;
 
                 fetch(url)
                     .then(response => {

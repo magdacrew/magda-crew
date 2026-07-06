@@ -40,7 +40,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($tituloDaPagina) ? htmlspecialchars($tituloDaPagina) : 'Magda Crew' ?></title>
     <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
-    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/Header.css">
+    <link rel="stylesheet" href="/MagdaCrew/public/assets/css/header.css">
     
     <style>
         .cart-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out; backdrop-filter: blur(2px); }
@@ -54,7 +54,8 @@ try {
         .cart-content { flex: 1; padding: 20px; overflow-y: auto; }
         .cart-footer { padding: 20px; border-top: 1px solid #333; background: #1a1a1a; }
         .cart-total { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.1rem; font-weight: bold; }
-        .btn-finalizar { width: 100%; padding: 15px; background: #fff; color: #000; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .btn-finalizar { width: 100%; padding: 15px; background: #fff; color: #000; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; text-decoration: none; display: block; text-align: center; box-sizing: border-box; transition: .25s; }
+        .btn-finalizar:hover { background: #dcdcdc; transform: translateY(-1px); }
         .btn-remover { background: none; border: none; cursor: pointer; padding: 5px; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-remover:hover { opacity: 0.5; }
         .btn-remover img { width: 18px; height: 18px; object-fit: contain; }
@@ -66,7 +67,7 @@ try {
   <nav>
     <a href="/MagdaCrew/views/pages/Shop.php">Shop</a>
     <a href="#">Archive</a>
-    <a href="/MagdaCrew/views/pages/Flagship.php">Flagship</a>
+    <a href="/MagdaCrew/views/pages/flagship.php">Flagship</a>
     <?php if (!empty($_SESSION["usuario_id"]) && !empty($_SESSION["is_admin"])): ?>
         <a href="/MagdaCrew/Painel.php">Painel</a>
     <?php endif; ?>
@@ -136,7 +137,11 @@ try {
     </div>
     <div class="cart-footer">
         <div class="cart-total"><span>Total estimado</span><span>R$ <?= number_format($totalCarrinho, 2, ',', '.') ?></span></div>
-        <button class="btn-finalizar">Finalizar a compra</button>
+        <?php if (empty($itensCarrinho)): ?>
+            <a class="btn-finalizar" href="/MagdaCrew/views/pages/shop.php">Continuar comprando</a>
+        <?php else: ?>
+            <a class="btn-finalizar" href="/MagdaCrew/views/pages/checkout.php">Finalizar a compra</a>
+        <?php endif; ?>
     </div>
 </div>
 

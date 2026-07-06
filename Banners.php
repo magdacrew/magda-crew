@@ -32,6 +32,7 @@ $stmt = $pdo->query("
             ELSE 3 
         END,
         ordem ASC,
+        
         id DESC
 ");
 $banners = $stmt->fetchAll(PDO::FETCH_ASSOC);

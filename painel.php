@@ -123,57 +123,73 @@ date_default_timezone_set('America/Sao_Paulo');
 
     <!-- ── KPI Cards ── -->
     <div class="kpi-grid">
-        <div class="kpi-card kpi-green">
-            <div class="kpi-icon">💰</div>
+        <div class="kpi-card">
+            <div>
+                <img src="/MagdaCrew/public/assets/images/BlackCoinBag.png" alt="Faturamento Confirmado" class="icon">
+            </div>
             <div class="kpi-info">
                 <span class="kpi-label">Faturamento Confirmado</span>
                 <strong class="kpi-value"><?= $faturamentoFmt ?></strong>
             </div>
         </div>
-        <div class="kpi-card kpi-blue">
-            <div class="kpi-icon">🛒</div>
+        <div class="kpi-card">
+            <div>
+                <img src="/MagdaCrew/public/assets/images/BlackShoppingCart.png" alt="Vendas Confirmadas" class="icon">
+            </div>
             <div class="kpi-info">
                 <span class="kpi-label">Vendas Confirmadas</span>
                 <strong class="kpi-value"><?= $totalVendas ?></strong>
             </div>
         </div>
-        <div class="kpi-card kpi-purple">
-            <div class="kpi-icon">🎯</div>
+        <div class="kpi-card">
+            <div>
+                <img src="/MagdaCrew/public/assets/images/BlackTarget.png" alt="Ticket Médio" class="icon">
+            </div>
             <div class="kpi-info">
                 <span class="kpi-label">Ticket Médio</span>
                 <strong class="kpi-value"><?= $ticketMedioFmt ?></strong>
             </div>
         </div>
-        <div class="kpi-card kpi-gray">
-            <div class="kpi-icon">👥</div>
+        <div class="kpi-card">
+            <div>
+                <img src="/MagdaCrew/public/assets/images/BlackPeople.png" alt="Clientes Cadastrados" class="icon">
+            </div>
             <div class="kpi-info">
                 <span class="kpi-label">Clientes Cadastrados</span>
                 <strong class="kpi-value"><?= $totalUsers ?></strong>
             </div>
         </div>
-        <div class="kpi-card kpi-dark">
-            <div class="kpi-icon">👕</div>
+        <div class="kpi-card">
+            <div>
+                <img src="/MagdaCrew/public/assets/images/BlackT-Shirt.png" alt="Produtos Ativos" class="icon">
+            </div>
             <div class="kpi-info">
                 <span class="kpi-label">Produtos Ativos</span>
                 <strong class="kpi-value"><?= $totalAtivo ?> / <?= $totalProdutos ?></strong>
             </div>
         </div>
-        <div class="kpi-card kpi-red">
-            <div class="kpi-icon">❌</div>
+        <div class="kpi-card">
+            <div>
+                <img src="/MagdaCrew/public/assets/images/XBlack.png" alt="Vendas Canceladas" class="icon">
+            </div>
             <div class="kpi-info">
                 <span class="kpi-label">Vendas Canceladas</span>
                 <strong class="kpi-value"><?= $totalCanceladas ?></strong>
             </div>
         </div>
-        <div class="kpi-card kpi-orange">
-            <div class="kpi-icon">📦</div>
+        <div class="kpi-card">
+            <div>
+                <img src="/MagdaCrew/public/assets/images/BlackBox.png" alt="Unidades em Estoque" class="icon">
+            </div>
             <div class="kpi-info">
                 <span class="kpi-label">Unidades em Estoque</span>
                 <strong class="kpi-value"><?= $totalEstoque ?></strong>
             </div>
         </div>
-        <div class="kpi-card kpi-teal">
-            <div class="kpi-icon">🏷️</div>
+        <div class="kpi-card">
+            <div>
+                <img src="/MagdaCrew/public/assets/images/BlackLabel.png" alt="Categorias Ativas" class="icon">
+            </div>
             <div class="kpi-info">
                 <span class="kpi-label">Categorias Ativas</span>
                 <strong class="kpi-value"><?= $totalCategorias ?></strong>
@@ -207,7 +223,7 @@ date_default_timezone_set('America/Sao_Paulo');
 
         <!-- Produtos mais vendidos -->
         <div class="table-box">
-            <h2 class="section-title">🏆 Produtos Mais Vendidos</h2>
+            <h2 class="section-title">Produtos Mais Vendidos</h2>
             <?php if (empty($maisProdutos)): ?>
                 <p class="empty-msg">Nenhuma venda confirmada registrada ainda.</p>
             <?php else: ?>
@@ -236,7 +252,7 @@ date_default_timezone_set('America/Sao_Paulo');
 
         <!-- Alertas de estoque baixo -->
         <div class="table-box">
-            <h2 class="section-title">⚠️ Alertas de Estoque Baixo</h2>
+            <h2 class="section-title">Alertas de Estoque Baixo</h2>
             <?php if (empty($estoqueBaixo)): ?>
                 <p class="empty-msg" style="color:#10b981;">✅ Estoque saudável em todos os produtos.</p>
             <?php else: ?>
@@ -274,7 +290,7 @@ date_default_timezone_set('America/Sao_Paulo');
 
         <!-- Últimas Vendas -->
         <div class="table-box">
-            <h2 class="section-title">🕐 Últimas Vendas</h2>
+            <h2 class="section-title">Últimas Vendas</h2>
             <?php if (empty($ultimasVendas)): ?>
                 <p class="empty-msg">Nenhuma venda registrada.</p>
             <?php else: ?>
@@ -314,7 +330,7 @@ date_default_timezone_set('America/Sao_Paulo');
 
         <!-- Clientes Recentes -->
         <div class="table-box">
-            <h2 class="section-title">👤 Clientes Recentes</h2>
+            <h2 class="section-title">Clientes Recentes</h2>
             <?php if (empty($clientesRecentes)): ?>
                 <p class="empty-msg">Nenhum cliente cadastrado.</p>
             <?php else: ?>

@@ -1,1 +1,2 @@
-fala galerinha do yutubas 
+1. No "Clientes.php" botar barra de pesquisa, por nome, CPF, E-mail e etc.
+2. No "Vendas.php" botar barra de pesquisa, por ID.

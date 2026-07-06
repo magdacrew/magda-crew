@@ -17,6 +17,70 @@ $pdo = Database::getConnection();
 
 $erro = "";
 
+
+/**
+ * Move o carrinho criado como visitante para a conta logada.
+ * Assim, os produtos adicionados antes do login continuam aparecendo depois do login.
+ */
+function migrarCarrinhoVisitanteParaUsuario(PDO $pdo, string $sessionIdAntigo, int $usuarioId): void
+{
+    if ($sessionIdAntigo === '') {
+        return;
+    }
+
+    $stmt = $pdo->prepare("
+        SELECT id, variante_id, quantidade
+        FROM carrinho
+        WHERE session_id = ?
+        AND usuario_id IS NULL
+    ");
+    $stmt->execute([$sessionIdAntigo]);
+    $itensVisitante = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($itensVisitante as $itemVisitante) {
+        $stmtItemUsuario = $pdo->prepare("
+            SELECT id
+            FROM carrinho
+            WHERE usuario_id = ?
+            AND variante_id = ?
+            LIMIT 1
+        ");
+        $stmtItemUsuario->execute([
+            $usuarioId,
+            $itemVisitante['variante_id']
+        ]);
+        $itemUsuario = $stmtItemUsuario->fetch(PDO::FETCH_ASSOC);
+
+        if ($itemUsuario) {
+            $stmtAtualizar = $pdo->prepare("
+                UPDATE carrinho
+                SET quantidade = quantidade + ?
+                WHERE id = ?
+            ");
+            $stmtAtualizar->execute([
+                (int) $itemVisitante['quantidade'],
+                $itemUsuario['id']
+            ]);
+
+            $stmtRemover = $pdo->prepare("
+                DELETE FROM carrinho
+                WHERE id = ?
+            ");
+            $stmtRemover->execute([$itemVisitante['id']]);
+        } else {
+            $stmtVincular = $pdo->prepare("
+                UPDATE carrinho
+                SET usuario_id = ?, session_id = NULL
+                WHERE id = ?
+            ");
+            $stmtVincular->execute([
+                $usuarioId,
+                $itemVisitante['id']
+            ]);
+        }
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | VERIFICA SE VEIO DO LOGIN
@@ -85,6 +149,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $usuario &&
             strtotime($usuario["codigo_expira"]) > time()
         ) {
+            $sessionIdAntigo = session_id();
+
+            migrarCarrinhoVisitanteParaUsuario(
+                $pdo,
+                $sessionIdAntigo,
+                (int) $usuario["id"]
+            );
+
             session_regenerate_id(true);
 
             $_SESSION["usuario_id"] = $usuario["id"];
