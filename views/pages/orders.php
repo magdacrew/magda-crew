@@ -4,6 +4,8 @@ require_once __DIR__ . '/../../src/Config/Database.php';
 
 $pdo = Database::getConnection();
 $usuario_id = $_SESSION['usuario_id'] ?? 1;
+// Cancelar pedido
+if(isset($_POST['cancelar_pedido'])){$pedido_id=(int)$_POST['pedido_id'];$stmt=$pdo->prepare("UPDATE vendas SET status='cancelado' WHERE id=? AND usuario_id=? AND status IN ('pendente','processando')");$stmt->execute([$pedido_id,$usuario_id]);header('Location: orders.php');exit;}
 
 // 1. Busca os pedidos
 $stmtVendas = $pdo->prepare("
@@ -95,7 +97,9 @@ $stmtItens = $pdo->prepare("
 
         .order-footer {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 24px;
             padding-top: 20px;
         }
 
@@ -207,6 +211,19 @@ $stmtItens = $pdo->prepare("
                     <?php endforeach; ?>
 
                     <div class="order-footer">
+                        <div class="order-actions">
+                            <?php if (in_array(strtolower($pedido['status']), ['pendente','processando'])): ?>
+                                <button
+                                    type="button"
+                                    class="cancelar-btn abrir-modal-cancelar"
+                                    data-pedido-id="<?= (int)$pedido['id'] ?>"
+                                    data-pedido-label="Pedido #<?= (int)$pedido['id'] ?>"
+                                >
+                                    Cancelar Pedido
+                                </button>
+                            <?php endif; ?>
+                        </div>
+
                         <div class="summary-box">
                             <div class="summary-line">
                                 <span>Subtotal</span>
@@ -226,5 +243,72 @@ $stmtItens = $pdo->prepare("
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
+
+    <div class="modal-cancelar-overlay" id="modalCancelar" aria-hidden="true">
+        <div class="modal-cancelar" role="dialog" aria-modal="true" aria-labelledby="modalCancelarTitulo">
+            <button type="button" class="modal-fechar" data-fechar-modal aria-label="Fechar modal">&times;</button>
+
+            <div class="modal-alerta-icon">!</div>
+
+            <h2 id="modalCancelarTitulo">Cancelar compra?</h2>
+            <p>
+                Você está prestes a cancelar <strong id="pedidoModalTexto">este pedido</strong>.
+                Essa ação só funciona para pedidos pendentes ou em processamento.
+            </p>
+
+            <form method="POST" class="modal-actions">
+                <input type="hidden" name="pedido_id" id="pedidoCancelarInput" value="">
+                <button type="button" class="btn-voltar" data-fechar-modal>Voltar</button>
+                <button type="submit" name="cancelar_pedido" class="btn-confirmar-cancelamento">Sim, cancelar compra</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modalCancelar = document.getElementById('modalCancelar');
+        const pedidoCancelarInput = document.getElementById('pedidoCancelarInput');
+        const pedidoModalTexto = document.getElementById('pedidoModalTexto');
+        const botoesAbrirModal = document.querySelectorAll('.abrir-modal-cancelar');
+        const botoesFecharModal = document.querySelectorAll('[data-fechar-modal]');
+
+        function abrirModalCancelamento(botao) {
+            const pedidoId = botao.dataset.pedidoId;
+            const pedidoLabel = botao.dataset.pedidoLabel || `Pedido #${pedidoId}`;
+
+            pedidoCancelarInput.value = pedidoId;
+            pedidoModalTexto.textContent = pedidoLabel;
+            modalCancelar.classList.add('ativo');
+            modalCancelar.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-aberto');
+        }
+
+        function fecharModalCancelamento() {
+            modalCancelar.classList.remove('ativo');
+            modalCancelar.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-aberto');
+            pedidoCancelarInput.value = '';
+        }
+
+        botoesAbrirModal.forEach((botao) => {
+            botao.addEventListener('click', () => abrirModalCancelamento(botao));
+        });
+
+        botoesFecharModal.forEach((botao) => {
+            botao.addEventListener('click', fecharModalCancelamento);
+        });
+
+        modalCancelar.addEventListener('click', (event) => {
+            if (event.target === modalCancelar) {
+                fecharModalCancelamento();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && modalCancelar.classList.contains('ativo')) {
+                fecharModalCancelamento();
+            }
+        });
+    </script>
+
 </body>
 </html>

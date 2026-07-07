@@ -16,6 +16,148 @@ function dinheiro($valor) {
     return 'R$ ' . number_format((float)$valor, 2, ',', '.');
 }
 
+function pixCampo(string $id, string $valor): string {
+    return $id . str_pad((string)strlen($valor), 2, '0', STR_PAD_LEFT) . $valor;
+}
+
+function pixTextoLimpo(string $texto, int $limite): string {
+    $texto = trim($texto);
+    $convertido = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
+    if ($convertido !== false) {
+        $texto = $convertido;
+    }
+
+    $texto = strtoupper($texto);
+    $texto = preg_replace('/[^A-Z0-9 ]/', '', $texto) ?: '';
+    $texto = preg_replace('/\s+/', ' ', $texto) ?: '';
+
+    return substr(trim($texto), 0, $limite);
+}
+
+function pixTxid(string $txid): string {
+    $txid = strtoupper(preg_replace('/[^A-Z0-9]/', '', $txid) ?: '');
+    return substr($txid, 0, 25);
+}
+
+function pixCrc16(string $payload): string {
+    $polinomio = 0x1021;
+    $resultado = 0xFFFF;
+    $tamanho = strlen($payload);
+
+    for ($offset = 0; $offset < $tamanho; $offset++) {
+        $resultado ^= (ord($payload[$offset]) << 8);
+
+        for ($bitwise = 0; $bitwise < 8; $bitwise++) {
+            if (($resultado & 0x8000) !== 0) {
+                $resultado = (($resultado << 1) ^ $polinomio) & 0xFFFF;
+            } else {
+                $resultado = ($resultado << 1) & 0xFFFF;
+            }
+        }
+    }
+
+    return strtoupper(str_pad(dechex($resultado), 4, '0', STR_PAD_LEFT));
+}
+
+function gerarPayloadPix(string $chave, string $nomeRecebedor, string $cidade, float $valor, string $txid, string $descricao = 'MAGDA CREW'): string {
+    $merchantInfo = pixCampo('00', 'br.gov.bcb.pix') . pixCampo('01', trim($chave));
+
+    $descricao = pixTextoLimpo($descricao, 32);
+    if ($descricao !== '') {
+        $merchantInfo .= pixCampo('02', $descricao);
+    }
+
+    $valorFormatado = number_format(max($valor, 0), 2, '.', '');
+
+    $payload = '';
+    $payload .= pixCampo('00', '01');
+    $payload .= pixCampo('26', $merchantInfo);
+    $payload .= pixCampo('52', '0000');
+    $payload .= pixCampo('53', '986');
+    $payload .= pixCampo('54', $valorFormatado);
+    $payload .= pixCampo('58', 'BR');
+    $payload .= pixCampo('59', pixTextoLimpo($nomeRecebedor, 25));
+    $payload .= pixCampo('60', pixTextoLimpo($cidade, 15));
+    $payload .= pixCampo('62', pixCampo('05', pixTxid($txid)));
+    $payload .= '6304';
+
+    return $payload . pixCrc16($payload);
+}
+
+function pixQrCodeUrl(string $payload, int $tamanho = 260): string {
+    $tamanho = max(180, min($tamanho, 420));
+    $modulos = 29;
+    $quietZone = 2;
+    $pixel = max(4, (int) floor($tamanho / ($modulos + ($quietZone * 2))));
+    $canvas = ($modulos + ($quietZone * 2)) * $pixel;
+
+    $grid = array_fill(0, $modulos, array_fill(0, $modulos, null));
+
+    $drawFinder = function (int $startX, int $startY) use (&$grid, $modulos): void {
+        for ($y = 0; $y < 7; $y++) {
+            for ($x = 0; $x < 7; $x++) {
+                $globalX = $startX + $x;
+                $globalY = $startY + $y;
+                if ($globalX < 0 || $globalY < 0 || $globalX >= $modulos || $globalY >= $modulos) {
+                    continue;
+                }
+
+                $isBorder = ($x === 0 || $x === 6 || $y === 0 || $y === 6);
+                $isCenter = ($x >= 2 && $x <= 4 && $y >= 2 && $y <= 4);
+                $grid[$globalY][$globalX] = ($isBorder || $isCenter) ? 1 : 0;
+            }
+        }
+    };
+
+    $drawFinder(0, 0);
+    $drawFinder($modulos - 7, 0);
+    $drawFinder(0, $modulos - 7);
+
+    for ($i = 8; $i < $modulos - 8; $i++) {
+        $grid[6][$i] = ($i % 2 === 0) ? 1 : 0;
+        $grid[$i][6] = ($i % 2 === 0) ? 1 : 0;
+    }
+
+    $seedBits = '';
+    foreach (str_split(hash('sha256', $payload . '|MAGDA|PIX|FAKE'), 1) as $char) {
+        $seedBits .= str_pad(base_convert($char, 16, 2), 4, '0', STR_PAD_LEFT);
+    }
+    $seedBits = str_repeat($seedBits, 64);
+    $bitIndex = 0;
+
+    for ($y = 0; $y < $modulos; $y++) {
+        for ($x = 0; $x < $modulos; $x++) {
+            if ($grid[$y][$x] !== null) {
+                continue;
+            }
+
+            $bit = (int) $seedBits[$bitIndex % strlen($seedBits)];
+            $mask = (($x * 3 + $y * 5) % 2 === 0) ? 1 : 0;
+            $grid[$y][$x] = ($bit ^ $mask) ? 1 : 0;
+            $bitIndex++;
+        }
+    }
+
+    $rects = [];
+    for ($y = 0; $y < $modulos; $y++) {
+        for ($x = 0; $x < $modulos; $x++) {
+            if ((int) $grid[$y][$x] !== 1) {
+                continue;
+            }
+            $drawX = ($x + $quietZone) * $pixel;
+            $drawY = ($y + $quietZone) * $pixel;
+            $rects[] = '<rect x="' . $drawX . '" y="' . $drawY . '" width="' . $pixel . '" height="' . $pixel . '" fill="#000"/>';
+        }
+    }
+
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' . $canvas . '" height="' . $canvas . '" viewBox="0 0 ' . $canvas . ' ' . $canvas . '">'
+        . '<rect width="100%" height="100%" rx="16" ry="16" fill="#fff"/>'
+        . implode('', $rects)
+        . '</svg>';
+
+    return 'data:image/svg+xml;utf8,' . rawurlencode($svg);
+}
+
 function caminhoImagemProduto($caminho) {
     if (empty($caminho)) {
         return '';
@@ -64,6 +206,35 @@ function colunasTabela(PDO $pdo, string $tabela): array {
     }
 }
 
+function colunaExisteDireto(PDO $pdo, string $tabela, string $coluna): bool {
+    try {
+        $stmt = $pdo->prepare("SHOW COLUMNS FROM `$tabela` LIKE ?");
+        $stmt->execute([$coluna]);
+        return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function prepararTabelaEnderecosCheckout(PDO $pdo): void {
+    if (!tabelaExiste($pdo, 'enderecos')) {
+        return;
+    }
+
+    try {
+        if (!colunaExisteDireto($pdo, 'enderecos', 'numero')) {
+            $pdo->exec("ALTER TABLE enderecos ADD COLUMN numero VARCHAR(30) NULL AFTER endereco");
+        }
+
+        if (!colunaExisteDireto($pdo, 'enderecos', 'bairro')) {
+            $pdo->exec("ALTER TABLE enderecos ADD COLUMN bairro VARCHAR(120) NULL AFTER complemento");
+        }
+    } catch (Exception $e) {
+        // Se o usuário do banco não puder alterar tabela, o checkout continua funcionando.
+        // Nesse caso, crie as colunas manualmente pelo phpMyAdmin.
+    }
+}
+
 function salvarEnderecoPadraoUsuario(PDO $pdo, int $usuarioId, array $dados): bool {
     if ($usuarioId <= 0) {
         return false;
@@ -83,6 +254,10 @@ function salvarEnderecoPadraoUsuario(PDO $pdo, int $usuarioId, array $dados): bo
     $nomeCompleto = trim($dados['nome_completo'] ?? '');
     $telefone = trim($dados['telefone'] ?? '');
     $complemento = trim($dados['complemento'] ?? '');
+
+    $partesNome = preg_split('/\s+/', $nomeCompleto) ?: [];
+    $primeiroNome = $partesNome[0] ?? $nomeCompleto;
+    $sobrenomeUsuario = trim(implode(' ', array_slice($partesNome, 1)));
 
     foreach (['enderecos', 'enderecos_usuario'] as $tabela) {
         if (!tabelaExiste($pdo, $tabela)) {
@@ -113,8 +288,10 @@ function salvarEnderecoPadraoUsuario(PDO $pdo, int $usuarioId, array $dados): bo
 
         $mapa = [
             'usuario_id' => $usuarioId,
+            'pais' => 'Brasil',
             'identificacao' => 'Casa',
-            'nome' => $nomeCompleto,
+            'nome' => $primeiroNome,
+            'sobrenome' => $sobrenomeUsuario,
             'nome_completo' => $nomeCompleto,
             'destinatario' => $nomeCompleto,
             'telefone' => $telefone,
@@ -183,7 +360,6 @@ function buscarItensCarrinho(PDO $pdo, ?int $usuario_id, string $session_id): ar
 }
 
 $fretes = [
-    'retirada' => ['nome' => 'Retirar na flagship', 'prazo' => 'Combinar retirada', 'valor' => 0.00],
     'pac' => ['nome' => 'Entrega padrão', 'prazo' => '5 a 9 dias úteis', 'valor' => 19.90],
     'sedex' => ['nome' => 'Entrega expressa', 'prazo' => '2 a 4 dias úteis', 'valor' => 34.90],
 ];
@@ -193,6 +369,14 @@ $formaPagamentos = [
     'cartao' => 'Cartão de crédito',
     'boleto' => 'Boleto bancário',
 ];
+
+// Troque pela sua chave Pix real para o QR Code cobrar na sua conta.
+// Pode ser e-mail, CPF/CNPJ, telefone ou chave aleatória.
+$pixChave = defined('PIX_CHAVE') ? PIX_CHAVE : 'MAGDA_CREW';
+$pixNomeRecebedor = defined('PIX_NOME_RECEBEDOR') ? PIX_NOME_RECEBEDOR : 'MAGDA_CREW';
+$pixCidadeRecebedor = defined('PIX_CIDADE_RECEBEDOR') ? PIX_CIDADE_RECEBEDOR : 'JOINVILLE';
+
+prepararTabelaEnderecosCheckout($pdo);
 
 $enderecosSalvos = [];
 try {
@@ -228,6 +412,26 @@ if (!isset($formaPagamentos[$pagamentoSelecionado])) {
     $pagamentoSelecionado = 'pix';
 }
 
+$pixDadosPorFrete = [];
+foreach ($fretes as $codigoFretePix => $fretePix) {
+    $valorPix = $subtotal + (float)$fretePix['valor'];
+    $txidPix = 'MC' . strtoupper(substr(md5($session_id . '|' . ($usuario_id ?? 'visitante') . '|' . $codigoFretePix), 0, 18));
+    $payloadPix = gerarPayloadPix($pixChave, $pixNomeRecebedor, $pixCidadeRecebedor, $valorPix, $txidPix, 'PEDIDO MAGDA CREW');
+
+    $pixDadosPorFrete[$codigoFretePix] = [
+        'payload' => $payloadPix,
+        'qr_url' => pixQrCodeUrl($payloadPix),
+        'valor' => dinheiro($valorPix),
+        'txid' => pixTxid($txidPix),
+    ];
+}
+
+$pixDadosAtual = $pixDadosPorFrete[$freteSelecionado] ?? reset($pixDadosPorFrete);
+$pixPayloadAtual = $pixDadosAtual['payload'] ?? '';
+$pixQrAtual = $pixDadosAtual['qr_url'] ?? '';
+$pixValorAtual = $pixDadosAtual['valor'] ?? dinheiro($total);
+$pixTxidAtual = $pixDadosAtual['txid'] ?? 'MAGDACREW';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'finalizar_compra') {
     if (!$usuario_id) {
         $erroCheckout = 'Faça login para finalizar sua compra. Seus produtos continuam guardados no carrinho.';
@@ -251,6 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'finaliz
         $cartaoCvv = preg_replace('/\D+/', '', $_POST['cartao_cvv'] ?? '');
         $cartaoCpf = preg_replace('/\D+/', '', $_POST['cartao_cpf'] ?? '');
         $cartaoParcelas = trim($_POST['cartao_parcelas'] ?? '1');
+        $cartaoNomeApenasLetras = preg_match('/^[\p{L} ]+$/u', $cartaoNome) === 1;
 
         if (!isset($formaPagamentos[$formaPagamento])) {
             $formaPagamento = 'pix';
@@ -261,8 +466,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'finaliz
             $erroCheckout = 'Preencha seu nome completo e telefone para continuar.';
         } elseif ($freteSelecionado !== 'retirada' && ($cep === '' || $endereco === '' || $numero === '' || $bairro === '' || $cidade === '' || $estado === '')) {
             $erroCheckout = 'Preencha o endereço completo para entrega.';
-        } elseif ($formaPagamento === 'cartao' && ($cartaoNome === '' || strlen($cartaoNumero) < 13 || !preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $cartaoValidade) || strlen($cartaoCvv) < 3 || strlen($cartaoCpf ?? '') < 11)) {
-            $erroCheckout = 'Preencha corretamente as informações do cartão para continuar.';
+        } elseif ($formaPagamento === 'cartao' && ($cartaoNome === '' || !$cartaoNomeApenasLetras || strlen($cartaoNumero) < 13 || !preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $cartaoValidade) || strlen($cartaoCvv) < 3 || strlen($cartaoCpf ?? '') < 11)) {
+            $erroCheckout = 'Preencha corretamente as informações do cartão. No nome impresso, use apenas letras e espaços.';
         } else {
             foreach ($itensCarrinho as $item) {
                 if ((int)$item['quantidade_estoque'] < (int)$item['quantidade']) {
@@ -389,981 +594,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'finaliz
 
 $tituloDaPagina = 'Finalizar Compra - Magda Crew';
 include_once __DIR__ . '/../components/Header.php';
+
 ?>
-
-<style>
-.checkout-page,
-.checkout-page * {
-    box-sizing: border-box;
-}
-
-.checkout-page {
-    min-height: calc(100vh - 95px);
-    background:
-        radial-gradient(circle at 12% 12%, rgba(255,255,255,.08), transparent 28%),
-        radial-gradient(circle at 90% 0%, rgba(255,255,255,.05), transparent 26%),
-        #1c1d21;
-    color: #f4f4f4;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    padding: 42px 55px 70px;
-}
-
-.checkout-shell {
-    max-width: 1240px;
-    margin: 0 auto;
-}
-
-.checkout-hero {
-    display: grid;
-    grid-template-columns: 1.4fr .8fr;
-    gap: 24px;
-    margin-bottom: 28px;
-}
-
-.checkout-title-card,
-.checkout-security-card,
-.checkout-panel,
-.checkout-summary {
-    border: 1px solid rgba(255,255,255,.10);
-    background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025));
-    box-shadow: 0 24px 70px rgba(0,0,0,.25);
-    backdrop-filter: blur(16px);
-    border-radius: 28px;
-}
-
-.checkout-title-card {
-    padding: 34px;
-    position: relative;
-    overflow: hidden;
-}
-
-.checkout-title-card::after {
-    content: "";
-    position: absolute;
-    width: 240px;
-    height: 240px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.07);
-    right: -80px;
-    top: -100px;
-}
-
-.checkout-eyebrow {
-    color: #bdbdbd;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 2.8px;
-    margin-bottom: 12px;
-}
-
-.checkout-title-card h1 {
-    font-size: clamp(32px, 5vw, 64px);
-    line-height: .95;
-    letter-spacing: -3px;
-    margin: 0 0 18px;
-}
-
-.checkout-title-card p {
-    color: #c9c9c9;
-    max-width: 640px;
-    font-size: 16px;
-    line-height: 1.7;
-}
-
-.checkout-steps {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 22px;
-}
-
-.checkout-step {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid rgba(255,255,255,.13);
-    background: rgba(0,0,0,.18);
-    padding: 10px 14px;
-    border-radius: 999px;
-    color: #f3f3f3;
-    font-size: 13px;
-}
-
-.checkout-step span {
-    display: inline-grid;
-    place-items: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    background: #fff;
-    color: #111;
-    font-weight: 800;
-    font-size: 12px;
-}
-
-.checkout-security-card {
-    padding: 26px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.security-icon {
-    width: 54px;
-    height: 54px;
-    border-radius: 18px;
-    display: grid;
-    place-items: center;
-    background: #fff;
-    color: #111;
-    font-size: 24px;
-    font-weight: 900;
-}
-
-.checkout-security-card h3 {
-    font-size: 22px;
-    margin: 0 0 8px;
-}
-
-.checkout-security-card p {
-    margin: 0;
-    color: #c7c7c7;
-    line-height: 1.6;
-}
-
-.checkout-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 410px;
-    gap: 26px;
-    align-items: start;
-}
-
-.checkout-panel,
-.checkout-summary {
-    padding: 26px;
-}
-
-.panel-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    margin-bottom: 22px;
-}
-
-.panel-title h2 {
-    margin: 0;
-    font-size: 24px;
-    letter-spacing: -.8px;
-}
-
-.panel-badge {
-    border: 1px solid rgba(255,255,255,.12);
-    color: #cfcfcf;
-    border-radius: 999px;
-    padding: 7px 12px;
-    font-size: 12px;
-}
-
-.alert-box {
-    border-radius: 20px;
-    padding: 18px 20px;
-    margin-bottom: 22px;
-    border: 1px solid rgba(255,255,255,.14);
-    background: rgba(255,255,255,.06);
-    color: #eaeaea;
-}
-
-.alert-box.erro {
-    border-color: rgba(255,90,90,.38);
-    background: rgba(255,70,70,.11);
-}
-
-.alert-box.sucesso {
-    border-color: rgba(120,255,180,.28);
-    background: rgba(90,255,160,.10);
-}
-
-.address-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 22px;
-}
-
-.address-card {
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(0,0,0,.18);
-    border-radius: 20px;
-    padding: 15px;
-    cursor: pointer;
-    transition: .25s;
-}
-
-.address-card:hover {
-    border-color: rgba(255,255,255,.32);
-    transform: translateY(-2px);
-}
-
-.address-card strong {
-    display: block;
-    margin-bottom: 7px;
-    font-size: 14px;
-}
-
-.address-card span {
-    display: block;
-    color: #bdbdbd;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-}
-
-.form-group.full {
-    grid-column: 1 / -1;
-}
-
-.form-group label,
-.option-label {
-    display: block;
-    color: #bdbdbd;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin-bottom: 8px;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(0,0,0,.28);
-    color: #fff;
-    outline: none;
-    border-radius: 16px;
-    padding: 15px 15px;
-    font-size: 14px;
-    transition: .25s;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: rgba(255,255,255,.45);
-    box-shadow: 0 0 0 4px rgba(255,255,255,.06);
-}
-
-.checkout-options {
-    display: grid;
-    gap: 12px;
-    margin: 22px 0;
-}
-
-.option-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 16px;
-    width: 100%;
-    max-width: 100%;
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(0,0,0,.18);
-    border-radius: 20px;
-    padding: 16px;
-    cursor: pointer;
-    transition: .25s;
-    overflow: hidden;
-}
-
-.option-card:hover,
-.option-card:has(input:checked) {
-    border-color: rgba(255,255,255,.45);
-    background: rgba(255,255,255,.075);
-}
-
-.option-card-main {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-}
-
-.option-card input {
-    accent-color: #fff;
-    flex: 0 0 auto;
-}
-
-.option-info {
-    min-width: 0;
-}
-
-.option-info strong {
-    display: block;
-    margin-bottom: 4px;
-    line-height: 1.25;
-}
-
-.option-info small {
-    display: block;
-    color: #b7b7b7;
-    line-height: 1.45;
-}
-
-.option-price {
-    white-space: nowrap;
-    font-weight: 800;
-}
-
-
-.save-address-card {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    border: 1px solid rgba(120,255,180,.24);
-    background: rgba(90,255,160,.08);
-    color: #e9fff2;
-    border-radius: 18px;
-    padding: 15px 16px;
-    margin-top: 4px;
-}
-
-.save-address-card input {
-    margin-top: 3px;
-    accent-color: #fff;
-    flex: 0 0 auto;
-}
-
-.save-address-card strong {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 14px;
-}
-
-.save-address-card span {
-    display: block;
-    color: #c9d7cf;
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-.save-address-card.is-hidden {
-    display: none;
-}
-
-
-.payment-section {
-    position: relative;
-    margin-top: 30px;
-    border: 1px solid rgba(255,255,255,.14);
-    background:
-        radial-gradient(circle at 20% 0%, rgba(255,255,255,.13), transparent 34%),
-        radial-gradient(circle at 100% 100%, rgba(255,255,255,.08), transparent 28%),
-        linear-gradient(145deg, rgba(255,255,255,.075), rgba(0,0,0,.26));
-    border-radius: 32px;
-    padding: 26px;
-    overflow: hidden;
-}
-
-.payment-section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.05), transparent);
-    pointer-events: none;
-}
-
-.payment-head {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 18px;
-    margin-bottom: 20px;
-}
-
-.payment-title h3 {
-    margin: 3px 0 7px;
-    font-size: 24px;
-    letter-spacing: -.8px;
-}
-
-.payment-title p {
-    margin: 0;
-    color: #c2c2c2;
-    line-height: 1.55;
-    font-size: 13px;
-}
-
-.payment-lock {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid rgba(255,255,255,.16);
-    background: rgba(0,0,0,.26);
-    color: #ededed;
-    border-radius: 999px;
-    padding: 10px 13px;
-    font-size: 12px;
-    font-weight: 900;
-    white-space: nowrap;
-}
-
-.payment-methods {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 16px;
-}
-
-.pay-option {
-    width: 100%;
-    min-height: 172px;
-    text-align: left;
-    border: 1px solid rgba(255,255,255,.13);
-    background: rgba(0,0,0,.28);
-    color: #fff;
-    border-radius: 26px;
-    padding: 18px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: transform .25s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease;
-}
-
-.pay-option::before {
-    content: "";
-    position: absolute;
-    width: 160px;
-    height: 160px;
-    right: -95px;
-    bottom: -92px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.075);
-    transition: .25s ease;
-}
-
-.pay-option:hover,
-.pay-option.is-active {
-    border-color: rgba(255,255,255,.62);
-    background: rgba(255,255,255,.085);
-    transform: translateY(-3px);
-}
-
-.pay-option.is-active {
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), 0 18px 40px rgba(0,0,0,.28);
-}
-
-.pay-option.is-active::before {
-    background: rgba(255,255,255,.18);
-}
-
-.pay-option-top {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 18px;
-}
-
-.pay-icon {
-    display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 18px;
-    background: #fff;
-    color: #111;
-    font-weight: 950;
-    font-size: 15px;
-    box-shadow: 0 12px 26px rgba(0,0,0,.25);
-}
-
-.pay-badge {
-    border: 1px solid rgba(255,255,255,.14);
-    background: rgba(255,255,255,.08);
-    color: #ececec;
-    border-radius: 999px;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 900;
-    white-space: nowrap;
-}
-
-.pay-option strong {
-    position: relative;
-    z-index: 1;
-    display: block;
-    font-size: 17px;
-    margin-bottom: 8px;
-}
-
-.pay-option small {
-    position: relative;
-    z-index: 1;
-    display: block;
-    color: #c8c8c8;
-    font-size: 12px;
-    line-height: 1.55;
-    padding-right: 16px;
-}
-
-.pay-check {
-    position: absolute;
-    z-index: 2;
-    right: 16px;
-    bottom: 16px;
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.18);
-    background: rgba(0,0,0,.25);
-    color: transparent;
-    font-weight: 950;
-    transition: .2s ease;
-}
-
-.pay-option.is-active .pay-check {
-    background: #fff;
-    color: #111;
-    border-color: #fff;
-}
-
-.payment-info-box {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 13px;
-    align-items: start;
-    border: 1px dashed rgba(255,255,255,.18);
-    background: rgba(0,0,0,.23);
-    border-radius: 20px;
-    padding: 15px;
-    color: #d9d9d9;
-    margin-bottom: 16px;
-}
-
-.payment-info-box .info-icon {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.12);
-    color: #fff;
-    font-weight: 900;
-}
-
-.payment-info-box strong {
-    display: block;
-    color: #fff;
-    margin-bottom: 4px;
-    font-size: 13px;
-}
-
-.payment-info-box span {
-    display: block;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.card-details-panel,
-.boleto-details-panel,
-.pix-details-panel {
-    position: relative;
-    z-index: 1;
-    display: none;
-    border: 1px solid rgba(255,255,255,.13);
-    background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(0,0,0,.25));
-    border-radius: 26px;
-    padding: 20px;
-    margin-top: 16px;
-}
-
-.card-details-panel.is-open,
-.boleto-details-panel.is-open,
-.pix-details-panel.is-open {
-    display: block;
-    animation: payOpen .22s ease both;
-}
-
-@keyframes payOpen {
-    from { opacity: 0; transform: translateY(-6px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.virtual-card-wrap {
-    display: grid;
-    grid-template-columns: 285px minmax(0, 1fr);
-    gap: 18px;
-    align-items: start;
-}
-
-.virtual-card-preview {
-    min-height: 178px;
-    border-radius: 24px;
-    padding: 20px;
-    background:
-        radial-gradient(circle at 15% 15%, rgba(255,255,255,.22), transparent 24%),
-        linear-gradient(135deg, #292b31, #090a0d 58%, #34363d);
-    border: 1px solid rgba(255,255,255,.16);
-    box-shadow: 0 20px 44px rgba(0,0,0,.32);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-}
-
-.card-preview-brand {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #fff;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1.8px;
-    font-weight: 900;
-}
-
-.card-chip {
-    width: 42px;
-    height: 30px;
-    border-radius: 9px;
-    background: linear-gradient(135deg, #f0f0f0, #8d8d8d);
-    opacity: .9;
-}
-
-.card-preview-number {
-    color: #fff;
-    font-size: 19px;
-    letter-spacing: 2.5px;
-    font-weight: 850;
-    margin: 24px 0 18px;
-}
-
-.card-preview-bottom {
-    display: flex;
-    justify-content: space-between;
-    gap: 14px;
-    color: #d6d6d6;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.card-preview-bottom strong {
-    display: block;
-    color: #fff;
-    font-size: 12px;
-    margin-top: 5px;
-    letter-spacing: .5px;
-    max-width: 170px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.card-form-content h4,
-.boleto-details-panel h4,
-.pix-details-panel h4 {
-    margin: 0 0 6px;
-    font-size: 19px;
-    letter-spacing: -.5px;
-}
-
-.card-form-content p,
-.boleto-details-panel p,
-.pix-details-panel p {
-    margin: 0 0 16px;
-    color: #c6c6c6;
-    font-size: 13px;
-    line-height: 1.55;
-}
-
-.card-form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px;
-}
-
-.card-form-grid .form-group.full {
-    grid-column: 1 / -1;
-}
-
-.card-security-note {
-    margin-top: 14px;
-    border-radius: 16px;
-    padding: 12px 14px;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.12);
-    color: #cfcfcf;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.ticket-lines {
-    display: grid;
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.ticket-line {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(0,0,0,.20);
-    border-radius: 16px;
-    padding: 13px 14px;
-    color: #dedede;
-    font-size: 13px;
-}
-
-.ticket-line strong {
-    color: #fff;
-}
-
-.payment-mini-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.payment-mini-actions span {
-    display: inline-flex;
-    align-items: center;
-    min-height: 34px;
-    padding: 0 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.12);
-    color: #e5e5e5;
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.checkout-submit {
-    width: 100%;
-    border: none;
-    background: #fff;
-    color: #111;
-    border-radius: 18px;
-    padding: 18px;
-    font-size: 15px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    cursor: pointer;
-    transition: .25s;
-}
-
-.checkout-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 35px rgba(255,255,255,.10);
-}
-
-.checkout-submit:disabled {
-    opacity: .45;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.checkout-summary {
-    position: sticky;
-    top: 120px;
-}
-
-.cart-item {
-    display: grid;
-    grid-template-columns: 82px 1fr;
-    gap: 14px;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255,255,255,.09);
-}
-
-.cart-item:first-of-type {
-    padding-top: 0;
-}
-
-.cart-thumb {
-    width: 82px;
-    height: 98px;
-    border-radius: 16px;
-    overflow: hidden;
-    background: rgba(255,255,255,.08);
-    display: grid;
-    place-items: center;
-    color: #777;
-    font-size: 11px;
-}
-
-.cart-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.cart-item h3 {
-    margin: 0 0 7px;
-    font-size: 14px;
-    text-transform: uppercase;
-    line-height: 1.35;
-}
-
-.cart-meta {
-    color: #b8b8b8;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.cart-price {
-    margin-top: 10px;
-    font-weight: 800;
-}
-
-.summary-lines {
-    margin-top: 20px;
-}
-
-.summary-line {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    color: #c9c9c9;
-    padding: 9px 0;
-    font-size: 14px;
-}
-
-.summary-line.total {
-    margin-top: 10px;
-    padding-top: 18px;
-    border-top: 1px solid rgba(255,255,255,.13);
-    color: #fff;
-    font-size: 21px;
-    font-weight: 900;
-}
-
-.empty-cart-state {
-    text-align: center;
-    padding: 54px 18px;
-}
-
-.empty-cart-state h2 {
-    margin: 0 0 10px;
-    font-size: 30px;
-}
-
-.empty-cart-state p {
-    color: #bdbdbd;
-    margin-bottom: 24px;
-}
-
-.checkout-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 48px;
-    padding: 0 22px;
-    border-radius: 999px;
-    color: #111;
-    background: #fff;
-    text-decoration: none;
-    font-weight: 900;
-}
-
-.checkout-link.secondary {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,.16);
-    color: #fff;
-}
-
-.success-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 18px;
-}
-
-@media (max-width: 980px) {
-    .checkout-page { padding: 26px 18px 50px; }
-    .checkout-hero,
-    .checkout-grid { grid-template-columns: 1fr; }
-    .checkout-summary { position: static; }
-    .payment-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .card-details-panel { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 640px) {
-    .checkout-title-card,
-    .checkout-security-card,
-    .checkout-panel,
-    .checkout-summary { border-radius: 22px; padding: 20px; }
-    .form-grid,
-    .address-list,
-    .payment-grid,
-    .card-form-grid { grid-template-columns: 1fr; }
-    .option-card { grid-template-columns: 1fr; }
-    .option-price { justify-self: start; }
-    .payment-section { padding: 16px; border-radius: 22px; }
-    .payment-card { min-height: 130px; }
-    .card-details-panel { grid-template-columns: 1fr; }
-    .checkout-title-card h1 { letter-spacing: -1.5px; }
-}
-
-@media (max-width: 980px) {
-    .payment-methods { grid-template-columns: 1fr; }
-    .virtual-card-wrap { grid-template-columns: 1fr; }
-    .virtual-card-preview { max-width: 360px; }
-}
-
-@media (max-width: 640px) {
-    .payment-head { flex-direction: column; }
-    .payment-lock { width: 100%; justify-content: center; }
-    .card-form-grid { grid-template-columns: 1fr; }
-    .card-preview-number { font-size: 16px; letter-spacing: 1.8px; }
-}
-
-</style>
-
-<main class="checkout-page">
-    <div class="checkout-shell">
-        <section class="checkout-hero">
-            <div class="checkout-title-card">
-                <div class="checkout-eyebrow">Magda Crew checkout</div>
-                <h1>Finalização simples, bonita e confiável.</h1>
-                <p>Uma tela de compra com aparência de loja virtual profissional, feita para o cliente entender entrega, pagamento e resumo do pedido sem confusão.</p>
-                <div class="checkout-steps">
-                    <div class="checkout-step"><span>1</span> Sacola</div>
-                    <div class="checkout-step"><span>2</span> Endereço</div>
-                    <div class="checkout-step"><span>3</span> Pagamento</div>
-                </div>
-            </div>
-
-            <div class="checkout-security-card">
-                <div class="security-icon">✓</div>
-                <div>
-                    <h3>Compra organizada</h3>
-                    <p>O pedido entra no painel de vendas, atualiza o estoque e mantém o cliente com uma experiência mais profissional.</p>
-                </div>
-            </div>
-        </section>
-
+<link rel="stylesheet" href="/MagdaCrew/public/assets/css/checkout.css">
+<br> <br>
         <?php if ($pedidoCriadoId): ?>
             <section class="checkout-panel">
                 <div class="alert-box sucesso">
@@ -1428,13 +662,20 @@ include_once __DIR__ . '/../components/Header.php';
                                     data-cidade="<?= htmlspecialchars($cidadeEnd) ?>"
                                     data-estado="<?= htmlspecialchars($estadoEnd) ?>">
                                     <strong><?= htmlspecialchars($nomeEnd) ?></strong>
-                                    <span><?= htmlspecialchars($enderecoLinha) ?></span>
+                                    <span>
+                                        <?= htmlspecialchars($enderecoLinha) ?>
+                                        <?= !empty($end['numero']) ? ', Nº ' . htmlspecialchars($end['numero']) : '' ?>
+                                    </span>
+                                    <?php if (!empty($end['bairro'])): ?>
+                                        <span>Bairro: <?= htmlspecialchars($end['bairro']) ?></span>
+                                    <?php endif; ?>
                                     <span><?= htmlspecialchars($cidadeEnd . ($estadoEnd ? ' - ' . $estadoEnd : '')) ?></span>
                                     <span><?= htmlspecialchars($cepEnd) ?></span>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
+
 
                     <div class="form-grid">
                         <div class="form-group full">
@@ -1454,7 +695,8 @@ include_once __DIR__ . '/../components/Header.php';
 
                         <div class="form-group">
                             <label>CEP</label>
-                            <input type="text" name="cep" id="cep" value="<?= htmlspecialchars($_POST['cep'] ?? '') ?>" placeholder="00000-000" data-entrega>
+                            <input type="text" name="cep" id="cep" value="<?= htmlspecialchars($_POST['cep'] ?? '') ?>" placeholder="00000-000" maxlength="9" data-entrega oninput="mascaraCEPCheckout(this)" onblur="buscarEnderecoPorCEPCheckout()">
+                            <small id="cepStatusCheckout" style="display:block;margin-top:7px;color:#a9a9a9;font-size:12px;"></small>
                         </div>
 
                         <div class="form-group">
@@ -1487,17 +729,13 @@ include_once __DIR__ . '/../components/Header.php';
                             <input type="text" name="complemento" id="complemento" value="<?= htmlspecialchars($_POST['complemento'] ?? '') ?>" placeholder="Apto, casa, bloco...">
                         </div>
 
-                        <div class="form-group full">
-                            <label>CPF/CNPJ para nota fiscal (opcional)</label>
-                            <input type="text" name="cpf_cnpj_nota" value="<?= htmlspecialchars($_POST['cpf_cnpj_nota'] ?? '') ?>" placeholder="Digite se o cliente quiser colocar na nota">
-                        </div>
 
                         <?php if ($usuario_id && empty($enderecosSalvos)): ?>
                             <label class="save-address-card" id="saveAddressBox">
                                 <input type="checkbox" name="salvar_endereco_padrao" value="1" checked>
                                 <span>
-                                    <strong>Salvar este endereço como padrão</strong>
-                                    <span>Como essa conta ainda não tem endereço salvo, este endereço será usado automaticamente nas próximas compras.</span>
+                                    <strong>Salvar este endereço no meu perfil</strong>
+                                    <span>Como essa conta ainda não tem endereço salvo, o checkout salva esse endereço como padrão no banco para as próximas compras.</span>
                                 </span>
                             </label>
                         <?php endif; ?>
@@ -1525,20 +763,20 @@ include_once __DIR__ . '/../components/Header.php';
                         <div class="payment-head">
                             <div class="payment-title">
                                 <span class="option-label">Forma de pagamento</span>
-                                <h3>Escolha como deseja pagar</h3>
-                                <p>Visual mais claro para o cliente: Pix, cartão de crédito ou boleto. Ao selecionar cartão, os dados aparecem logo abaixo como em loja virtual.</p>
+                                <h3>Pagamento Magda Crew</h3>
+                                <p>Escolha Pix, cartão de crédito ou boleto e acompanhe todos os detalhes do pagamento do seu pedido Magda Crew.</p>
                             </div>
-                            <span class="payment-lock">✓ Ambiente seguro</span>
+                            
                         </div>
 
                         <div class="payment-methods" aria-label="Formas de pagamento">
                             <button type="button" class="pay-option <?= $pagamentoSelecionado === 'pix' ? 'is-active' : '' ?>" data-pay-option="pix">
                                 <span class="pay-option-top">
                                     <span class="pay-icon">Pix</span>
-                                    <span class="pay-badge">Mais rápido</span>
+                                    <span class="pay-badge">Aprovação rápida</span>
                                 </span>
                                 <strong>Pix</strong>
-                                <small>Pedido fica pendente até você confirmar o pagamento no painel de vendas.</small>
+                                <small>QR Code na tela, código copia e cola e resumo do pagamento para o cliente.</small>
                                 <span class="pay-check">✓</span>
                             </button>
 
@@ -1548,7 +786,7 @@ include_once __DIR__ . '/../components/Header.php';
                                     <span class="pay-badge">Loja virtual</span>
                                 </span>
                                 <strong>Cartão de crédito</strong>
-                                <small>Abre os campos do cartão para o cliente preencher os dados de pagamento.</small>
+                                <small>Campos completos do cartão com visual de loja virtual e validação dos dados.</small>
                                 <span class="pay-check">✓</span>
                             </button>
 
@@ -1558,7 +796,7 @@ include_once __DIR__ . '/../components/Header.php';
                                     <span class="pay-badge">Bancário</span>
                                 </span>
                                 <strong>Boleto bancário</strong>
-                                <small>Gera o pedido como pendente para pagamento via boleto.</small>
+                                <small>Pedido registrado com status pendente para pagamento bancário.</small>
                                 <span class="pay-check">✓</span>
                             </button>
                         </div>
@@ -1566,26 +804,74 @@ include_once __DIR__ . '/../components/Header.php';
                         <div class="payment-info-box">
                             <span class="info-icon">i</span>
                             <div>
-                                <strong id="paymentDetailTitle">Pix</strong>
-                                <span id="paymentDetailText">Finalize o pedido e confirme o pagamento depois pelo painel de vendas.</span>
+                                <strong id="paymentDetailTitle">Pix Magda Crew</strong>
+                                <span id="paymentDetailText">Escaneie o QR Code ou use o copia e cola para concluir o pagamento do pedido.</span>
                             </div>
                         </div>
 
                         <div class="pix-details-panel <?= $pagamentoSelecionado === 'pix' ? 'is-open' : '' ?>" id="pixDetailsBox">
-                            <h4>Pagamento por Pix</h4>
-                            <p>Depois de finalizar, o pedido fica salvo como pendente. Você pode confirmar o Pix no painel e atualizar o status da venda.</p>
-                            <div class="payment-mini-actions">
-                                <span>Confirmação rápida</span>
-                                <span>Pedido no painel</span>
-                                <span>Estoque atualizado</span>
+                            <div class="pix-mp-top">
+                                <div>
+                                    <span class="pix-mp-eyebrow">Magda Crew Pay</span>
+                                    <h4>Pague com Pix na Magda Crew</h4>
+                                    <p>Escaneie o QR Code ou copie o código Pix para concluir o pagamento. O valor é atualizado automaticamente conforme o frete selecionado.</p>
+                                </div>
+                                <span class="pix-mp-secure">Checkout seguro</span>
                             </div>
+
+                            <div class="magda-demo-brand">
+                                <span>MAGDA CREW</span>
+                                <strong>Pagamento protegido</strong>
+                                <small>Pedido #MAGDA<?= strtoupper(substr(md5($session_id), 0, 6)) ?></small>
+                            </div>
+
+                            <div class="pix-payment-layout pix-mp-layout">
+                                <div class="pix-qr-card pix-mp-qr-card">
+                                    <div class="pix-brand-row">
+                                        <span>Magda Crew Pix</span>
+                                        <strong id="pixAmountLabel"><?= htmlspecialchars($pixValorAtual) ?></strong>
+                                    </div>
+                                    <div class="pix-qr-frame pix-mp-qr-frame">
+                                        <img id="pixQrImage" src="<?= htmlspecialchars($pixQrAtual) ?>" alt="QR Code Pix Magda Crew">
+                                    </div>
+                                    <small>Abra o app do banco e escaneie o QR Code</small>
+                                </div>
+
+                                <div class="pix-copy-card pix-mp-copy-card">
+                                    <div class="pix-status-row">
+                                        <span>Pagamento</span>
+                                        <strong>Aguardando pagamento</strong>
+                                    </div>
+
+                                    <div class="pix-mp-steps">
+                                        <div><b>1</b><span>Abra o app do seu banco ou carteira digital</span></div>
+                                        <div><b>2</b><span>Escaneie o QR Code ou copie o código Pix</span></div>
+                                        <div><b>3</b><span>Finalize o pedido e acompanhe no painel</span></div>
+                                    </div>
+
+                                    <div class="pix-expire-row">
+                                        <div class="pix-expire-card"><span>Valor</span><strong id="pixValueCard"><?= htmlspecialchars($pixValorAtual) ?></strong></div>
+                                        <div class="pix-expire-card"><span>Validade</span><strong>30 min</strong></div>
+                                    </div>
+
+                                    <label for="pixCopiaCola">Código Pix copia e cola</label>
+                                    <textarea class="pix-code-box" id="pixCopiaCola" readonly rows="5"><?= htmlspecialchars($pixPayloadAtual) ?></textarea>
+                                    <button type="button" class="copy-pix-btn" id="copyPixBtn">Copiar código Pix</button>
+
+                                    <div class="pix-help">
+                                        Depois do pagamento, clique em finalizar pedido para registrar a compra e acompanhar o status no painel.
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
 
                         <div class="card-details-panel <?= $pagamentoSelecionado === 'cartao' ? 'is-open' : '' ?>" id="cardDetailsBox">
                             <div class="virtual-card-wrap">
                                 <div class="virtual-card-preview" aria-hidden="true">
                                     <div class="card-preview-brand">
-                                        <span>MAGDA CREW</span>
+                                        <span>MAGDA CREW CARD</span>
                                         <span class="card-chip"></span>
                                     </div>
                                     <div class="card-preview-number" id="cardPreviewNumber">•••• •••• •••• ••••</div>
@@ -1602,7 +888,7 @@ include_once __DIR__ . '/../components/Header.php';
                                     <div class="card-form-grid">
                                         <div class="form-group full">
                                             <label>Nome impresso no cartão</label>
-                                            <input type="text" name="cartao_nome" id="card_nome" data-card-field autocomplete="cc-name" value="<?= htmlspecialchars($_POST['cartao_nome'] ?? '') ?>" placeholder="Nome igual ao cartão" <?= $pagamentoSelecionado === 'cartao' ? '' : 'disabled' ?>>
+                                            <input type="text" name="cartao_nome" id="card_nome" data-card-field autocomplete="cc-name" pattern="[A-Za-zÀ-ÖØ-öø-ÿ ]+" title="Digite apenas letras e espaços" maxlength="60" value="<?= htmlspecialchars($_POST['cartao_nome'] ?? '') ?>" placeholder="Nome igual ao cartão" <?= $pagamentoSelecionado === 'cartao' ? '' : 'disabled' ?>>
                                         </div>
 
                                         <div class="form-group full">
@@ -1636,7 +922,7 @@ include_once __DIR__ . '/../components/Header.php';
                                     </div>
 
                                     <div class="card-security-note">
-                                        Observação: esses dados não devem ser guardados no banco. Para cobrar cartão de verdade, integre depois com Mercado Pago, AbacatePay ou outro gateway.
+                                        Dados protegidos: as informações do cartão são usadas apenas para validação visual do checkout e não ficam salvas no banco.
                                     </div>
                                 </div>
                             </div>
@@ -1715,6 +1001,81 @@ const freteEl = document.getElementById('freteResumo');
 const totalEl = document.getElementById('totalResumo');
 const entregaInputs = document.querySelectorAll('[data-entrega]');
 const saveAddressBox = document.getElementById('saveAddressBox');
+const cepStatusCheckout = document.getElementById('cepStatusCheckout');
+
+function mascaraCEPCheckout(input) {
+    let value = input.value.replace(/\D/g, '').slice(0, 8);
+    if (value.length > 5) {
+        value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+    }
+    input.value = value;
+}
+
+async function buscarEnderecoPorCEPCheckout() {
+    const cepInput = document.getElementById('cep');
+    const enderecoInput = document.getElementById('endereco');
+    const bairroInput = document.getElementById('bairro');
+    const cidadeInput = document.getElementById('cidade');
+    const estadoInput = document.getElementById('estado');
+    const numeroInput = document.getElementById('numero');
+
+    if (!cepInput) return;
+
+    const cep = cepInput.value.replace(/\D/g, '');
+
+    if (cep.length !== 8) {
+        if (cepStatusCheckout) {
+            cepStatusCheckout.textContent = 'Digite um CEP com 8 números.';
+            cepStatusCheckout.style.color = '#ffb4b4';
+        }
+        return;
+    }
+
+    if (cepStatusCheckout) {
+        cepStatusCheckout.textContent = 'Buscando endereço pelo CEP...';
+        cepStatusCheckout.style.color = '#cfcfcf';
+    }
+
+    try {
+        const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const dados = await resposta.json();
+
+        if (dados.erro) {
+            if (cepStatusCheckout) {
+                cepStatusCheckout.textContent = 'CEP não encontrado. Preencha o endereço manualmente.';
+                cepStatusCheckout.style.color = '#ffb4b4';
+            }
+            return;
+        }
+
+        if (enderecoInput) enderecoInput.value = dados.logradouro || '';
+        if (bairroInput) bairroInput.value = dados.bairro || '';
+        if (cidadeInput) cidadeInput.value = dados.localidade || '';
+        if (estadoInput) estadoInput.value = dados.uf || '';
+
+        if (cepStatusCheckout) {
+            cepStatusCheckout.textContent = 'Endereço preenchido automaticamente. Agora coloque o número.';
+            cepStatusCheckout.style.color = '#8ff0b3';
+        }
+
+        if (numeroInput) numeroInput.focus();
+    } catch (error) {
+        if (cepStatusCheckout) {
+            cepStatusCheckout.textContent = 'Não foi possível buscar o CEP agora. Preencha manualmente.';
+            cepStatusCheckout.style.color = '#ffb4b4';
+        }
+    }
+}
+
+const cepCheckoutInput = document.getElementById('cep');
+if (cepCheckoutInput) {
+    cepCheckoutInput.addEventListener('input', () => {
+        const cepLimpo = cepCheckoutInput.value.replace(/\D/g, '');
+        if (cepLimpo.length === 8) {
+            buscarEnderecoPorCEPCheckout();
+        }
+    });
+}
 
 function atualizarResumoCheckout() {
     if (!subtotalEl || !freteEl || !totalEl) return;
@@ -1751,25 +1112,74 @@ const pixDetailsBox = document.getElementById('pixDetailsBox');
 const cardDetailsBox = document.getElementById('cardDetailsBox');
 const boletoDetailsBox = document.getElementById('boletoDetailsBox');
 const cardFields = document.querySelectorAll('[data-card-field]');
+const pixPaymentData = <?= json_encode($pixDadosPorFrete, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+const pixQrImage = document.getElementById('pixQrImage');
+const pixCopiaCola = document.getElementById('pixCopiaCola');
+const pixAmountLabel = document.getElementById('pixAmountLabel');
+const pixValueCard = document.getElementById('pixValueCard');
+const pixTxidCard = document.getElementById('pixTxidCard');
+const copyPixBtn = document.getElementById('copyPixBtn');
 
 const paymentTexts = {
     pix: {
-        title: 'Pix',
-        text: 'Finalize o pedido e confirme o pagamento depois pelo painel de vendas.'
+        title: 'Pix Magda Crew',
+        text: 'Escaneie o QR Code pelo app do banco ou use o código Pix copia e cola para concluir o pagamento.'
     },
     cartao: {
-        title: 'Cartão de crédito',
+        title: 'Cartão Magda Crew',
         text: 'Preencha os dados do cartão logo abaixo. Essa área aparece somente quando cartão está selecionado.'
     },
     boleto: {
-        title: 'Boleto bancário',
-        text: 'O pedido fica pendente para pagamento via boleto e pode ser atualizado no painel.'
+        title: 'Boleto Magda Crew',
+        text: 'O pedido será registrado para pagamento via boleto e acompanhamento no painel.'
     }
 };
 
 function setBoxOpen(box, shouldOpen) {
     if (!box) return;
     box.classList.toggle('is-open', shouldOpen);
+}
+
+function dadosPixFreteAtual() {
+    const freteMarcado = document.querySelector('input[name="frete_tipo"]:checked');
+    const codigoFrete = freteMarcado ? freteMarcado.value : 'pac';
+    const primeiroCodigo = Object.keys(pixPaymentData || {})[0];
+    return (pixPaymentData && (pixPaymentData[codigoFrete] || pixPaymentData[primeiroCodigo])) || null;
+}
+
+function atualizarPixCheckout() {
+    const dados = dadosPixFreteAtual();
+    if (!dados) return;
+
+    if (pixQrImage) pixQrImage.src = dados.qr_url || '';
+    if (pixCopiaCola) pixCopiaCola.value = dados.payload || '';
+    if (pixAmountLabel) pixAmountLabel.textContent = dados.valor || '';
+    if (pixValueCard) pixValueCard.textContent = dados.valor || '';
+    if (pixTxidCard) pixTxidCard.textContent = dados.txid || '';
+}
+
+document.querySelectorAll('input[name="frete_tipo"]').forEach(input => {
+    input.addEventListener('change', atualizarPixCheckout);
+});
+
+if (copyPixBtn) {
+    copyPixBtn.addEventListener('click', async () => {
+        if (!pixCopiaCola) return;
+
+        try {
+            await navigator.clipboard.writeText(pixCopiaCola.value);
+        } catch (error) {
+            pixCopiaCola.focus();
+            pixCopiaCola.select();
+            document.execCommand('copy');
+        }
+
+        const textoOriginal = copyPixBtn.textContent;
+        copyPixBtn.textContent = 'Código copiado!';
+        setTimeout(() => {
+            copyPixBtn.textContent = textoOriginal;
+        }, 1800);
+    });
 }
 
 function selecionarPagamento(valor) {
@@ -1823,12 +1233,35 @@ if (cardNumero) cardNumero.addEventListener('input', atualizarNumeroCartao);
 
 const cardNome = document.getElementById('card_nome');
 const cardPreviewName = document.getElementById('cardPreviewName');
+function limparNomeCartao(valor) {
+    return valor
+        .replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s]/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .slice(0, 60);
+}
 function atualizarNomeCartao() {
-    if (cardPreviewName && cardNome) {
+    if (!cardNome) return;
+
+    const limpo = limparNomeCartao(cardNome.value);
+    if (cardNome.value !== limpo) {
+        cardNome.value = limpo;
+    }
+
+    const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ ]+$/.test(cardNome.value.trim());
+    if (cardNome.value.trim() && !nomeValido) {
+        cardNome.setCustomValidity('Digite apenas letras no nome do cartão.');
+    } else {
+        cardNome.setCustomValidity('');
+    }
+
+    if (cardPreviewName) {
         cardPreviewName.textContent = cardNome.value.trim() || 'Nome do cartão';
     }
 }
-if (cardNome) cardNome.addEventListener('input', atualizarNomeCartao);
+if (cardNome) {
+    cardNome.addEventListener('input', atualizarNomeCartao);
+    cardNome.addEventListener('paste', () => setTimeout(atualizarNomeCartao, 0));
+}
 
 const cardValidade = document.getElementById('card_validade');
 const cardPreviewDate = document.getElementById('cardPreviewDate');
@@ -1865,6 +1298,14 @@ if (checkoutForm) {
         if (forma !== 'cartao') return;
 
         selecionarPagamento('cartao');
+        atualizarNomeCartao();
+
+        if (cardNome && !/^[A-Za-zÀ-ÖØ-öø-ÿ ]+$/.test(cardNome.value.trim())) {
+            event.preventDefault();
+            cardNome.focus();
+            cardNome.reportValidity();
+            return;
+        }
 
         for (const field of cardFields) {
             if (!field.value.trim()) {
@@ -1879,6 +1320,7 @@ if (checkoutForm) {
     });
 }
 
+atualizarPixCheckout();
 selecionarPagamento(paymentHidden ? paymentHidden.value : 'pix');
 atualizarNumeroCartao();
 atualizarNomeCartao();

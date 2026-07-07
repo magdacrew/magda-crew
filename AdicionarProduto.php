@@ -113,21 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <title>Novo Produto</title>
     <link rel="stylesheet" href="/MagdaCrew/public/assets/css/AdicionarProduto.css">
-    
-    <style>
-        .alerta-erro {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            padding: 12px 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-    </style>
 </head>
 <body>
 
@@ -164,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="">Selecione uma categoria</option>
                 <?php foreach($categorias as $categoria): ?>
                     <option value="<?= $categoria['id'] ?>" <?= (isset($_POST['categoria_id']) && $_POST['categoria_id'] == $categoria['id']) ? 'selected' : '' ?>>
-                        <?= $categoria['nome'] ?>
+                        <?= htmlspecialchars($categoria['nome']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -198,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             >
         </div>
 
-        <div id="previewImagens" class="preview-imagens" style="color: #666; font-size: 12px; margin-top: 10px;"></div>
+        <div id="previewImagens" class="preview-imagens preview-novas"></div>
 
         <button type="submit" class="btn-add">
             Cadastrar Produto
@@ -207,11 +196,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 </main>
 
+<div class="modal-confirmacao" id="modalRemoverImagem" aria-hidden="true">
+    <div class="modal-confirmacao-card" role="dialog" aria-modal="true" aria-labelledby="modalRemoverTitulo">
+        <button type="button" class="modal-fechar" id="btnFecharModal" aria-label="Fechar">×</button>
+
+        <div class="modal-icone">!</div>
+
+        <h2 id="modalRemoverTitulo">Remover imagem?</h2>
+        <p>
+            Essa imagem será removida da seleção do produto. 
+            <strong>Ela não será enviada ao cadastrar.</strong>
+        </p>
+
+        <div class="modal-acoes">
+            <button type="button" class="btn-modal btn-modal-cancelar" id="btnCancelarRemocao">
+                Cancelar
+            </button>
+            <button type="button" class="btn-modal btn-modal-apagar" id="btnConfirmarRemocao">
+                Apagar imagem
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 const inputImagens = document.getElementById('imagens');
 const preview = document.getElementById('previewImagens');
+const modalRemoverImagem = document.getElementById('modalRemoverImagem');
+const btnFecharModal = document.getElementById('btnFecharModal');
+const btnCancelarRemocao = document.getElementById('btnCancelarRemocao');
+const btnConfirmarRemocao = document.getElementById('btnConfirmarRemocao');
 
 let arquivosAcumulados = [];
+let imagemPendenteRemocao = null;
+let imagemPrincipalAtual = 0;
 
 function atualizarInputFiles() {
     const dataTransfer = new DataTransfer();
@@ -222,7 +240,16 @@ function atualizarInputFiles() {
 }
 
 function renderizarPreview() {
-    preview.innerHTML = ''; 
+    preview.innerHTML = '';
+
+    if (arquivosAcumulados.length === 0) {
+        imagemPrincipalAtual = 0;
+        return;
+    }
+
+    if (imagemPrincipalAtual >= arquivosAcumulados.length) {
+        imagemPrincipalAtual = 0;
+    }
 
     arquivosAcumulados.forEach((arquivo, index) => {
         const reader = new FileReader();
@@ -232,16 +259,16 @@ function renderizarPreview() {
             div.classList.add('preview-item');
 
             div.innerHTML = `
-                <button type="button" class="btn-remover" onclick="removerImagem(${index})"></button>
+                <button type="button" class="btn-remover" onclick="abrirModalRemoverImagem(${index})"></button>
                 
-                <img src="${e.target.result}">
+                <img src="${e.target.result}" alt="Imagem selecionada">
 
                 <label class="principal-label">
                     <input 
                         type="radio"
                         name="imagem_principal"
                         value="${index}"
-                        ${index === 0 ? 'checked' : ''}
+                        ${index === imagemPrincipalAtual ? 'checked' : ''}
                     >
                     <span>Principal</span>
                 </label>
@@ -256,16 +283,71 @@ function renderizarPreview() {
 
 inputImagens.addEventListener('change', function() {
     const novosArquivos = Array.from(this.files);
+
+    if (arquivosAcumulados.length === 0 && novosArquivos.length > 0) {
+        imagemPrincipalAtual = 0;
+    }
+
     arquivosAcumulados = arquivosAcumulados.concat(novosArquivos);
-    atualizarInputFiles(); 
-    renderizarPreview();   
+    atualizarInputFiles();
+    renderizarPreview();
 });
 
-window.removerImagem = function(index) {
-    arquivosAcumulados.splice(index, 1); 
-    atualizarInputFiles();               
-    renderizarPreview();                 
-};
+preview.addEventListener('change', function(event) {
+    if (event.target.name === 'imagem_principal') {
+        imagemPrincipalAtual = parseInt(event.target.value, 10);
+    }
+});
+
+function abrirModalRemoverImagem(index) {
+    imagemPendenteRemocao = index;
+    modalRemoverImagem.classList.add('show');
+    modalRemoverImagem.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    btnConfirmarRemocao.focus();
+}
+
+function fecharModalRemoverImagem() {
+    imagemPendenteRemocao = null;
+    modalRemoverImagem.classList.remove('show');
+    modalRemoverImagem.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+}
+
+function removerImagemConfirmada() {
+    if (imagemPendenteRemocao === null) {
+        return;
+    }
+
+    const indexRemovido = imagemPendenteRemocao;
+    arquivosAcumulados.splice(indexRemovido, 1);
+
+    if (indexRemovido === imagemPrincipalAtual) {
+        imagemPrincipalAtual = 0;
+    } else if (indexRemovido < imagemPrincipalAtual) {
+        imagemPrincipalAtual--;
+    }
+
+    atualizarInputFiles();
+    renderizarPreview();
+    fecharModalRemoverImagem();
+}
+
+btnFecharModal.addEventListener('click', fecharModalRemoverImagem);
+btnCancelarRemocao.addEventListener('click', fecharModalRemoverImagem);
+btnConfirmarRemocao.addEventListener('click', removerImagemConfirmada);
+
+modalRemoverImagem.addEventListener('click', function(event) {
+    if (event.target === modalRemoverImagem) {
+        fecharModalRemoverImagem();
+    }
+});
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && modalRemoverImagem.classList.contains('show')) {
+        fecharModalRemoverImagem();
+    }
+});
 </script>
 </body>
 </html>

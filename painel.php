@@ -15,7 +15,14 @@ $totalProdutos     = $pdo->query("SELECT COUNT(*) FROM produtos")->fetchColumn()
 $totalAtivo        = $pdo->query("SELECT COUNT(*) FROM produtos WHERE ativo = 1")->fetchColumn();
 $totalCategorias   = $pdo->query("SELECT COUNT(*) FROM categorias WHERE ativo = 1")->fetchColumn();
 
-$rowVendas         = $pdo->query("SELECT COUNT(*) as qtd, COALESCE(SUM(valor_total),0) as fat FROM vendas WHERE status = 'confirmado'")->fetch();
+$statusContabilizados = "'confirmado','pago','separando','enviado','entregue','finalizado','concluido'";
+
+$rowVendas = $pdo->query("
+    SELECT COUNT(*) as qtd, COALESCE(SUM(valor_total),0) as fat
+    FROM vendas
+    WHERE status IN ($statusContabilizados)
+")->fetch();
+
 $totalVendas       = $rowVendas['qtd'];
 $faturamentoTotal  = $rowVendas['fat'];
 

@@ -59,6 +59,25 @@ try {
         .btn-remover { background: none; border: none; cursor: pointer; padding: 5px; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-remover:hover { opacity: 0.5; }
         .btn-remover img { width: 18px; height: 18px; object-fit: contain; }
+        /* Adicione isso dentro da sua tag <style> no header.php */
+        .sacola-badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Arial', sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+            pointer-events: none; /* Para não atrapalhar o clique na sacola */
+        }
     </style>
 </head>
 <body>
@@ -99,7 +118,12 @@ try {
     <?php endif; ?>
 
     <a href="#"><img src="/MagdaCrew/public/assets/images/Sun.png" alt="Alternar tema" class="icon"></a>
-    <a href="#" onclick="abrirCarrinho(event)"><img src="/MagdaCrew/public/assets/images/WhiteBag.png" alt="Sacola" class="icon"></a>
+    <a href="#" onclick="abrirCarrinho(event)" style="position: relative; display: inline-flex;">
+      <img src="/MagdaCrew/public/assets/images/WhiteBag.png" alt="Sacola" class="icon">
+      <?php if ($quantidadeTotal > 0): ?>
+          <span class="sacola-badge"><?= $quantidadeTotal ?></span>
+      <?php endif; ?>
+    </a>
   </div>
 </header>
 

@@ -139,7 +139,10 @@ require_once __DIR__ . '/../components/Header.php';
         <p class="categoria-badge"><?= htmlspecialchars($produto['categoria_nome'] ?? '') ?></p>
         <h1><?= htmlspecialchars($produto['nome'] ?? '') ?></h1>
         <div class="preco">R$ <?= number_format($produto['preco'] ?? 0, 2, ',', '.') ?></div>
-        <p class="descricao"><?= nl2br(htmlspecialchars($produto['descricao'] ?? '')) ?></p>
+        <div class="descricao-area" id="descricao-area">
+            <p class="descricao" id="descricao-produto"><?= nl2br(htmlspecialchars($produto['descricao'] ?? '')) ?></p>
+            <button type="button" class="btn-descricao" id="btn-descricao" aria-expanded="false">Mostrar mais</button>
+        </div>
 
         <form class="form-compra" method="POST" action="/MagdaCrew/src/Controllers/adicionar.php">
             <input type="hidden" name="variante_id" id="variante-selecionada" value="<?php echo $variante_pre_selecionada; ?>">
@@ -237,6 +240,88 @@ require_once __DIR__ . '/../components/Header.php';
         imagemPrincipal.src = novaSrc;
         miniaturas.forEach(min => min.classList.remove('ativa'));
         miniaturas[imagemAtual].classList.add('ativa');
+    }
+
+    // ----------------------------------------------------
+    // LÓGICA MOSTRAR MAIS / MENOS DA DESCRIÇÃO
+    // ----------------------------------------------------
+    const descricaoProduto = document.getElementById('descricao-produto');
+    const btnDescricao = document.getElementById('btn-descricao');
+    const imagemBoxDescricao = document.querySelector('.imagem-placeholder-detalhe');
+    const produtoInfoDescricao = document.querySelector('.produto-info');
+    let resizeDescricaoTimer;
+
+    function configurarDescricaoProduto() {
+        if (!descricaoProduto || !btnDescricao || !imagemBoxDescricao || !produtoInfoDescricao) return;
+
+        // Em telas pequenas a imagem fica acima do texto, então não precisa limitar pela altura dela.
+        if (window.innerWidth <= 900) {
+            descricaoProduto.classList.remove('descricao-limitada', 'descricao-aberta');
+            descricaoProduto.style.maxHeight = '';
+            btnDescricao.classList.remove('visivel');
+            btnDescricao.setAttribute('aria-expanded', 'false');
+            btnDescricao.innerText = 'Mostrar mais';
+            return;
+        }
+
+        const estavaAberta = btnDescricao.getAttribute('aria-expanded') === 'true';
+
+        descricaoProduto.classList.remove('descricao-limitada', 'descricao-aberta');
+        descricaoProduto.style.maxHeight = '';
+
+        const alturaImagem = imagemBoxDescricao.getBoundingClientRect().height;
+        const topoInfo = produtoInfoDescricao.getBoundingClientRect().top;
+        const topoDescricao = descricaoProduto.getBoundingClientRect().top;
+        const alturaDisponivel = Math.max(160, alturaImagem - (topoDescricao - topoInfo) - 18);
+        const precisaCortar = descricaoProduto.scrollHeight > alturaDisponivel + 6;
+
+        if (!precisaCortar) {
+            btnDescricao.classList.remove('visivel');
+            btnDescricao.setAttribute('aria-expanded', 'false');
+            btnDescricao.innerText = 'Mostrar mais';
+            return;
+        }
+
+        btnDescricao.classList.add('visivel');
+
+        if (estavaAberta) {
+            descricaoProduto.classList.add('descricao-aberta');
+            descricaoProduto.style.maxHeight = descricaoProduto.scrollHeight + 'px';
+            btnDescricao.innerText = 'Mostrar menos';
+        } else {
+            descricaoProduto.classList.add('descricao-limitada');
+            descricaoProduto.style.maxHeight = alturaDisponivel + 'px';
+            btnDescricao.innerText = 'Mostrar mais';
+        }
+    }
+
+    if (descricaoProduto && btnDescricao) {
+        btnDescricao.addEventListener('click', () => {
+            const estaAberta = btnDescricao.getAttribute('aria-expanded') === 'true';
+
+            if (estaAberta) {
+                btnDescricao.setAttribute('aria-expanded', 'false');
+                configurarDescricaoProduto();
+            } else {
+                descricaoProduto.classList.remove('descricao-limitada');
+                descricaoProduto.classList.add('descricao-aberta');
+                descricaoProduto.style.maxHeight = descricaoProduto.scrollHeight + 'px';
+                btnDescricao.setAttribute('aria-expanded', 'true');
+                btnDescricao.innerText = 'Mostrar menos';
+            }
+        });
+
+        window.addEventListener('load', configurarDescricaoProduto);
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeDescricaoTimer);
+            resizeDescricaoTimer = setTimeout(configurarDescricaoProduto, 150);
+        });
+
+        if (imagemPrincipal) {
+            imagemPrincipal.addEventListener('load', configurarDescricaoProduto);
+        }
+
+        configurarDescricaoProduto();
     }
 
     // ----------------------------------------------------

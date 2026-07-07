@@ -1,4 +1,8 @@
 /* --- FUNDO E CORES GERAIS --- */
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -11,6 +15,9 @@ body {
     width: 100%;
     background: #1c1d21;
     border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .top-content {
@@ -22,18 +29,64 @@ body {
     justify-content: space-between;
 }
 
-.logo { height: 45px; }
+.logo {
+    height: 45px;
+    transition: .3s ease;
+}
+
+.logo:hover {
+    opacity: .75;
+    transform: scale(.97);
+}
 
 .menu {
     display: flex;
-    gap: 20px;
+    gap: 28px;
     align-items: center;
 }
 
+/* Link geral do menu */
 .menu a {
     text-decoration: none;
     color: #ffffff;
     font-size: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Animação nos botões Orders/Profile */
+.menu a:not(:first-child) {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 0;
+    color: #ffffff;
+    transition: color .3s ease, transform .3s ease, opacity .3s ease;
+}
+
+.menu a:not(:first-child)::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 2px;
+    width: 0;
+    height: 1px;
+    background: #ffffff;
+    opacity: .9;
+    transition: width .3s ease, opacity .3s ease;
+}
+
+.menu a:not(:first-child):hover {
+    color: #a1a1aa;
+    transform: translateY(-2px);
+}
+
+.menu a:not(:first-child):hover::after {
+    width: 100%;
+}
+
+/* Link da logo não recebe linha */
+.menu a:first-child::after {
+    display: none;
 }
 
 .profile-icon {
@@ -44,7 +97,12 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: .3s ease;
+}
 
+.profile-icon:hover {
+    opacity: .6;
+    transform: rotate(90deg) scale(.96);
 }
 
 /* --- CONTAINER GERAL --- */
@@ -62,16 +120,17 @@ h1 {
 
 /* --- CARD DO PEDIDO (GRID) --- */
 .order-card {
-    background: #111214; /* Fundo escuro do card */
+    background: #111214;
     border-radius: 12px;
     padding: 40px;
     margin-bottom: 30px;
 }
 
 /* Sistema de Grid para as colunas */
-.order-grid-header, .order-item-row {
+.order-grid-header,
+.order-item-row {
     display: grid;
-    grid-template-columns: 3fr 1fr 1fr 1fr; /* Produto ocupa mais espaço, os outros dividem igual */
+    grid-template-columns: 3fr 1fr 1fr 1fr;
     align-items: center;
 }
 
@@ -80,7 +139,7 @@ h1 {
 }
 
 .col-center {
-    text-align: left; /* Na imagem, está alinhado à esquerda dentro da coluna */
+    text-align: left;
 }
 
 /* Cabeçalho da Tabela */
@@ -107,7 +166,7 @@ h1 {
 }
 
 .item-info img {
-    width: 60px; /* Ajuste o tamanho da imagem da calça aqui */
+    width: 60px;
     height: auto;
     object-fit: contain;
 }
@@ -137,4 +196,240 @@ h1 {
     padding: 60px 20px;
     background: #111214;
     border-radius: 16px;
+}
+
+/* --- AÇÕES DO PEDIDO / CANCELAMENTO --- */
+.order-card .order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding-top: 24px;
+}
+
+.order-actions {
+    min-width: 190px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+.cancelar-btn {
+    background: linear-gradient(135deg, #ff4b5c, #b8172d);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    padding: 12px 22px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    box-shadow: 0 10px 24px rgba(184, 23, 45, 0.28);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.cancelar-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(184, 23, 45, 0.38);
+}
+
+.cancelar-btn:active {
+    transform: translateY(0);
+}
+
+body.modal-aberto {
+    overflow: hidden;
+}
+
+.modal-cancelar-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .25s ease, visibility .25s ease;
+}
+
+.modal-cancelar-overlay.ativo {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.modal-cancelar {
+    position: relative;
+    width: min(440px, 100%);
+    background: linear-gradient(180deg, #191a1f 0%, #101114 100%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 24px;
+    padding: 34px 28px 26px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    transform: translateY(18px) scale(.96);
+    transition: transform .25s ease;
+}
+
+.modal-cancelar-overlay.ativo .modal-cancelar {
+    transform: translateY(0) scale(1);
+}
+
+.modal-fechar {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
+}
+
+.modal-fechar:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: rotate(90deg);
+}
+
+.modal-alerta-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 75, 92, 0.14);
+    border: 1px solid rgba(255, 75, 92, 0.45);
+    color: #ff6b79;
+    font-size: 32px;
+    font-weight: 900;
+}
+
+.modal-cancelar h2 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: 26px;
+    letter-spacing: -0.6px;
+}
+
+.modal-cancelar p {
+    margin: 0;
+    color: #b8b8bd;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.modal-cancelar strong {
+    color: #fff;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+}
+
+.btn-voltar,
+.btn-confirmar-cancelamento {
+    flex: 1;
+    border: 0;
+    border-radius: 14px;
+    padding: 13px 16px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 13px;
+    transition: transform .2s ease, filter .2s ease, background .2s ease;
+}
+
+.btn-voltar {
+    background: rgba(255, 255, 255, 0.10);
+    color: #fff;
+}
+
+.btn-voltar:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+}
+
+.btn-confirmar-cancelamento {
+    background: linear-gradient(135deg, #ff4b5c, #b8172d);
+    color: #fff;
+    box-shadow: 0 12px 25px rgba(184, 23, 45, 0.30);
+}
+
+.btn-confirmar-cancelamento:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+/* --- RESPONSIVO --- */
+@media (max-width: 720px) {
+    .top-content {
+        padding: 16px 20px;
+    }
+
+    .menu {
+        gap: 14px;
+    }
+
+    .menu a:not(:first-child) {
+        font-size: 14px;
+    }
+
+    .logo {
+        height: 38px;
+    }
+
+    .order-grid-header,
+    .order-item-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .order-grid-header {
+        display: none;
+    }
+
+    .item-info {
+        align-items: flex-start;
+    }
+
+    .order-card {
+        padding: 24px;
+    }
+
+    .order-card .order-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .summary-box {
+        width: 100% !important;
+    }
+
+    .order-actions {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .cancelar-btn {
+        width: 100%;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
 }

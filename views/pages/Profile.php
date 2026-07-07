@@ -30,6 +30,21 @@ $pass = '';             // Coloque a sua senha do banco
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Garante os campos separados de número e bairro.
+    function colunaExisteEndereco(PDO $pdo, string $coluna): bool {
+        $stmt = $pdo->prepare("SHOW COLUMNS FROM enderecos LIKE ?");
+        $stmt->execute([$coluna]);
+        return (bool) $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    if (!colunaExisteEndereco($pdo, 'numero')) {
+        $pdo->exec("ALTER TABLE enderecos ADD COLUMN numero VARCHAR(30) NULL AFTER endereco");
+    }
+
+    if (!colunaExisteEndereco($pdo, 'bairro')) {
+        $pdo->exec("ALTER TABLE enderecos ADD COLUMN bairro VARCHAR(120) NULL AFTER complemento");
+    }
 } catch (PDOException $e) {
     die("Erro de conexão: " . $e->getMessage());
 }
@@ -43,7 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
     $sobrenome   = $_POST['sobrenome'] ?? '';
     $cep         = $_POST['cep'] ?? '';
     $endereco    = $_POST['endereco'] ?? '';
+    $numero      = $_POST['numero'] ?? '';
     $complemento = $_POST['complemento'] ?? '';
+    $bairro      = $_POST['bairro'] ?? '';
     $cidade      = $_POST['cidade'] ?? '';
     $estado      = $_POST['estado'] ?? '';
     $telefone    = $_POST['telefone'] ?? '';
@@ -56,10 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
     }
 
     // Insere no banco
-    $sql = "INSERT INTO enderecos (usuario_id, pais, nome, sobrenome, cep, endereco, complemento, cidade, estado, telefone, padrao) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO enderecos (usuario_id, pais, nome, sobrenome, cep, endereco, numero, complemento, bairro, cidade, estado, telefone, padrao) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$usuario_id, $pais, $nome, $sobrenome, $cep, $endereco, $complemento, $cidade, $estado, $telefone, $padrao]);
+    $stmt->execute([$usuario_id, $pais, $nome, $sobrenome, $cep, $endereco, $numero, $complemento, $bairro, $cidade, $estado, $telefone, $padrao]);
 
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
@@ -86,8 +103,235 @@ $meus_enderecos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 // Listas para o select
-$lista_paises = ["Brasil", "Estados Unidos", "Portugal", "Espanha", "França", "Argentina"]; // Adicione mais se precisar
-$lista_estados = ["AC"=>"Acre", "AL"=>"Alagoas", "AP"=>"Amapá", "AM"=>"Amazonas", "BA"=>"Bahia", "CE"=>"Ceará", "DF"=>"Distrito Federal", "ES"=>"Espírito Santo", "GO"=>"Goiás", "MA"=>"Maranhão", "MT"=>"Mato Grosso", "MS"=>"Mato Grosso do Sul", "MG"=>"Minas Gerais", "PA"=>"Pará", "PB"=>"Paraíba", "PR"=>"Paraná", "PE"=>"Pernambuco", "PI"=>"Piauí", "RJ"=>"Rio de Janeiro", "RN"=>"Rio Grande do Norte", "RS"=>"Rio Grande do Sul", "RO"=>"Rondônia", "RR"=>"Roraima", "SC"=>"Santa Catarina", "SP"=>"São Paulo", "SE"=>"Sergipe", "TO"=>"Tocantins"];
+$lista_paises = [
+    "Afeganistão",
+    "África do Sul",
+    "Albânia",
+    "Alemanha",
+    "Andorra",
+    "Angola",
+    "Antígua e Barbuda",
+    "Arábia Saudita",
+    "Argélia",
+    "Argentina",
+    "Armênia",
+    "Austrália",
+    "Áustria",
+    "Azerbaijão",
+    "Bahamas",
+    "Bahrein",
+    "Bangladesh",
+    "Barbados",
+    "Bélgica",
+    "Belize",
+    "Benin",
+    "Bielorrússia",
+    "Bolívia",
+    "Bósnia e Herzegovina",
+    "Botsuana",
+    "Brasil",
+    "Brunei",
+    "Bulgária",
+    "Burkina Faso",
+    "Burundi",
+    "Butão",
+    "Cabo Verde",
+    "Camarões",
+    "Camboja",
+    "Canadá",
+    "Catar",
+    "Cazaquistão",
+    "Chade",
+    "Chile",
+    "China",
+    "Chipre",
+    "Colômbia",
+    "Comores",
+    "Coreia do Norte",
+    "Coreia do Sul",
+    "Costa do Marfim",
+    "Costa Rica",
+    "Croácia",
+    "Cuba",
+    "Dinamarca",
+    "Djibuti",
+    "Dominica",
+    "Egito",
+    "El Salvador",
+    "Emirados Árabes Unidos",
+    "Equador",
+    "Eritreia",
+    "Eslováquia",
+    "Eslovênia",
+    "Espanha",
+    "Estados Unidos",
+    "Estônia",
+    "Eswatini",
+    "Etiópia",
+    "Fiji",
+    "Filipinas",
+    "Finlândia",
+    "França",
+    "Gabão",
+    "Gâmbia",
+    "Gana",
+    "Geórgia",
+    "Granada",
+    "Grécia",
+    "Guatemala",
+    "Guiana",
+    "Guiné",
+    "Guiné-Bissau",
+    "Guiné Equatorial",
+    "Haiti",
+    "Honduras",
+    "Hungria",
+    "Iêmen",
+    "Ilhas Marshall",
+    "Ilhas Salomão",
+    "Índia",
+    "Indonésia",
+    "Irã",
+    "Iraque",
+    "Irlanda",
+    "Islândia",
+    "Israel",
+    "Itália",
+    "Jamaica",
+    "Japão",
+    "Jordânia",
+    "Kiribati",
+    "Kosovo",
+    "Kuwait",
+    "Laos",
+    "Lesoto",
+    "Letônia",
+    "Líbano",
+    "Libéria",
+    "Líbia",
+    "Liechtenstein",
+    "Lituânia",
+    "Luxemburgo",
+    "Macedônia do Norte",
+    "Madagascar",
+    "Malásia",
+    "Malawi",
+    "Maldivas",
+    "Mali",
+    "Malta",
+    "Marrocos",
+    "Maurício",
+    "Mauritânia",
+    "México",
+    "Micronésia",
+    "Moçambique",
+    "Moldávia",
+    "Mônaco",
+    "Mongólia",
+    "Montenegro",
+    "Myanmar",
+    "Namíbia",
+    "Nauru",
+    "Nepal",
+    "Nicarágua",
+    "Níger",
+    "Nigéria",
+    "Noruega",
+    "Nova Zelândia",
+    "Omã",
+    "Países Baixos",
+    "Palau",
+    "Palestina",
+    "Panamá",
+    "Papua-Nova Guiné",
+    "Paquistão",
+    "Paraguai",
+    "Peru",
+    "Polônia",
+    "Portugal",
+    "Quênia",
+    "Quirguistão",
+    "Reino Unido",
+    "República Centro-Africana",
+    "República Democrática do Congo",
+    "República do Congo",
+    "República Dominicana",
+    "Romênia",
+    "Ruanda",
+    "Rússia",
+    "Samoa",
+    "San Marino",
+    "Santa Lúcia",
+    "São Cristóvão e Nevis",
+    "São Tomé e Príncipe",
+    "São Vicente e Granadinas",
+    "Seicheles",
+    "Senegal",
+    "Serra Leoa",
+    "Sérvia",
+    "Singapura",
+    "Síria",
+    "Somália",
+    "Sri Lanka",
+    "Sudão",
+    "Sudão do Sul",
+    "Suécia",
+    "Suíça",
+    "Suriname",
+    "Tailândia",
+    "Taiwan",
+    "Tajiquistão",
+    "Tanzânia",
+    "Tchéquia",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad e Tobago",
+    "Tunísia",
+    "Turcomenistão",
+    "Turquia",
+    "Tuvalu",
+    "Ucrânia",
+    "Uganda",
+    "Uruguai",
+    "Uzbequistão",
+    "Vanuatu",
+    "Vaticano",
+    "Venezuela",
+    "Vietnã",
+    "Zâmbia",
+    "Zimbábue"
+];
+
+$lista_estados = [
+    "AC" => "Acre",
+    "AL" => "Alagoas",
+    "AP" => "Amapá",
+    "AM" => "Amazonas",
+    "BA" => "Bahia",
+    "CE" => "Ceará",
+    "DF" => "Distrito Federal",
+    "ES" => "Espírito Santo",
+    "GO" => "Goiás",
+    "MA" => "Maranhão",
+    "MT" => "Mato Grosso",
+    "MS" => "Mato Grosso do Sul",
+    "MG" => "Minas Gerais",
+    "PA" => "Pará",
+    "PB" => "Paraíba",
+    "PR" => "Paraná",
+    "PE" => "Pernambuco",
+    "PI" => "Piauí",
+    "RJ" => "Rio de Janeiro",
+    "RN" => "Rio Grande do Norte",
+    "RS" => "Rio Grande do Sul",
+    "RO" => "Rondônia",
+    "RR" => "Roraima",
+    "SC" => "Santa Catarina",
+    "SP" => "São Paulo",
+    "SE" => "Sergipe",
+    "TO" => "Tocantins"
+];
 ?>
 
 <!DOCTYPE html>
@@ -142,7 +386,14 @@ $lista_estados = ["AC"=>"Acre", "AL"=>"Alagoas", "AP"=>"Amapá", "AM"=>"Amazonas
                                     <span class="badge-padrao">Padrão</span>
                                 <?php endif; ?>
                             </strong>
-                            <p><?= htmlspecialchars($end['endereco']) ?><?= !empty($end['complemento']) ? ', ' . htmlspecialchars($end['complemento']) : '' ?></p>
+                            <p>
+                                <?= htmlspecialchars($end['endereco']) ?>
+                                <?= !empty($end['numero']) ? ', Nº ' . htmlspecialchars($end['numero']) : '' ?>
+                                <?= !empty($end['complemento']) ? ', ' . htmlspecialchars($end['complemento']) : '' ?>
+                            </p>
+                            <?php if (!empty($end['bairro'])): ?>
+                                <p>Bairro: <?= htmlspecialchars($end['bairro']) ?></p>
+                            <?php endif; ?>
                             <p><?= htmlspecialchars($end['cidade']) ?> - <?= htmlspecialchars($end['estado']) ?>, <?= htmlspecialchars($end['cep']) ?></p>
                             <p><?= htmlspecialchars($end['pais']) ?></p>
                             <p> <?= htmlspecialchars($end['telefone']) ?></p>
@@ -190,11 +441,21 @@ $lista_estados = ["AC"=>"Acre", "AL"=>"Alagoas", "AP"=>"Amapá", "AM"=>"Amazonas
             </div>
 
             <div class="form-group">
-                <input type="text" name="cep" id="cepInput" placeholder="CEP" maxlength="9" required oninput="mascaraCEP(this)">
+                <input type="text" name="cep" id="cepInput" placeholder="CEP" maxlength="9" required oninput="mascaraCEP(this)" onblur="buscarEnderecoPorCEP()">
+                <small id="cepStatus" style="display:block;margin-top:6px;color:#777;font-size:12px;"></small>
             </div>
 
             <div class="form-group">
-                <input type="text" name="endereco" placeholder="Endereço e número" required>
+                <input type="text" name="endereco" id="enderecoInput" placeholder="Rua, avenida ou travessa" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half">
+                    <input type="text" name="numero" id="numeroInput" placeholder="Número" required>
+                </div>
+                <div class="form-group half">
+                    <input type="text" name="bairro" id="bairroInput" placeholder="Bairro" required>
+                </div>
             </div>
 
             <div class="form-group">
@@ -203,10 +464,10 @@ $lista_estados = ["AC"=>"Acre", "AL"=>"Alagoas", "AP"=>"Amapá", "AM"=>"Amazonas
 
             <div class="form-row">
                 <div class="form-group half">
-                    <input type="text" name="cidade" placeholder="Cidade" required>
+                    <input type="text" name="cidade" id="cidadeInput" placeholder="Cidade" required>
                 </div>
                 <div class="form-group half">
-                    <select name="estado" required>
+                    <select name="estado" id="estadoInput" required>
                         <option value="" disabled selected>Estado</option>
                         <?php foreach ($lista_estados as $sigla => $nome_estado): ?>
                             <option value="<?= $sigla ?>"><?= $nome_estado ?></option>
@@ -246,6 +507,74 @@ $lista_estados = ["AC"=>"Acre", "AL"=>"Alagoas", "AP"=>"Amapá", "AM"=>"Amazonas
         }
         input.value = value;
     }
+
+    async function buscarEnderecoPorCEP() {
+        const cepInput = document.getElementById('cepInput');
+        const enderecoInput = document.getElementById('enderecoInput');
+        const bairroInput = document.getElementById('bairroInput');
+        const cidadeInput = document.getElementById('cidadeInput');
+        const estadoInput = document.getElementById('estadoInput');
+        const numeroInput = document.getElementById('numeroInput');
+        const cepStatus = document.getElementById('cepStatus');
+
+        if (!cepInput) return;
+
+        const cep = cepInput.value.replace(/\D/g, '');
+
+        if (cep.length !== 8) {
+            if (cepStatus) {
+                cepStatus.textContent = 'Digite um CEP com 8 números.';
+                cepStatus.style.color = '#c77';
+            }
+            return;
+        }
+
+        if (cepStatus) {
+            cepStatus.textContent = 'Buscando endereço...';
+            cepStatus.style.color = '#777';
+        }
+
+        try {
+            const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const dados = await resposta.json();
+
+            if (dados.erro) {
+                if (cepStatus) {
+                    cepStatus.textContent = 'CEP não encontrado.';
+                    cepStatus.style.color = '#c77';
+                }
+                return;
+            }
+
+            if (enderecoInput) enderecoInput.value = dados.logradouro || '';
+            if (bairroInput) bairroInput.value = dados.bairro || '';
+            if (cidadeInput) cidadeInput.value = dados.localidade || '';
+            if (estadoInput) estadoInput.value = dados.uf || '';
+
+            if (cepStatus) {
+                cepStatus.textContent = 'Endereço preenchido automaticamente.';
+                cepStatus.style.color = '#39a96b';
+            }
+
+            if (numeroInput) {
+                numeroInput.focus();
+            }
+        } catch (erro) {
+            if (cepStatus) {
+                cepStatus.textContent = 'Não foi possível buscar o CEP agora.';
+                cepStatus.style.color = '#c77';
+            }
+        }
+    }
+
+    document.addEventListener('input', function(e) {
+        if (e.target && e.target.id === 'cepInput') {
+            const cepLimpo = e.target.value.replace(/\D/g, '');
+            if (cepLimpo.length === 8) {
+                buscarEnderecoPorCEP();
+            }
+        }
+    });
 
     function mascaraTelefone(input) {
         let value = input.value.replace(/\D/g, ''); // Remove tudo que não for número

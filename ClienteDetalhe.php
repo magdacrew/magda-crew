@@ -135,7 +135,7 @@ function getStatusClass($status) {
                             </span>
                         </td>
                         <td style="text-align: center;">
-                            <a href="venda_detalhes.php?id=<?= $venda['id'] ?>" class="btn-acao">Ver Detalhes</a>
+                            <a href="VendaDetalhe.php?id=<?= $venda['id'] ?>" class="btn-acao">Ver Detalhes</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
