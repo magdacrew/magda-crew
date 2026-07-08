@@ -11,7 +11,8 @@ $quantidadeTotal = 0;
 try {
     $pdo_cart = Database::getConnection();
     
-    $sql = "SELECT c.quantidade, c.variante_id, t.nome AS tamanho_nome, p.nome, p.preco, p_img.caminho_imagem
+    // Adicionado "p.id AS produto_id" para podermos criar o link para a página do produto
+    $sql = "SELECT c.quantidade, c.variante_id, t.nome AS tamanho_nome, p.nome, p.preco, p_img.caminho_imagem, p.id AS produto_id
             FROM carrinho c
             JOIN produto_variantes v ON c.variante_id = v.id
             JOIN tamanhos t ON v.tamanho_id = t.id
@@ -41,44 +42,6 @@ try {
     <title><?= isset($tituloDaPagina) ? htmlspecialchars($tituloDaPagina) : 'Magda Crew' ?></title>
     <link rel="icon" type="image/png" href="/MagdaCrew/public/assets/images/MgdWhite.png">
     <link rel="stylesheet" href="/MagdaCrew/public/assets/css/header.css">
-    
-    <style>
-        .cart-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out; backdrop-filter: blur(2px); }
-        .cart-overlay.ativo { opacity: 1; visibility: visible; }
-        .cart-drawer { position: fixed; top: 0; right: -450px; width: 100%; max-width: 450px; height: 100vh; background-color: #1a1a1a; color: #fff; z-index: 1000; box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5); transition: right 0.3s ease-in-out; display: flex; flex-direction: column; font-family: Arial, sans-serif; }
-        .cart-drawer.aberto { right: 0; }
-        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #333; flex-wrap: wrap;}
-        .cart-header h2 { font-size: 1.2rem; margin: 0; display: flex; align-items: center; gap: 10px; font-weight: normal; width: 100%;}
-        .cart-count { background: #fff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.9rem; font-weight: bold;}
-        .fechar-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; position: absolute; right: 20px; top: 15px;}
-        .cart-content { flex: 1; padding: 20px; overflow-y: auto; }
-        .cart-footer { padding: 20px; border-top: 1px solid #333; background: #1a1a1a; }
-        .cart-total { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.1rem; font-weight: bold; }
-        .btn-finalizar { width: 100%; padding: 15px; background: #fff; color: #000; border: none; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer; text-decoration: none; display: block; text-align: center; box-sizing: border-box; transition: .25s; }
-        .btn-finalizar:hover { background: #dcdcdc; transform: translateY(-1px); }
-        .btn-remover { background: none; border: none; cursor: pointer; padding: 5px; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
-        .btn-remover:hover { opacity: 0.5; }
-        .btn-remover img { width: 18px; height: 18px; object-fit: contain; }
-        /* Adicione isso dentro da sua tag <style> no header.php */
-        .sacola-badge {
-            position: absolute;
-            top: -5px;
-            right: -8px;
-            background-color: #ffffff;
-            color: #000000;
-            font-family: 'Arial', sans-serif;
-            font-size: 11px;
-            font-weight: bold;
-            min-width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 3px;
-            pointer-events: none; /* Para não atrapalhar o clique na sacola */
-        }
-    </style>
 </head>
 <body>
 
@@ -118,6 +81,8 @@ try {
     <?php endif; ?>
 
     <a href="#"><img src="/MagdaCrew/public/assets/images/Sun.png" alt="Alternar tema" class="icon"></a>
+    
+    <!-- Ícone da Sacola com o Badge -->
     <a href="#" onclick="abrirCarrinho(event)" style="position: relative; display: inline-flex;">
       <img src="/MagdaCrew/public/assets/images/WhiteBag.png" alt="Sacola" class="icon">
       <?php if ($quantidadeTotal > 0): ?>
@@ -130,53 +95,71 @@ try {
 <div id="cartOverlay" class="cart-overlay" onclick="fecharCarrinho()"></div>
 <div id="cartDrawer" class="cart-drawer">
     <div class="cart-header">
-        <h2>Carrinho <span class="cart-count"><?= $quantidadeTotal ?></span></h2>
+        <h2>CARRINHO <span class="cart-count"><?= $quantidadeTotal ?></span></h2>
         <button class="fechar-btn" onclick="fecharCarrinho()">&times;</button>
     </div>
+
     <div class="cart-content">
         <?php if (empty($itensCarrinho)): ?>
             <p style="text-align: center; color: #888; margin-top: 20px;">Seu carrinho está vazio.</p>
         <?php else: ?>
             <?php foreach($itensCarrinho as $item): ?>
-                <div style="display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px; position: relative;">
+                <div class="cart-item">
                     <?php 
                         $imgSrc = $item['caminho_imagem'];
-                        // Ajuste simples para o caminho da imagem
                         if (strpos($imgSrc, 'http') === false) {
-                            $imgSrc = '/MagdaCrew/' . $imgSrc;
+                            $imgSrc = '/MagdaCrew/' . ltrim($imgSrc, '/');
                         }
                     ?>
-                    <img src="<?= htmlspecialchars($imgSrc) ?>" style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; background: #fff;">
-                    <div style="flex: 1;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <h4 style="margin: 0; font-size: 0.95rem; text-transform: uppercase; padding-right: 25px;"><?= htmlspecialchars($item['nome']) ?></h4>
-                            <button class="btn-remover" onclick="removerItem(<?= $item['variante_id'] ?>)"><img src="/MagdaCrew/public/assets/images/WhiteTrash.png" alt="Remover"></button>
+                    
+                    <!-- Link na Imagem -->
+                    <a href="/MagdaCrew/public/produtos/detalhes/<?= $item['produto_id'] ?>">
+                        <img src="<?= htmlspecialchars($imgSrc) ?>" class="cart-item-img" alt="<?= htmlspecialchars($item['nome']) ?>">
+                    </a>
+                    
+                    <div class="cart-item-details">
+                        <div class="cart-item-info-top">
+                            <a href="/MagdaCrew/public/produtos/detalhes/<?= $item['produto_id'] ?>" style="text-decoration: none; color: inherit;">
+                                <h4 class="cart-item-title"><?= htmlspecialchars($item['nome']) ?></h4>
+                            </a>
+                            <button class="btn-remover" onclick="removerItem(<?= $item['variante_id'] ?>)">
+                                <img src="/MagdaCrew/public/assets/images/WhiteTrash.png" alt="Remover">
+                            </button>
                         </div>
-                        <p style="margin: 5px 0; color: #aaa; font-size: 0.85rem;">Tamanho: <?= htmlspecialchars($item['tamanho_nome']) ?> <br> Quantidade: <?= $item['quantidade'] ?></p>
-                        <p style="margin: 0; font-weight: bold;">R$ <?= number_format($item['preco'] * $item['quantidade'], 2, ',', '.') ?></p>
+
+                        <!-- Esse bloco será empurrado para baixo pelo margin-top: auto -->
+                        <div class="cart-item-info-bottom">
+                            <p class="cart-item-variant">Tamanho: <?= htmlspecialchars($item['tamanho_nome']) ?></p>
+                            <p class="cart-item-variant">Quantidade: <?= $item['quantidade'] ?></p>
+                            <p class="cart-item-price">R$ <?= number_format($item['preco'] * $item['quantidade'], 2, ',', '.') ?></p>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
+    
     <div class="cart-footer">
-        <div class="cart-total"><span>Total estimado</span><span>R$ <?= number_format($totalCarrinho, 2, ',', '.') ?></span></div>
+        <div class="cart-total">
+            <span>SUBTOTAL</span>
+            <span>R$ <?= number_format($totalCarrinho, 2, ',', '.') ?></span>
+        </div>
+        <p class="cart-footer-note">Taxas de frete calculadas no checkout.</p>
+        
         <?php if (empty($itensCarrinho)): ?>
-            <a class="btn-finalizar" href="/MagdaCrew/views/pages/shop.php">Continuar comprando</a>
+            <a class="btn-finalizar" href="/MagdaCrew/views/pages/Shop.php">CONTINUAR COMPRANDO</a>
         <?php else: ?>
-            <a class="btn-finalizar" href="/MagdaCrew/views/pages/checkout.php">Finalizar a compra</a>
+            <a class="btn-finalizar" href="/MagdaCrew/views/pages/checkout.php">FINALIZAR COMPRA</a>
         <?php endif; ?>
     </div>
 </div>
 
 <script>
-    // FUNÇÃO DE BUSCA ATUALIZADA PARA REDIRECIONAR PARA SEARCH.PHP
     function executarBusca() {
         const input = document.getElementById('inputBusca');
         const termo = input.value.trim();
         
         if (termo.length >= 2) { 
-            // Redireciona para a nova página de pesquisa dedicada
             window.location.href = '/MagdaCrew/views/pages/search.php?q=' + encodeURIComponent(termo);
         } else {
             input.focus();
@@ -187,6 +170,7 @@ try {
 
     function abrirCarrinho(e) { if(e) e.preventDefault(); document.getElementById('cartDrawer').classList.add('aberto'); document.getElementById('cartOverlay').classList.add('ativo'); document.body.style.overflow = 'hidden'; }
     function fecharCarrinho() { document.getElementById('cartDrawer').classList.remove('aberto'); document.getElementById('cartOverlay').classList.remove('ativo'); document.body.style.overflow = 'auto'; }
+    
     function removerItem(varianteId) {
         const formData = new FormData();
         formData.append('variante_id', varianteId);

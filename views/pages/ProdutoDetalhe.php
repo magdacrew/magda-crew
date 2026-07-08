@@ -341,93 +341,58 @@ require_once __DIR__ . '/../components/Header.php';
             fetch(this.action, {
                 method: 'POST',
                 body: new FormData(this),
-                credentials: 'same-origin' // <-- ADICIONADO PARA ENVIAR O COOKIE DE SESSÃO
+                credentials: 'same-origin'
             })
-            // Leitura segura da resposta para capturar erros do PHP
-            .then(async res => {
-                const text = await res.text();
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    throw new Error("Erro do PHP retornado: " + text);
-                }
-            })
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    fetch(window.location.href + '?v=' + Math.random())
+                    // Recarrega o conteúdo do header/carrinho para atualizar tudo
+                    fetch(window.location.href.split('?')[0] + '?v=' + Math.random())
                         .then(res => res.text())
                         .then(html => {
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(html, 'text/html');
                             
-                            const novoConteudo = doc.querySelector('.cart-content').innerHTML;
-                            const novoTotal = doc.querySelector('.cart-total').innerHTML;
-                            const novaContagem = doc.querySelector('.cart-count').innerHTML;
-
-                            document.querySelector('.cart-content').innerHTML = novoConteudo;
-                            document.querySelector('.cart-total').innerHTML = novoTotal;
-                            document.querySelector('.cart-count').innerHTML = novaContagem;
+                            // Atualiza os elementos visuais do carrinho
+                            document.querySelector('.cart-content').innerHTML = doc.querySelector('.cart-content').innerHTML;
+                            document.querySelector('.cart-total').innerHTML = doc.querySelector('.cart-total').innerHTML;
+                            document.querySelector('.cart-count').innerHTML = doc.querySelector('.cart-count').innerHTML;
+                            
+                            // ATUALIZA A BOLINHA (BADGE) DO MENU
+                            const novoBadge = doc.querySelector('.sacola-badge');
+                            const badgeElement = document.querySelector('.sacola-badge');
+                            
+                            if (novoBadge) {
+                                if (badgeElement) {
+                                    badgeElement.innerText = novoBadge.innerText;
+                                } else {
+                                    // Se a bolinha não existia (carrinho estava zerado), cria ela
+                                    const sacolaIcon = document.querySelector('a[onclick*="abrirCarrinho"]');
+                                    if (sacolaIcon) {
+                                        sacolaIcon.insertAdjacentHTML('beforeend', novoBadge.outerHTML);
+                                    }
+                                }
+                            }
                             
                             btnSubmit.innerText = 'Adicionado!';
-                            btnSubmit.style.backgroundColor = '#111';
-                            btnSubmit.style.color = '#fff';
-                            btnSubmit.style.borderColor = '#fff';
-                            
                             if(typeof abrirCarrinho === 'function') abrirCarrinho();
 
                             setTimeout(() => {
                                 btnSubmit.innerText = textoOriginal;
-                                btnSubmit.style.backgroundColor = ''; 
-                                btnSubmit.style.color = '';
-                                btnSubmit.style.borderColor = '';
                                 btnSubmit.disabled = false;
                             }, 2000);
                         });
                 } else {
-                    alert(data.message);
+                    alert(data.message || "Erro ao adicionar item.");
                     btnSubmit.innerText = textoOriginal;
                     btnSubmit.disabled = false;
                 }
             })
             .catch(err => {
-                console.error(err);
-                alert("Ocorreu um erro ao adicionar. Veja o console (F12) para detalhes.");
+                console.error("Erro na requisição:", err);
                 btnSubmit.disabled = false;
                 btnSubmit.innerText = textoOriginal;
             });
-        });
-    }
-
-    document.querySelectorAll('.tamanho-opcao').forEach(botao => {
-        botao.addEventListener('click', function() {
-            if (this.classList.contains('sem-estoque') || this.disabled) return;
-            document.querySelectorAll('.tamanho-opcao').forEach(b => b.classList.remove('selecionado'));
-            this.classList.add('selecionado');
-            document.getElementById('variante-selecionada').value = this.getAttribute('data-id');
-        });
-    });
-
-    // ----------------------------------------------------
-    // LÓGICA DA VITRINE SCROLLBAR (PRODUTOS RELACIONADOS)
-    // ----------------------------------------------------
-    const vitrine = document.getElementById('vitrine-container');
-    const scrollbar = document.getElementById('custom-scrollbar');
-
-    if (vitrine && scrollbar) {
-        // Atualiza a barrinha quando o cliente desliza com o dedo/mouse
-        vitrine.addEventListener('scroll', () => {
-            const maxScrollLeft = vitrine.scrollWidth - vitrine.clientWidth;
-            if (maxScrollLeft > 0) {
-                const scrollPercentage = (vitrine.scrollLeft / maxScrollLeft) * 100;
-                scrollbar.value = scrollPercentage;
-            }
-        });
-
-        // Atualiza os produtos quando o cliente arrasta a barrinha
-        scrollbar.addEventListener('input', () => {
-            const maxScrollLeft = vitrine.scrollWidth - vitrine.clientWidth;
-            const scrollPos = (scrollbar.value / 100) * maxScrollLeft;
-            vitrine.scrollLeft = scrollPos;
         });
     }
 </script>

@@ -45,8 +45,7 @@ html[data-theme="light"] {
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   transition: background-color .25s ease, color .25s ease;
 }
 
@@ -165,7 +164,9 @@ html[data-theme="light"] .search {
   opacity: .5;
 }
 
-/* CARRINHO */
+/* =========================================================
+   CARRINHO E DRAWER
+   ========================================================= */
 .cart-overlay {
   position: fixed;
   top: 0;
@@ -199,7 +200,7 @@ html[data-theme="light"] .search {
   transition: right 0.3s ease-in-out, background-color .25s ease, color .25s ease;
   display: flex;
   flex-direction: column;
-  font-family: Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .cart-drawer.aberto {
@@ -215,12 +216,13 @@ html[data-theme="light"] .search {
 }
 
 .cart-header h2 {
-  font-size: 1.2rem;
+  font-size: 1rem;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: normal;
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .cart-count {
@@ -228,9 +230,8 @@ html[data-theme="light"] .search {
   color: var(--cart-bg);
   border-radius: 50%;
   padding: 2px 8px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: bold;
-  border: 1px solid var(--cart-border);
 }
 
 .fechar-btn {
@@ -241,6 +242,7 @@ html[data-theme="light"] .search {
   cursor: pointer;
 }
 
+/* Conteúdo dos Itens */
 .cart-content {
   flex: 1;
   padding: 20px;
@@ -248,85 +250,64 @@ html[data-theme="light"] .search {
 }
 
 .cart-item {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--cart-border);
-  padding-bottom: 15px;
-  position: relative;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--cart-border);
+    padding-bottom: 20px;
 }
 
+/* IMAGEM QUADRADA 1:1 */
 .cart-item-img {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
-  border-radius: 8px;
-  background: #fff;
-  border: 1px solid var(--cart-border);
+    width: 85px;
+    height: 85px;
+    object-fit: cover;
+    background: #fff;
+    border-radius: 2px;
+    transition: opacity 0.2s;
 }
 
-.cart-item-title {
-  margin: 0;
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  padding-right: 25px;
-  color: var(--cart-text);
+.cart-item-img:hover {
+    opacity: 0.8;
 }
 
-.cart-item-meta {
-  margin: 5px 0;
-  color: var(--cart-secondary-text);
-  font-size: 0.85rem;
+.cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cart-item-info-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* --- NOVO BLOCO PARA ALINHAMENTO NA BASE --- */
+.cart-item-info-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.cart-item-variant {
+    color: var(--cart-secondary-text);
+    font-size: 0.75rem;
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 .cart-item-price {
-  margin: 0;
-  font-weight: bold;
-  color: var(--cart-text);
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin: 5px 0 0 0;
+    color: var(--cart-text);
 }
-
-.cart-footer {
-  padding: 20px;
-  border-top: 1px solid var(--cart-border);
-  background: var(--cart-bg);
-}
-
-.cart-total {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.btn-finalizar {
-  width: 100%;
-  min-height: 52px;
-  padding: 15px;
-  background: var(--cart-text);
-  color: var(--cart-bg);
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity .2s ease, transform .2s ease;
-}
-
-.btn-finalizar:hover {
-  opacity: .88;
-  transform: translateY(-1px);
-}
-
-.btn-finalizar-disabled {
-  opacity: .45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+/* ------------------------------------------- */
 
 .btn-remover {
   background: none;
@@ -339,19 +320,98 @@ html[data-theme="light"] .search {
   justify-content: center;
 }
 
+
 .btn-remover:hover {
   opacity: 0.5;
 }
 
 .btn-remover img {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
+}
+
+html[data-theme="light"] .btn-remover img {
+  filter: invert(1);
+}
+
+/* Rodapé do Carrinho */
+.cart-footer {
+  padding: 25px 20px;
+  border-top: 1px solid var(--cart-border);
+  background: var(--cart-bg);
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.cart-footer-note {
+    text-align: center;
+    color: var(--cart-secondary-text);
+    font-size: 0.75rem;
+    margin: 0 0 15px 0;
+}
+
+.btn-finalizar {
+  width: 100%;
+  min-height: 52px;
+  padding: 15px;
+  background: var(--cart-text);
+  color: var(--cart-bg);
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.btn-finalizar:hover {
+  opacity: .88;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   BADGE DO ÍCONE DA SACOLA NO MENU PRINCIPAL
+   ========================================================= */
+.sacola-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: 'Arial', sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    pointer-events: none;
+}
+
+html[data-theme="light"] .sacola-badge {
+    background-color: #000000;
+    color: #ffffff;
 }
 
 /* =========================================================
    MODO CLARO GLOBAL
-   Força as páginas que tinham cores fixas a respeitarem o tema.
    ========================================================= */
 html[data-theme="light"] body,
 html[data-theme="light"] main,

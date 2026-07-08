@@ -216,6 +216,78 @@ function colunaExisteDireto(PDO $pdo, string $tabela, string $coluna): bool {
     }
 }
 
+
+function quoteIdentCheckout(string $nome): string {
+    return '`' . str_replace('`', '``', $nome) . '`';
+}
+
+function infoColunaCheckout(PDO $pdo, string $tabela, string $coluna): ?array {
+    if (!preg_match('/^[A-Za-z0-9_]+$/', $tabela) || !preg_match('/^[A-Za-z0-9_]+$/', $coluna)) {
+        return null;
+    }
+
+    try {
+        $stmt = $pdo->prepare('SHOW COLUMNS FROM ' . quoteIdentCheckout($tabela) . ' LIKE ?');
+        $stmt->execute([$coluna]);
+        $info = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $info ?: null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+function idPrecisaSerInformadoCheckout(PDO $pdo, string $tabela): bool {
+    $info = infoColunaCheckout($pdo, $tabela, 'id');
+    if (!$info) {
+        return false;
+    }
+
+    $extra = strtolower((string)($info['Extra'] ?? ''));
+    return strpos($extra, 'auto_increment') === false;
+}
+
+function proximoIdCheckout(PDO $pdo, string $tabela): int {
+    try {
+        $stmt = $pdo->query('SELECT COALESCE(MAX(`id`), 0) + 1 FROM ' . quoteIdentCheckout($tabela));
+        return max(1, (int)$stmt->fetchColumn());
+    } catch (Exception $e) {
+        return 1;
+    }
+}
+
+function tentarCorrigirAutoIncrementCheckout(PDO $pdo, string $tabela): void {
+    if (!tabelaExiste($pdo, $tabela)) {
+        return;
+    }
+
+    $info = infoColunaCheckout($pdo, $tabela, 'id');
+    if (!$info) {
+        return;
+    }
+
+    $extra = strtolower((string)($info['Extra'] ?? ''));
+    if (strpos($extra, 'auto_increment') !== false) {
+        return;
+    }
+
+    $tipo = (string)($info['Type'] ?? 'INT');
+    if (stripos($tipo, 'int') === false) {
+        return;
+    }
+
+    try {
+        $pdo->exec('ALTER TABLE ' . quoteIdentCheckout($tabela) . ' MODIFY `id` ' . $tipo . ' NOT NULL AUTO_INCREMENT');
+    } catch (Exception $e) {
+        // Se o banco não permitir ALTER TABLE, o checkout usa ID manual no INSERT.
+    }
+}
+
+function montarInsertCheckout(string $tabela, array $campos): string {
+    $camposSql = implode(', ', array_map('quoteIdentCheckout', $campos));
+    $placeholders = implode(', ', array_fill(0, count($campos), '?'));
+    return 'INSERT INTO ' . quoteIdentCheckout($tabela) . ' (' . $camposSql . ') VALUES (' . $placeholders . ')';
+}
+
 function prepararTabelaEnderecosCheckout(PDO $pdo): void {
     if (!tabelaExiste($pdo, 'enderecos')) {
         return;
@@ -316,10 +388,12 @@ function salvarEnderecoPadraoUsuario(PDO $pdo, int $usuarioId, array $dados): bo
             continue;
         }
 
-        $placeholders = implode(', ', array_fill(0, count($campos), '?'));
-        $camposSql = implode(', ', array_map(fn($campo) => "`$campo`", $campos));
+        if (idPrecisaSerInformadoCheckout($pdo, $tabela) && !in_array('id', array_map('strtolower', $campos), true)) {
+            array_unshift($campos, 'id');
+            array_unshift($valores, proximoIdCheckout($pdo, $tabela));
+        }
 
-        $stmtInsert = $pdo->prepare("INSERT INTO `$tabela` ($camposSql) VALUES ($placeholders)");
+        $stmtInsert = $pdo->prepare(montarInsertCheckout($tabela, $campos));
         return $stmtInsert->execute($valores);
     }
 
@@ -377,6 +451,9 @@ $pixNomeRecebedor = defined('PIX_NOME_RECEBEDOR') ? PIX_NOME_RECEBEDOR : 'MAGDA_
 $pixCidadeRecebedor = defined('PIX_CIDADE_RECEBEDOR') ? PIX_CIDADE_RECEBEDOR : 'JOINVILLE';
 
 prepararTabelaEnderecosCheckout($pdo);
+foreach (['vendas', 'itens_venda', 'enderecos_venda', 'enderecos', 'enderecos_usuario'] as $tabelaComId) {
+    tentarCorrigirAutoIncrementCheckout($pdo, $tabelaComId);
+}
 
 $enderecosSalvos = [];
 try {
@@ -481,15 +558,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'finaliz
             try {
                 $pdo->beginTransaction();
 
-                $stmtVenda = $pdo->prepare("
-                    INSERT INTO vendas
-                        (usuario_id, valor_total, subtotal, valor_frete, forma_pagamento, frete_tipo, cpf_cnpj_nota, status)
-                    VALUES
-                        (?, ?, ?, ?, ?, ?, ?, ?)
-                ");
-
                 $statusInicial = in_array($formaPagamento, ['pix', 'boleto'], true) ? 'pendente' : 'processando';
-                $stmtVenda->execute([
+
+                $camposVenda = ['usuario_id', 'valor_total', 'subtotal', 'valor_frete', 'forma_pagamento', 'frete_tipo', 'cpf_cnpj_nota', 'status'];
+                $valoresVenda = [
                     $usuario_id,
                     $total,
                     $subtotal,
@@ -498,25 +570,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'finaliz
                     $freteSelecionado,
                     $cpfNota,
                     $statusInicial
-                ]);
+                ];
+
+                $idVendaManual = null;
+                if (idPrecisaSerInformadoCheckout($pdo, 'vendas')) {
+                    $idVendaManual = proximoIdCheckout($pdo, 'vendas');
+                    array_unshift($camposVenda, 'id');
+                    array_unshift($valoresVenda, $idVendaManual);
+                }
+
+                $stmtVenda = $pdo->prepare(montarInsertCheckout('vendas', $camposVenda));
+                $stmtVenda->execute($valoresVenda);
 
                 $pedidoCriadoId = (int)$pdo->lastInsertId();
+                if ($pedidoCriadoId <= 0 && $idVendaManual !== null) {
+                    $pedidoCriadoId = (int)$idVendaManual;
+                }
 
-                $stmtItem = $pdo->prepare("
-                    INSERT INTO itens_venda
-                        (venda_id, variante_id, produto_nome, quantidade, preco_unitario, tamanho_nome, cor_nome)
-                    VALUES
-                        (?, ?, ?, ?, ?, ?, ?)
-                ");
+                if ($pedidoCriadoId <= 0) {
+                    throw new Exception('Não foi possível gerar o ID da venda. Verifique se a coluna id da tabela vendas está como AUTO_INCREMENT.');
+                }
+
+                $camposItemVenda = ['venda_id', 'variante_id', 'produto_nome', 'quantidade', 'preco_unitario', 'tamanho_nome', 'cor_nome'];
+                $itemVendaUsaIdManual = idPrecisaSerInformadoCheckout($pdo, 'itens_venda');
+                if ($itemVendaUsaIdManual) {
+                    array_unshift($camposItemVenda, 'id');
+                }
+
+                $stmtItem = $pdo->prepare(montarInsertCheckout('itens_venda', $camposItemVenda));
 
                 $stmtEstoque = $pdo->prepare("
                     UPDATE produto_variantes
                     SET quantidade_estoque = GREATEST(quantidade_estoque - ?, 0)
-                    WHERE id = ?
+                    WHERE id = ? AND quantidade_estoque >= ?
                 ");
 
                 foreach ($itensCarrinho as $item) {
-                    $stmtItem->execute([
+                    $valoresItemVenda = [
                         $pedidoCriadoId,
                         $item['variante_id'],
                         $item['nome'],
@@ -524,23 +614,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'finaliz
                         $item['preco'],
                         $item['tamanho_nome'],
                         $item['cor_nome']
-                    ]);
+                    ];
+
+                    if ($itemVendaUsaIdManual) {
+                        array_unshift($valoresItemVenda, proximoIdCheckout($pdo, 'itens_venda'));
+                    }
+
+                    $stmtItem->execute($valoresItemVenda);
 
                     $stmtEstoque->execute([
                         $item['quantidade'],
-                        $item['variante_id']
+                        $item['variante_id'],
+                        $item['quantidade']
                     ]);
+
+                    if ($stmtEstoque->rowCount() < 1) {
+                        throw new Exception('O produto "' . $item['nome'] . '" acabou no estoque antes de finalizar a compra.');
+                    }
                 }
 
                 if (tabelaExiste($pdo, 'enderecos_venda')) {
-                    $stmtEnderecoVenda = $pdo->prepare("
-                        INSERT INTO enderecos_venda
-                            (venda_id, cep, logradouro, numero, complemento, bairro, cidade, estado, destinatario)
-                        VALUES
-                            (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ");
-
-                    $stmtEnderecoVenda->execute([
+                    $camposEnderecoVenda = ['venda_id', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'destinatario'];
+                    $valoresEnderecoVenda = [
                         $pedidoCriadoId,
                         $cep,
                         $endereco,
@@ -550,7 +645,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'finaliz
                         $cidade,
                         $estado,
                         $nomeCompleto
-                    ]);
+                    ];
+
+                    if (idPrecisaSerInformadoCheckout($pdo, 'enderecos_venda')) {
+                        array_unshift($camposEnderecoVenda, 'id');
+                        array_unshift($valoresEnderecoVenda, proximoIdCheckout($pdo, 'enderecos_venda'));
+                    }
+
+                    $stmtEnderecoVenda = $pdo->prepare(montarInsertCheckout('enderecos_venda', $camposEnderecoVenda));
+                    $stmtEnderecoVenda->execute($valoresEnderecoVenda);
                 }
 
                 if (
