@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 07/07/2026 às 03:23
--- Versão do servidor: 10.4.28-MariaDB
--- Versão do PHP: 8.2.4
+-- Tempo de geração: 09/07/2026 às 17:38
+-- Versão do servidor: 10.4.32-MariaDB
+-- Versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Banco de dados: `magda_crew`
 --
+CREATE DATABASE IF NOT EXISTS `magda_crew` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `magda_crew`;
 
 -- --------------------------------------------------------
 
@@ -45,11 +47,11 @@ INSERT INTO `carrinho` (`id`, `usuario_id`, `session_id`, `variante_id`, `quanti
 (8, NULL, 'avrdqc09m757k17jb768g1gajd', 4, 2, '2026-05-28 18:57:19'),
 (9, NULL, 'avrdqc09m757k17jb768g1gajd', 8, 2, '2026-05-28 18:57:55'),
 (10, NULL, 'nbc63qf75sp7m7so3h0msu36rl', 8, 1, '2026-05-28 19:04:56'),
-(20, 4, '6qnrqut6cde8qjb7p1b392tqn7', 9, 1, '2026-06-03 19:31:01'),
 (25, NULL, 'm8sfdpdhkru2ae52kt4rbm5s7n', 4, 1, '2026-06-03 21:41:42'),
 (29, NULL, 'lbtrre5dagusa4hkjf5addj42m', 7, 1, '2026-07-02 19:36:01'),
 (30, NULL, 'lbtrre5dagusa4hkjf5addj42m', 8, 1, '2026-07-02 19:36:08'),
-(48, 4, '7s617e6pm2ggmql5m5edi5h8mm', 36, 1, '2026-07-06 22:06:56');
+(76, 4, 'kem35r7v4tshqbrejku0a1qjv4', 38, 1, '2026-07-07 22:34:53'),
+(89, 4, 'p560lsi7lgbl4haeceqiq1u5vu', 36, 1, '2026-07-08 22:21:31');
 
 -- --------------------------------------------------------
 
@@ -183,6 +185,7 @@ CREATE TABLE `enderecos_venda` (
 --
 
 INSERT INTO `enderecos_venda` (`id`, `venda_id`, `cep`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `estado`, `destinatario`) VALUES
+(0, 0, '89224-381', 'Rua Aristídes Rudnick', '977', 'casa', 'Jardim Iririú', 'Joinville', 'SC', 'Gabriel Holz'),
 (1, 3, '89224-381', 'Rua aristides rudnick', '977', 'Casa', 'Jardim Iririu', 'Joinville', 'SC', 'Vitor Souza'),
 (2, 4, '89224-381', 'Rua aristides rudnick, 977', '977', 'Casa', 'Jardim Iririu', 'Joinville', 'SC', 'Vitor Souza'),
 (3, 5, '89224-381', 'Rua aristides rudnick, 977', '977', 'Casa', 'Jardim Iririu', 'Joinville', 'SC', 'Vitor Souza'),
@@ -192,7 +195,9 @@ INSERT INTO `enderecos_venda` (`id`, `venda_id`, `cep`, `logradouro`, `numero`, 
 (7, 9, '89224-381', 'Rua aristides rudnick, 977', '977', 'Casa', 'Jardim Iririu', 'Joinville', 'SC', 'Vitor Souza'),
 (8, 10, '89230-779', 'Rua Carlos Afonso Moreira', '318', 'casa', 'Adhemar Garcia', 'Joinville', 'SC', 'Maria clara'),
 (9, 11, '89224-381', 'Rua aristides rudnick, 977', '977', 'Casa', 'Jardim Iririu', 'Joinville', 'SC', 'Vitor Souza'),
-(10, 12, '89230-779', 'Rua Carlos Afonso Moreira', '318', 'casa', 'Adhemar Garcia', 'Joinville', 'SC', 'Maria clara');
+(10, 12, '89230-779', 'Rua Carlos Afonso Moreira', '318', 'casa', 'Adhemar Garcia', 'Joinville', 'SC', 'Maria clara'),
+(11, 13, '89224-381', 'Rua Aristídes Rudnick', '977', 'casa', 'Jardim Iririú', 'Joinville', 'SC', 'Gabriel Holz'),
+(12, 14, '89224-381', 'Rua Aristídes Rudnick', '977', 'casa', 'Jardim Iririú', 'Joinville', 'SC', 'Gabriel Holz');
 
 -- --------------------------------------------------------
 
@@ -216,7 +221,7 @@ CREATE TABLE `home_banners` (
 --
 
 INSERT INTO `home_banners` (`id`, `titulo`, `texto_botao`, `link_botao`, `imagem_fundo`, `ativo`, `ordem`, `tipo`) VALUES
-(1, 'FALL ’26 COLLECTION ©', 'Compre Agora', '/views/pages/Shop.php', '/MagdaCrew/public/assets/images/background3.png', 1, 1, 'hero_topo'),
+(1, 'FALL ’26 COLLECTION ©', 'Compre Agora', '/Shop.php', '/MagdaCrew/public/assets/images/background3.png', 1, 1, 'hero_topo'),
 (2, 'ROMANTIC ’26 ©', 'Compre Agora', '/views/pages/Shop.php', '/MagdaCrew/public/assets/images/background2.png', 1, 2, 'hero_topo'),
 (5, 'VAMPETA’26 | T-SHIRTS', 'Explore Agora', '/MagdaCrew/public/produtos', '/MagdaCrew/public/assets/images/banners/banner_5_1780445932_6a1f72ec438fb.png', 0, 1, 'banner_baixo'),
 (8, 'FALL COLLETION', 'Compre Agora', '/views/pages/Shop.php', '/MagdaCrew/public/assets/images/banners/banner_novo_1780526313_6a20ace93721d.jpg', 1, 1, 'banner_baixo');
@@ -243,6 +248,7 @@ CREATE TABLE `itens_venda` (
 --
 
 INSERT INTO `itens_venda` (`id`, `venda_id`, `variante_id`, `produto_nome`, `quantidade`, `preco_unitario`, `tamanho_nome`, `cor_nome`) VALUES
+(0, 0, 40, 'Bermuda Balão 3/4 Longa', 1, 200.00, 'M', 'Preto'),
 (1, 1, NULL, 'teste', 1, 189.00, 'M', '1'),
 (5, 2, NULL, 'Magda Art Burgundy Tee', 1, 179.00, 'M', '1'),
 (6, 2, NULL, 'Magda Art Burgundy Tee', 2, 179.00, 'M', '1'),
@@ -259,7 +265,9 @@ INSERT INTO `itens_venda` (`id`, `venda_id`, `variante_id`, `produto_nome`, `qua
 (17, 12, 8, 'Magda Crew Tee', 1, 189.90, 'M', 'Preto'),
 (18, 12, 6, 'Magda Art Burgundy Tee', 1, 179.90, 'G', 'Vermelho'),
 (19, 12, 9, 'Magda Signature Black Tee', 1, 189.90, 'GG', 'Preto'),
-(20, 12, 11, 'Signature Black Baggy', 1, 369.90, 'M', 'Rosa');
+(20, 12, 11, 'Signature Black Baggy', 1, 369.90, 'M', 'Rosa'),
+(21, 13, 40, 'Bermuda Balão 3/4 Longa', 1, 200.00, 'M', 'Preto'),
+(22, 14, 41, 'Bermuda Balão 3/4 Longa', 1, 200.00, 'P', 'Preto');
 
 -- --------------------------------------------------------
 
@@ -442,8 +450,8 @@ INSERT INTO `produto_variantes` (`id`, `produto_id`, `tamanho_id`, `cor_id`, `qu
 (37, 24, 5, 2, 1, NULL),
 (38, 25, 1, 1, 2, NULL),
 (39, 25, 6, 1, 6, NULL),
-(40, 26, 3, 1, 6, NULL),
-(41, 26, 2, 1, 1, NULL);
+(40, 26, 3, 1, 0, NULL),
+(41, 26, 2, 1, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -495,11 +503,11 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nome_completo`, `email`, `telefone`, `cpf`, `nascimento`, `codigo_login`, `codigo_expira`, `email_verificado`, `ultimo_login`, `data_cadastro`, `is_admin`, `ativo`) VALUES
-(1, NULL, 'gabrielholz422@gmail.com', NULL, NULL, NULL, NULL, NULL, 1, '2026-06-10 19:28:46', '2026-05-25 19:51:23', 1, 1),
+(1, NULL, 'gabrielholz422@gmail.com', NULL, NULL, NULL, NULL, NULL, 1, '2026-07-07 20:30:53', '2026-05-25 19:51:23', 1, 1),
 (2, NULL, 'vitordesouza1903@gmail.com', NULL, NULL, NULL, NULL, NULL, 1, '2026-07-06 22:00:44', '2026-05-26 19:14:00', 1, 1),
 (3, NULL, 'gustavo_fabiam@estudante.sesisenai.org.br', NULL, NULL, NULL, NULL, NULL, 1, '2026-05-27 19:31:04', '2026-05-27 19:30:44', 0, 1),
-(4, NULL, 'holzadrian8@gmail.com', NULL, NULL, NULL, NULL, NULL, 1, '2026-07-06 20:59:52', '2026-05-27 21:37:40', 1, 1),
-(5, NULL, 'gustavojoaquimfabiam@gmail.com', NULL, NULL, NULL, NULL, NULL, 1, '2026-06-03 21:26:44', '2026-06-03 21:08:56', 0, 1),
+(4, NULL, 'holzadrian8@gmail.com', NULL, NULL, NULL, NULL, NULL, 1, '2026-07-08 22:19:34', '2026-05-27 21:37:40', 1, 1),
+(5, NULL, 'gustavojoaquimfabiam@gmail.com', NULL, NULL, NULL, NULL, NULL, 1, '2026-07-08 22:17:10', '2026-06-03 21:08:56', 1, 1),
 (7, NULL, 'maria_ct_silva@estudante.sesisenai.org.br', NULL, NULL, NULL, NULL, NULL, 1, '2026-07-06 21:44:12', '2026-07-06 21:32:51', 0, 1),
 (8, NULL, 'lucasedbatista@gmail.com', NULL, NULL, NULL, '660664', '2026-07-07 02:52:42', 0, NULL, '2026-07-06 21:41:06', 0, 1);
 
@@ -527,6 +535,7 @@ CREATE TABLE `vendas` (
 --
 
 INSERT INTO `vendas` (`id`, `usuario_id`, `valor_total`, `subtotal`, `valor_frete`, `forma_pagamento`, `frete_tipo`, `cpf_cnpj_nota`, `status`, `data_venda`) VALUES
+(0, 1, 234.90, 200.00, 34.90, 'pix', 'sedex', '', 'cancelado', '2026-07-07 20:33:26'),
 (1, 1, 101.00, 20.00, 10.00, 'simulacao', 'sedex', '123.456.789.40', 'cancelado', '2026-05-26 19:26:44'),
 (2, 2, 100.00, 100.00, 50.00, 'teste', 'sedex', '123.456.789.40', 'enviado', '2026-05-26 19:47:14'),
 (3, 2, 414.70, 379.80, 34.90, 'pix', 'sedex', '', 'cancelado', '2026-07-06 20:48:12'),
@@ -538,7 +547,9 @@ INSERT INTO `vendas` (`id`, `usuario_id`, `valor_total`, `subtotal`, `valor_fret
 (9, 2, 209.80, 189.90, 19.90, 'cartao', 'pac', '', 'cancelado', '2026-07-06 21:47:02'),
 (10, 7, 584.70, 549.80, 34.90, 'cartao', 'sedex', '', 'processando', '2026-07-06 21:51:56'),
 (11, 2, 389.80, 369.90, 19.90, 'cartao', 'pac', '', 'processando', '2026-07-06 21:54:29'),
-(12, 7, 964.50, 929.60, 34.90, 'pix', 'sedex', '', 'cancelado', '2026-07-06 21:54:30');
+(12, 7, 964.50, 929.60, 34.90, 'pix', 'sedex', '', 'cancelado', '2026-07-06 21:54:30'),
+(13, 1, 219.90, 200.00, 19.90, 'pix', 'pac', '', 'pendente', '2026-07-07 21:35:45'),
+(14, 1, 219.90, 200.00, 19.90, 'pix', 'pac', '', 'pendente', '2026-07-07 21:36:12');
 
 --
 -- Índices para tabelas despejadas
@@ -652,7 +663,7 @@ ALTER TABLE `vendas`
 -- AUTO_INCREMENT de tabela `carrinho`
 --
 ALTER TABLE `carrinho`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT de tabela `categorias`
@@ -677,116 +688,556 @@ ALTER TABLE `enderecos`
 --
 ALTER TABLE `enderecos_usuario`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- Banco de dados: `phpmyadmin`
+--
+CREATE DATABASE IF NOT EXISTS `phpmyadmin` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
+USE `phpmyadmin`;
+
+-- --------------------------------------------------------
 
 --
--- AUTO_INCREMENT de tabela `enderecos_venda`
---
-ALTER TABLE `enderecos_venda`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT de tabela `home_banners`
---
-ALTER TABLE `home_banners`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT de tabela `itens_venda`
---
-ALTER TABLE `itens_venda`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
-
---
--- AUTO_INCREMENT de tabela `produtos`
---
-ALTER TABLE `produtos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
--- AUTO_INCREMENT de tabela `produto_imagens`
---
-ALTER TABLE `produto_imagens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
-
---
--- AUTO_INCREMENT de tabela `produto_variantes`
---
-ALTER TABLE `produto_variantes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
-
---
--- AUTO_INCREMENT de tabela `tamanhos`
---
-ALTER TABLE `tamanhos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT de tabela `usuarios`
---
-ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT de tabela `vendas`
---
-ALTER TABLE `vendas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- Restrições para tabelas despejadas
+-- Estrutura para tabela `pma__bookmark`
 --
 
---
--- Restrições para tabelas `carrinho`
---
-ALTER TABLE `carrinho`
-  ADD CONSTRAINT `carrinho_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `carrinho_ibfk_2` FOREIGN KEY (`variante_id`) REFERENCES `produto_variantes` (`id`) ON DELETE CASCADE;
+CREATE TABLE `pma__bookmark` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `dbase` varchar(255) NOT NULL DEFAULT '',
+  `user` varchar(255) NOT NULL DEFAULT '',
+  `label` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `query` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Bookmarks';
+
+-- --------------------------------------------------------
 
 --
--- Restrições para tabelas `enderecos_usuario`
+-- Estrutura para tabela `pma__central_columns`
 --
-ALTER TABLE `enderecos_usuario`
-  ADD CONSTRAINT `enderecos_usuario_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+
+CREATE TABLE `pma__central_columns` (
+  `db_name` varchar(64) NOT NULL,
+  `col_name` varchar(64) NOT NULL,
+  `col_type` varchar(64) NOT NULL,
+  `col_length` text DEFAULT NULL,
+  `col_collation` varchar(64) NOT NULL,
+  `col_isNull` tinyint(1) NOT NULL,
+  `col_extra` varchar(255) DEFAULT '',
+  `col_default` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Central list of columns';
+
+-- --------------------------------------------------------
 
 --
--- Restrições para tabelas `enderecos_venda`
+-- Estrutura para tabela `pma__column_info`
 --
-ALTER TABLE `enderecos_venda`
-  ADD CONSTRAINT `enderecos_venda_ibfk_1` FOREIGN KEY (`venda_id`) REFERENCES `vendas` (`id`) ON DELETE CASCADE;
+
+CREATE TABLE `pma__column_info` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `column_name` varchar(64) NOT NULL DEFAULT '',
+  `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `mimetype` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `transformation` varchar(255) NOT NULL DEFAULT '',
+  `transformation_options` varchar(255) NOT NULL DEFAULT '',
+  `input_transformation` varchar(255) NOT NULL DEFAULT '',
+  `input_transformation_options` varchar(255) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Column information for phpMyAdmin';
+
+-- --------------------------------------------------------
 
 --
--- Restrições para tabelas `itens_venda`
+-- Estrutura para tabela `pma__designer_settings`
 --
-ALTER TABLE `itens_venda`
-  ADD CONSTRAINT `itens_venda_ibfk_1` FOREIGN KEY (`venda_id`) REFERENCES `vendas` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `itens_venda_ibfk_2` FOREIGN KEY (`variante_id`) REFERENCES `produto_variantes` (`id`) ON DELETE SET NULL;
+
+CREATE TABLE `pma__designer_settings` (
+  `username` varchar(64) NOT NULL,
+  `settings_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Settings related to Designer';
+
+-- --------------------------------------------------------
 
 --
--- Restrições para tabelas `produtos`
+-- Estrutura para tabela `pma__export_templates`
 --
-ALTER TABLE `produtos`
-  ADD CONSTRAINT `produtos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`);
+
+CREATE TABLE `pma__export_templates` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `export_type` varchar(10) NOT NULL,
+  `template_name` varchar(64) NOT NULL,
+  `template_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved export templates';
 
 --
--- Restrições para tabelas `produto_imagens`
+-- Despejando dados para a tabela `pma__export_templates`
 --
-ALTER TABLE `produto_imagens`
-  ADD CONSTRAINT `produto_imagens_ibfk_1` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`) ON DELETE CASCADE;
+
+INSERT INTO `pma__export_templates` (`id`, `username`, `export_type`, `template_name`, `template_data`) VALUES
+(1, 'root', 'database', 'magda_crew', '{\"quick_or_custom\":\"quick\",\"what\":\"sql\",\"structure_or_data_forced\":\"0\",\"table_select[]\":[\"carrinho\",\"categorias\",\"cores\",\"enderecos\",\"enderecos_usuario\",\"enderecos_venda\",\"home_banners\",\"itens_venda\",\"produtos\",\"produto_imagens\",\"produto_variantes\",\"tamanhos\",\"usuarios\",\"vendas\"],\"table_structure[]\":[\"carrinho\",\"categorias\",\"cores\",\"enderecos\",\"enderecos_usuario\",\"enderecos_venda\",\"home_banners\",\"itens_venda\",\"produtos\",\"produto_imagens\",\"produto_variantes\",\"tamanhos\",\"usuarios\",\"vendas\"],\"table_data[]\":[\"carrinho\",\"categorias\",\"cores\",\"enderecos\",\"enderecos_usuario\",\"enderecos_venda\",\"home_banners\",\"itens_venda\",\"produtos\",\"produto_imagens\",\"produto_variantes\",\"tamanhos\",\"usuarios\",\"vendas\"],\"aliases_new\":\"\",\"output_format\":\"sendit\",\"filename_template\":\"@DATABASE@\",\"remember_template\":\"on\",\"charset\":\"utf-8\",\"compression\":\"none\",\"maxsize\":\"\",\"codegen_structure_or_data\":\"data\",\"codegen_format\":\"0\",\"csv_separator\":\",\",\"csv_enclosed\":\"\\\"\",\"csv_escaped\":\"\\\"\",\"csv_terminated\":\"AUTO\",\"csv_null\":\"NULL\",\"csv_columns\":\"something\",\"csv_structure_or_data\":\"data\",\"excel_null\":\"NULL\",\"excel_columns\":\"something\",\"excel_edition\":\"win\",\"excel_structure_or_data\":\"data\",\"json_structure_or_data\":\"data\",\"json_unicode\":\"something\",\"latex_caption\":\"something\",\"latex_structure_or_data\":\"structure_and_data\",\"latex_structure_caption\":\"Estrutura da tabela @TABLE@\",\"latex_structure_continued_caption\":\"Estrutura da tabela @TABLE@ (continuação)\",\"latex_structure_label\":\"tab:@TABLE@-structure\",\"latex_relation\":\"something\",\"latex_comments\":\"something\",\"latex_mime\":\"something\",\"latex_columns\":\"something\",\"latex_data_caption\":\"Conteúdo da tabela @TABLE@\",\"latex_data_continued_caption\":\"Conteúdo da tabela @TABLE@ (continuação)\",\"latex_data_label\":\"tab:@TABLE@-data\",\"latex_null\":\"\\\\textit{NULL}\",\"mediawiki_structure_or_data\":\"structure_and_data\",\"mediawiki_caption\":\"something\",\"mediawiki_headers\":\"something\",\"htmlword_structure_or_data\":\"structure_and_data\",\"htmlword_null\":\"NULL\",\"ods_null\":\"NULL\",\"ods_structure_or_data\":\"data\",\"odt_structure_or_data\":\"structure_and_data\",\"odt_relation\":\"something\",\"odt_comments\":\"something\",\"odt_mime\":\"something\",\"odt_columns\":\"something\",\"odt_null\":\"NULL\",\"pdf_report_title\":\"\",\"pdf_structure_or_data\":\"structure_and_data\",\"phparray_structure_or_data\":\"data\",\"sql_include_comments\":\"something\",\"sql_header_comment\":\"\",\"sql_use_transaction\":\"something\",\"sql_compatibility\":\"NONE\",\"sql_structure_or_data\":\"structure_and_data\",\"sql_create_table\":\"something\",\"sql_auto_increment\":\"something\",\"sql_create_view\":\"something\",\"sql_procedure_function\":\"something\",\"sql_create_trigger\":\"something\",\"sql_backquotes\":\"something\",\"sql_type\":\"INSERT\",\"sql_insert_syntax\":\"both\",\"sql_max_query_size\":\"50000\",\"sql_hex_for_binary\":\"something\",\"sql_utc_time\":\"something\",\"texytext_structure_or_data\":\"structure_and_data\",\"texytext_null\":\"NULL\",\"xml_structure_or_data\":\"data\",\"xml_export_events\":\"something\",\"xml_export_functions\":\"something\",\"xml_export_procedures\":\"something\",\"xml_export_tables\":\"something\",\"xml_export_triggers\":\"something\",\"xml_export_views\":\"something\",\"xml_export_contents\":\"something\",\"yaml_structure_or_data\":\"data\",\"\":null,\"lock_tables\":null,\"as_separate_files\":null,\"csv_removeCRLF\":null,\"excel_removeCRLF\":null,\"json_pretty_print\":null,\"htmlword_columns\":null,\"ods_columns\":null,\"sql_dates\":null,\"sql_relation\":null,\"sql_mime\":null,\"sql_disable_fk\":null,\"sql_views_as_tables\":null,\"sql_metadata\":null,\"sql_create_database\":null,\"sql_drop_table\":null,\"sql_if_not_exists\":null,\"sql_simple_view_export\":null,\"sql_view_current_user\":null,\"sql_or_replace_view\":null,\"sql_truncate\":null,\"sql_delayed\":null,\"sql_ignore\":null,\"texytext_columns\":null}');
+
+-- --------------------------------------------------------
 
 --
--- Restrições para tabelas `produto_variantes`
+-- Estrutura para tabela `pma__favorite`
 --
-ALTER TABLE `produto_variantes`
-  ADD CONSTRAINT `produto_variantes_ibfk_1` FOREIGN KEY (`tamanho_id`) REFERENCES `tamanhos` (`id`),
-  ADD CONSTRAINT `produto_variantes_ibfk_2` FOREIGN KEY (`cor_id`) REFERENCES `cores` (`id`),
-  ADD CONSTRAINT `produto_variantes_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`);
+
+CREATE TABLE `pma__favorite` (
+  `username` varchar(64) NOT NULL,
+  `tables` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Favorite tables';
+
+-- --------------------------------------------------------
 
 --
--- Restrições para tabelas `vendas`
+-- Estrutura para tabela `pma__history`
 --
-ALTER TABLE `vendas`
-  ADD CONSTRAINT `vendas_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
+
+CREATE TABLE `pma__history` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL DEFAULT '',
+  `db` varchar(64) NOT NULL DEFAULT '',
+  `table` varchar(64) NOT NULL DEFAULT '',
+  `timevalue` timestamp NOT NULL DEFAULT current_timestamp(),
+  `sqlquery` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='SQL history for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__navigationhiding`
+--
+
+CREATE TABLE `pma__navigationhiding` (
+  `username` varchar(64) NOT NULL,
+  `item_name` varchar(64) NOT NULL,
+  `item_type` varchar(64) NOT NULL,
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Hidden items of navigation tree';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__pdf_pages`
+--
+
+CREATE TABLE `pma__pdf_pages` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `page_nr` int(10) UNSIGNED NOT NULL,
+  `page_descr` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='PDF relation pages for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__recent`
+--
+
+CREATE TABLE `pma__recent` (
+  `username` varchar(64) NOT NULL,
+  `tables` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Recently accessed tables';
+
+--
+-- Despejando dados para a tabela `pma__recent`
+--
+
+INSERT INTO `pma__recent` (`username`, `tables`) VALUES
+('root', '[{\"db\":\"magda_crew\",\"table\":\"usuarios\"},{\"db\":\"magda_crew\",\"table\":\"produtos\"},{\"db\":\"prisao_junina\",\"table\":\"ordens_prisao\"}]');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__relation`
+--
+
+CREATE TABLE `pma__relation` (
+  `master_db` varchar(64) NOT NULL DEFAULT '',
+  `master_table` varchar(64) NOT NULL DEFAULT '',
+  `master_field` varchar(64) NOT NULL DEFAULT '',
+  `foreign_db` varchar(64) NOT NULL DEFAULT '',
+  `foreign_table` varchar(64) NOT NULL DEFAULT '',
+  `foreign_field` varchar(64) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Relation table';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__savedsearches`
+--
+
+CREATE TABLE `pma__savedsearches` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL DEFAULT '',
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `search_name` varchar(64) NOT NULL DEFAULT '',
+  `search_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved searches';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__table_coords`
+--
+
+CREATE TABLE `pma__table_coords` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `pdf_page_number` int(11) NOT NULL DEFAULT 0,
+  `x` float UNSIGNED NOT NULL DEFAULT 0,
+  `y` float UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table coordinates for phpMyAdmin PDF output';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__table_info`
+--
+
+CREATE TABLE `pma__table_info` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `display_field` varchar(64) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table information for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__table_uiprefs`
+--
+
+CREATE TABLE `pma__table_uiprefs` (
+  `username` varchar(64) NOT NULL,
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL,
+  `prefs` text NOT NULL,
+  `last_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Tables'' UI preferences';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__tracking`
+--
+
+CREATE TABLE `pma__tracking` (
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL,
+  `version` int(10) UNSIGNED NOT NULL,
+  `date_created` datetime NOT NULL,
+  `date_updated` datetime NOT NULL,
+  `schema_snapshot` text NOT NULL,
+  `schema_sql` text DEFAULT NULL,
+  `data_sql` longtext DEFAULT NULL,
+  `tracking` set('UPDATE','REPLACE','INSERT','DELETE','TRUNCATE','CREATE DATABASE','ALTER DATABASE','DROP DATABASE','CREATE TABLE','ALTER TABLE','RENAME TABLE','DROP TABLE','CREATE INDEX','DROP INDEX','CREATE VIEW','ALTER VIEW','DROP VIEW') DEFAULT NULL,
+  `tracking_active` int(1) UNSIGNED NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Database changes tracking for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__userconfig`
+--
+
+CREATE TABLE `pma__userconfig` (
+  `username` varchar(64) NOT NULL,
+  `timevalue` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `config_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User preferences storage for phpMyAdmin';
+
+--
+-- Despejando dados para a tabela `pma__userconfig`
+--
+
+INSERT INTO `pma__userconfig` (`username`, `timevalue`, `config_data`) VALUES
+('root', '2026-07-09 15:38:23', '{\"Console\\/Mode\":\"collapse\",\"lang\":\"pt_BR\",\"NavigationWidth\":189}');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__usergroups`
+--
+
+CREATE TABLE `pma__usergroups` (
+  `usergroup` varchar(64) NOT NULL,
+  `tab` varchar(64) NOT NULL,
+  `allowed` enum('Y','N') NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User groups with configured menu items';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pma__users`
+--
+
+CREATE TABLE `pma__users` (
+  `username` varchar(64) NOT NULL,
+  `usergroup` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users and their assignments to user groups';
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `pma__bookmark`
+--
+ALTER TABLE `pma__bookmark`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `pma__central_columns`
+--
+ALTER TABLE `pma__central_columns`
+  ADD PRIMARY KEY (`db_name`,`col_name`);
+
+--
+-- Índices de tabela `pma__column_info`
+--
+ALTER TABLE `pma__column_info`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `db_name` (`db_name`,`table_name`,`column_name`);
+
+--
+-- Índices de tabela `pma__designer_settings`
+--
+ALTER TABLE `pma__designer_settings`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Índices de tabela `pma__export_templates`
+--
+ALTER TABLE `pma__export_templates`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `u_user_type_template` (`username`,`export_type`,`template_name`);
+
+--
+-- Índices de tabela `pma__favorite`
+--
+ALTER TABLE `pma__favorite`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Índices de tabela `pma__history`
+--
+ALTER TABLE `pma__history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `username` (`username`,`db`,`table`,`timevalue`);
+
+--
+-- Índices de tabela `pma__navigationhiding`
+--
+ALTER TABLE `pma__navigationhiding`
+  ADD PRIMARY KEY (`username`,`item_name`,`item_type`,`db_name`,`table_name`);
+
+--
+-- Índices de tabela `pma__pdf_pages`
+--
+ALTER TABLE `pma__pdf_pages`
+  ADD PRIMARY KEY (`page_nr`),
+  ADD KEY `db_name` (`db_name`);
+
+--
+-- Índices de tabela `pma__recent`
+--
+ALTER TABLE `pma__recent`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Índices de tabela `pma__relation`
+--
+ALTER TABLE `pma__relation`
+  ADD PRIMARY KEY (`master_db`,`master_table`,`master_field`),
+  ADD KEY `foreign_field` (`foreign_db`,`foreign_table`);
+
+--
+-- Índices de tabela `pma__savedsearches`
+--
+ALTER TABLE `pma__savedsearches`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `u_savedsearches_username_dbname` (`username`,`db_name`,`search_name`);
+
+--
+-- Índices de tabela `pma__table_coords`
+--
+ALTER TABLE `pma__table_coords`
+  ADD PRIMARY KEY (`db_name`,`table_name`,`pdf_page_number`);
+
+--
+-- Índices de tabela `pma__table_info`
+--
+ALTER TABLE `pma__table_info`
+  ADD PRIMARY KEY (`db_name`,`table_name`);
+
+--
+-- Índices de tabela `pma__table_uiprefs`
+--
+ALTER TABLE `pma__table_uiprefs`
+  ADD PRIMARY KEY (`username`,`db_name`,`table_name`);
+
+--
+-- Índices de tabela `pma__tracking`
+--
+ALTER TABLE `pma__tracking`
+  ADD PRIMARY KEY (`db_name`,`table_name`,`version`);
+
+--
+-- Índices de tabela `pma__userconfig`
+--
+ALTER TABLE `pma__userconfig`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Índices de tabela `pma__usergroups`
+--
+ALTER TABLE `pma__usergroups`
+  ADD PRIMARY KEY (`usergroup`,`tab`,`allowed`);
+
+--
+-- Índices de tabela `pma__users`
+--
+ALTER TABLE `pma__users`
+  ADD PRIMARY KEY (`username`,`usergroup`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `pma__bookmark`
+--
+ALTER TABLE `pma__bookmark`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__column_info`
+--
+ALTER TABLE `pma__column_info`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__export_templates`
+--
+ALTER TABLE `pma__export_templates`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `pma__history`
+--
+ALTER TABLE `pma__history`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__pdf_pages`
+--
+ALTER TABLE `pma__pdf_pages`
+  MODIFY `page_nr` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `pma__savedsearches`
+--
+ALTER TABLE `pma__savedsearches`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
+-- Banco de dados: `prisao_junina`
+--
+CREATE DATABASE IF NOT EXISTS `prisao_junina` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `prisao_junina`;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `ordens_prisao`
+--
+
+CREATE TABLE `ordens_prisao` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `categoria_alvo` enum('aluno','professor','externo') NOT NULL,
+  `nome_alvo` varchar(100) DEFAULT NULL,
+  `caracteristicas_externo` text DEFAULT NULL,
+  `tipo_pedido` enum('prisao','fianca') NOT NULL DEFAULT 'prisao',
+  `status` enum('aguardando_pagamento','procurado','preso','fianca_paga','finalizado') NOT NULL DEFAULT 'aguardando_pagamento',
+  `valor_cobrado` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `tempo_pena_minutos` int(10) UNSIGNED DEFAULT NULL,
+  `hora_captura` datetime DEFAULT NULL,
+  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Despejando dados para a tabela `ordens_prisao`
+--
+
+INSERT INTO `ordens_prisao` (`id`, `categoria_alvo`, `nome_alvo`, `caracteristicas_externo`, `tipo_pedido`, `status`, `valor_cobrado`, `tempo_pena_minutos`, `hora_captura`, `criado_em`) VALUES
+(6, 'aluno', 'Adrian Holz (1°1)', NULL, 'prisao', 'finalizado', 2.00, 5, '2026-07-01 19:19:24', '2026-07-01 22:15:48'),
+(7, 'aluno', 'Gabriel Holz (1°2)', NULL, 'prisao', 'finalizado', 5.00, 10, '2026-07-01 19:23:13', '2026-07-01 22:21:33'),
+(8, 'aluno', 'Adrian Holz (1°1)', NULL, 'prisao', 'finalizado', 10.00, 15, '2026-07-01 19:26:45', '2026-07-01 22:25:25'),
+(9, 'externo', NULL, 'camisa verde', 'fianca', 'finalizado', 2.00, 10, '2026-07-01 19:33:27', '2026-07-01 22:32:41'),
+(10, 'aluno', 'Adrian Holz (1°1)', NULL, 'prisao', 'preso', 10.00, 15, '2026-07-03 19:49:36', '2026-07-03 22:47:20'),
+(11, 'externo', NULL, 'Um cara de casaco preto', 'fianca', 'fianca_paga', 2.00, 5, '2026-07-03 19:53:19', '2026-07-03 22:52:58');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `professores`
+--
+
+CREATE TABLE `professores` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nome` varchar(100) NOT NULL,
+  `is_imune` tinyint(1) NOT NULL DEFAULT 0,
+  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Despejando dados para a tabela `professores`
+--
+
+INSERT INTO `professores` (`id`, `nome`, `is_imune`, `criado_em`) VALUES
+(1, 'Prof. Carlos Silva', 0, '2026-07-01 22:05:43'),
+(2, 'Profa. Maria Souza', 0, '2026-07-01 22:05:43'),
+(3, 'Prof. João Pereira', 1, '2026-07-01 22:05:43'),
+(4, 'Profa. Ana Lima', 0, '2026-07-01 22:05:43'),
+(5, 'Prof. Roberto Alves', 0, '2026-07-01 22:05:43');
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `ordens_prisao`
+--
+ALTER TABLE `ordens_prisao`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_nome_alvo` (`nome_alvo`);
+
+--
+-- Índices de tabela `professores`
+--
+ALTER TABLE `professores`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `ordens_prisao`
+--
+ALTER TABLE `ordens_prisao`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de tabela `professores`
+--
+ALTER TABLE `professores`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+--
+-- Banco de dados: `test`
+--
+CREATE DATABASE IF NOT EXISTS `test` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `test`;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
