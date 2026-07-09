@@ -263,7 +263,7 @@ html[data-theme="light"] .search {
     height: 85px;
     object-fit: cover;
     background: #fff;
-    border-radius: 2px;
+    border-radius: 10px;
     transition: opacity 0.2s;
 }
 

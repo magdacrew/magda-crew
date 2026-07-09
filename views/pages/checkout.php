@@ -838,7 +838,7 @@ include_once __DIR__ . '/../components/Header.php';
                                 <input type="checkbox" name="salvar_endereco_padrao" value="1" checked>
                                 <span>
                                     <strong>Salvar este endereço no meu perfil</strong>
-                                    <span>Como essa conta ainda não tem endereço salvo, o checkout salva esse endereço como padrão no banco para as próximas compras.</span>
+                                    <span>Como essa conta ainda não tem endereço salvo, o checkout salva esse endereço como padrão para as próximas compras.</span>
                                 </span>
                             </label>
                         <?php endif; ?>
@@ -1130,6 +1130,7 @@ async function buscarEnderecoPorCEPCheckout() {
         if (cepStatusCheckout) {
             cepStatusCheckout.textContent = 'Digite um CEP com 8 números.';
             cepStatusCheckout.style.color = '#ffb4b4';
+            cepStatusCheckout.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
         }
         return;
     }
@@ -1137,6 +1138,7 @@ async function buscarEnderecoPorCEPCheckout() {
     if (cepStatusCheckout) {
         cepStatusCheckout.textContent = 'Buscando endereço pelo CEP...';
         cepStatusCheckout.style.color = '#cfcfcf';
+        cepStatusCheckout.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
     }
 
     try {
@@ -1147,6 +1149,7 @@ async function buscarEnderecoPorCEPCheckout() {
             if (cepStatusCheckout) {
                 cepStatusCheckout.textContent = 'CEP não encontrado. Preencha o endereço manualmente.';
                 cepStatusCheckout.style.color = '#ffb4b4';
+                cepStatusCheckout.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
             }
             return;
         }
@@ -1159,6 +1162,7 @@ async function buscarEnderecoPorCEPCheckout() {
         if (cepStatusCheckout) {
             cepStatusCheckout.textContent = 'Endereço preenchido automaticamente. Agora coloque o número.';
             cepStatusCheckout.style.color = '#8ff0b3';
+            cepStatusCheckout.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
         }
 
         if (numeroInput) numeroInput.focus();
@@ -1166,6 +1170,7 @@ async function buscarEnderecoPorCEPCheckout() {
         if (cepStatusCheckout) {
             cepStatusCheckout.textContent = 'Não foi possível buscar o CEP agora. Preencha manualmente.';
             cepStatusCheckout.style.color = '#ffb4b4';
+            cepStatusCheckout.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
         }
     }
 }

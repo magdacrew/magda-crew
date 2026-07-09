@@ -218,7 +218,7 @@ require_once __DIR__ . '/../components/Header.php';
 
 <script>
     // ----------------------------------------------------
-    // LÓGICA DA GALERIA DO PRODUTO
+    // 1. LÓGICA DA GALERIA DO PRODUTO
     // ----------------------------------------------------
     let imagemAtual = 0;
     const miniaturas = document.querySelectorAll('.miniatura');
@@ -237,13 +237,15 @@ require_once __DIR__ . '/../components/Header.php';
 
     function atualizarGaleria() {
         const novaSrc = miniaturas[imagemAtual].getAttribute('data-src');
-        imagemPrincipal.src = novaSrc;
-        miniaturas.forEach(min => min.classList.remove('ativa'));
-        miniaturas[imagemAtual].classList.add('ativa');
+        if (imagemPrincipal && novaSrc) {
+            imagemPrincipal.src = novaSrc;
+            miniaturas.forEach(min => min.classList.remove('ativa'));
+            miniaturas[imagemAtual].classList.add('ativa');
+        }
     }
 
     // ----------------------------------------------------
-    // LÓGICA MOSTRAR MAIS / MENOS DA DESCRIÇÃO
+    // 2. LÓGICA MOSTRAR MAIS / MENOS DA DESCRIÇÃO
     // ----------------------------------------------------
     const descricaoProduto = document.getElementById('descricao-produto');
     const btnDescricao = document.getElementById('btn-descricao');
@@ -325,7 +327,24 @@ require_once __DIR__ . '/../components/Header.php';
     }
 
     // ----------------------------------------------------
-    // LÓGICA AJAX (CARRINHO) E SELEÇÃO DE TAMANHOS
+    // 3. LÓGICA DE SELEÇÃO DE TAMANHO
+    // ----------------------------------------------------
+    document.querySelectorAll('.tamanho-opcao').forEach(botao => {
+        botao.addEventListener('click', function() {
+            if (this.classList.contains('sem-estoque') || this.disabled) return;
+            
+            document.querySelectorAll('.tamanho-opcao').forEach(b => b.classList.remove('selecionado'));
+            this.classList.add('selecionado');
+            
+            const inputVariante = document.getElementById('variante-selecionada');
+            if (inputVariante) {
+                inputVariante.value = this.getAttribute('data-id');
+            }
+        });
+    });
+
+    // ----------------------------------------------------
+    // 4. LÓGICA AJAX (CARRINHO) COM FAILSAFE (+1)
     // ----------------------------------------------------
     const formCompra = document.querySelector('.form-compra');
     
@@ -335,7 +354,7 @@ require_once __DIR__ . '/../components/Header.php';
             const btnSubmit = this.querySelector('.btn-comprar');
             const textoOriginal = btnSubmit.innerText;
 
-            btnSubmit.innerText = 'Adicionando...';
+            btnSubmit.innerText = 'ADICIONANDO...';
             btnSubmit.disabled = true;
             
             fetch(this.action, {
@@ -346,35 +365,58 @@ require_once __DIR__ . '/../components/Header.php';
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    // Recarrega o conteúdo do header/carrinho para atualizar tudo
-                    fetch(window.location.href.split('?')[0] + '?v=' + Math.random())
+                    fetch(window.location.href.split('?')[0] + '?t=' + new Date().getTime(), { method: 'GET' })
                         .then(res => res.text())
                         .then(html => {
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(html, 'text/html');
                             
-                            // Atualiza os elementos visuais do carrinho
-                            document.querySelector('.cart-content').innerHTML = doc.querySelector('.cart-content').innerHTML;
-                            document.querySelector('.cart-total').innerHTML = doc.querySelector('.cart-total').innerHTML;
-                            document.querySelector('.cart-count').innerHTML = doc.querySelector('.cart-count').innerHTML;
+                            // A. Atualiza miolo e rodapé do carrinho
+                            const novoCartContent = doc.querySelector('.cart-content');
+                            if (novoCartContent) document.querySelector('.cart-content').innerHTML = novoCartContent.innerHTML;
                             
-                            // ATUALIZA A BOLINHA (BADGE) DO MENU
+                            const novoFooter = doc.querySelector('.cart-footer');
+                            if (novoFooter) document.querySelector('.cart-footer').innerHTML = novoFooter.innerHTML;
+
+                            // B. ATUALIZA A BOLINHA DE DENTRO DO CARRINHO (Com Trava de Atraso)
+                            const countAtual = document.querySelector('.cart-count');
+                            const novoCount = doc.querySelector('.cart-count');
+                            if (countAtual) {
+                                let valAtual = parseInt(countAtual.innerText.replace(/\D/g, '')) || 0;
+                                let valNovo = novoCount ? (parseInt(novoCount.innerText.replace(/\D/g, '')) || 0) : 0;
+                                
+                                if (valNovo <= valAtual) valNovo = valAtual + 1;
+                                
+                                // Substitui apenas o número mantendo parênteses ou formatação
+                                countAtual.innerText = countAtual.innerText.replace(/\d+/, valNovo);
+                            }
+                            
+                            // C. ATUALIZA A BOLINHA DA NAVBAR (Com Trava de Atraso)
+                            const badgeAtual = document.querySelector('.sacola-badge');
                             const novoBadge = doc.querySelector('.sacola-badge');
-                            const badgeElement = document.querySelector('.sacola-badge');
+                            let badgeValAtual = badgeAtual ? parseInt(badgeAtual.innerText) || 0 : 0;
+                            let badgeValNovo = novoBadge ? parseInt(novoBadge.innerText) || 0 : 0;
                             
-                            if (novoBadge) {
-                                if (badgeElement) {
-                                    badgeElement.innerText = novoBadge.innerText;
-                                } else {
-                                    // Se a bolinha não existia (carrinho estava zerado), cria ela
-                                    const sacolaIcon = document.querySelector('a[onclick*="abrirCarrinho"]');
-                                    if (sacolaIcon) {
-                                        sacolaIcon.insertAdjacentHTML('beforeend', novoBadge.outerHTML);
-                                    }
+                            if (badgeValNovo <= badgeValAtual) badgeValNovo = badgeValAtual + 1;
+
+                            if (badgeAtual) {
+                                badgeAtual.innerText = badgeValNovo;
+                            } else {
+                                const sacolaIcon = document.querySelector('a[onclick*="abrirCarrinho"]');
+                                if (sacolaIcon) {
+                                    sacolaIcon.insertAdjacentHTML('beforeend', `<span class="sacola-badge">${badgeValNovo}</span>`);
                                 }
                             }
                             
-                            btnSubmit.innerText = 'Adicionado!';
+                            // D. Corrige o botão FINALIZAR COMPRA
+                            const btnFinalizar = document.querySelector('.cart-footer .btn-finalizar');
+                            if (btnFinalizar) {
+                                btnFinalizar.innerText = 'FINALIZAR COMPRA';
+                                btnFinalizar.href = '/MagdaCrew/views/pages/checkout.php';
+                            }
+                            
+                            // E. Finaliza a ação
+                            btnSubmit.innerText = 'ADICIONADO!';
                             if(typeof abrirCarrinho === 'function') abrirCarrinho();
 
                             setTimeout(() => {
@@ -393,6 +435,23 @@ require_once __DIR__ . '/../components/Header.php';
                 btnSubmit.disabled = false;
                 btnSubmit.innerText = textoOriginal;
             });
+        });
+    }
+
+    // ----------------------------------------------------
+    // 5. LÓGICA DA VITRINE (PRODUTOS RELACIONADOS)
+    // ----------------------------------------------------
+    const vitrine = document.getElementById('vitrine-container');
+    const scrollbar = document.getElementById('custom-scrollbar');
+
+    if (vitrine && scrollbar) {
+        vitrine.addEventListener('scroll', () => {
+            const maxScrollLeft = vitrine.scrollWidth - vitrine.clientWidth;
+            if (maxScrollLeft > 0) scrollbar.value = (vitrine.scrollLeft / maxScrollLeft) * 100;
+        });
+
+        scrollbar.addEventListener('input', () => {
+            vitrine.scrollLeft = (scrollbar.value / 100) * (vitrine.scrollWidth - vitrine.clientWidth);
         });
     }
 </script>

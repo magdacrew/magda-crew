@@ -141,6 +141,7 @@
 .checkout-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 410px;
+    padding: 0px 55px;
     gap: 26px;
     align-items: start;
 }
@@ -159,12 +160,14 @@
 }
 
 .panel-title h2 {
+    font-family: "Inter", sans-serif;
     margin: 0;
     font-size: 24px;
     letter-spacing: -.8px;
 }
 
 .panel-badge {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     border: 1px solid rgba(255,255,255,.12);
     color: #cfcfcf;
     border-radius: 999px;
@@ -173,6 +176,7 @@
 }
 
 .alert-box {
+    
     border-radius: 20px;
     padding: 18px 20px;
     margin-bottom: 22px;
@@ -237,6 +241,7 @@
 
 .form-group label,
 .option-label {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     display: block;
     color: #bdbdbd;
     font-size: 12px;
@@ -309,18 +314,21 @@
 }
 
 .option-info strong {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     display: block;
     margin-bottom: 4px;
     line-height: 1.25;
 }
 
 .option-info small {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     display: block;
     color: #b7b7b7;
     line-height: 1.45;
 }
 
 .option-price {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     white-space: nowrap;
     font-weight: 800;
 }
@@ -352,6 +360,7 @@
 }
 
 .save-address-card span {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     display: block;
     color: #c9d7cf;
     font-size: 12px;
@@ -364,6 +373,7 @@
 
 
 .payment-section {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     position: relative;
     margin-top: 30px;
     border: 1px solid rgba(255,255,255,.14);
@@ -1185,12 +1195,11 @@
 }
 
 .cart-thumb {
-    width: 82px;
-    height: 98px;
+    width: 85px;
+    height: 85px;
     border-radius: 16px;
     overflow: hidden;
     background: rgba(255,255,255,.08);
-    display: grid;
     place-items: center;
     color: #777;
     font-size: 11px;
@@ -1203,6 +1212,7 @@
 }
 
 .cart-item h3 {
+    font-family: "Inter", sans-serif;
     margin: 0 0 7px;
     font-size: 14px;
     text-transform: uppercase;
@@ -1210,12 +1220,14 @@
 }
 
 .cart-meta {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: #b8b8b8;
     font-size: 12px;
     line-height: 1.5;
 }
 
 .cart-price {
+    font-family: "Inter", sans-serif;
     margin-top: 10px;
     font-weight: 800;
 }
@@ -1225,6 +1237,7 @@
 }
 
 .summary-line {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     display: flex;
     justify-content: space-between;
     gap: 20px;
@@ -1234,6 +1247,7 @@
 }
 
 .summary-line.total {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     margin-top: 10px;
     padding-top: 18px;
     border-top: 1px solid rgba(255,255,255,.13);
