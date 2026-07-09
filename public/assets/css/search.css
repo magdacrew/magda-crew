@@ -94,7 +94,7 @@ body {
     color: #000;
 }
 
-/* Grid de Produtos (4 colunas como solicitado) */
+/* Grid de Produtos */
 .magda-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -106,12 +106,13 @@ body {
     text-decoration: none;
     color: inherit;
     display: block;
+    position: relative;
 }
 
 .product-img-box {
-    background-color: #f6f6f6; /* Fundo claro para destacar a roupa */
+    background-color: #f6f6f6;
     aspect-ratio: 1 / 1;
-    border-radius: 15px; /* Bordas arredondadas do print */
+    border-radius: 12px;
     overflow: hidden;
     margin-bottom: 15px;
     position: relative;
@@ -124,25 +125,57 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: none;
+    transform: none !important;
 }
 
-.product-card:hover .product-img-box img {
-    transform: scale(1.05);
+/* Efeito de escurecimento ao passar o mouse */
+.product-img-box::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    transition: background-color 0.3s ease;
+    pointer-events: none;
+    border-radius: 12px;
+    z-index: 2;
 }
 
+.product-card:hover .product-img-box::after {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Badge e Overlay de Esgotado */
 .badge-status {
     position: absolute;
     top: 12px;
     left: 12px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.6);
     color: white;
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 10px;
     font-weight: 600;
+    z-index: 10;
+    pointer-events: none;
 }
 
+.overlay-esgotado {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); 
+    z-index: 5;
+    border-radius: 12px; 
+    pointer-events: none;
+}
+
+/* Informações do Produto */
 .product-info h3 {
     font-size: 12px;
     font-weight: 700;
@@ -206,9 +239,15 @@ body {
 /* ==========================================
    ESTILOS DOS MENUS DROPDOWN (DARK GLASS)
 ========================================== */
+/* Container dos filtros - Adicione ou ajuste esta regra para dar o espaçamento */
 .dropdown-group {
     position: relative;
+    margin-bottom: 30px; /* Ajuste este valor para mais ou menos distância */
+    display: inline-block; /* Garante que fiquem lado a lado se necessário */
+    margin-right: 10px;    /* Opcional: espaçamento lateral entre Filtrar e Ordenar */
 }
+
+/* --- O restante do seu CSS do Dropdown --- */
 
 .dropdown-menu {
     position: absolute;

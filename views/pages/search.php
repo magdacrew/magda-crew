@@ -211,7 +211,11 @@ include __DIR__ . '/../components/header.php';
                 <?php foreach ($produtos as $produto): ?>
                     <a href="/MagdaCrew/public/produtos/detalhes/<?= $produto['id'] ?>" class="product-card">
                         <div class="product-img-box">
-                            <?= ($produto['total_estoque'] <= 0) ? '<span class="badge-status">Esgotado</span>' : '' ?>
+                            <?php if ($produto['total_estoque'] <= 0): ?>
+                                <span class="badge-status">Esgotado</span>
+                                <div class="overlay-esgotado"></div>
+                            <?php endif; ?>
+                            
                             <img src="/MagdaCrew/<?= $produto['caminho_imagem'] ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
                         </div>
                         <div class="product-info">
